@@ -18,6 +18,7 @@ interface DataContextType {
   updatePractice: (id: string, practice: Partial<Practice>) => void;
   deletePractice: (id: string) => void;
   addPrescription: (prescription: Omit<Prescription, 'id' | 'number' | 'createdAt'>) => void;
+  updatePrescription: (id: string, prescription: Partial<Prescription>) => void;
   getNextPrescriptionNumber: () => number;
 }
 
@@ -85,6 +86,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setPrescriptions(prev => [...prev, newPrescription]);
   };
 
+  const updatePrescription = (id: string, prescriptionData: Partial<Prescription>) => {
+    setPrescriptions(prev => prev.map(p => p.id === id ? { ...p, ...prescriptionData } : p));
+  };
+
   const value = {
     doctors,
     patients,
@@ -100,6 +105,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     updatePractice,
     deletePractice,
     addPrescription,
+    updatePrescription,
     updatePrescription,
     getNextPrescriptionNumber
   };
