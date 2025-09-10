@@ -6,10 +6,11 @@ import PrescriptionHistory from './components/PrescriptionHistory';
 import { DoctorManager } from './components/DoctorManager';
 import { PatientManager } from './components/PatientManager';
 import { PracticeManager } from './components/PracticeManager';
+import { PracticeAdmin } from './components/PracticeAdmin';
 import { Prescription } from './types';
 import { FileText, History, User, Users, Activity, Stethoscope, Download } from 'lucide-react';
 
-type View = 'new' | 'history' | 'doctors' | 'patients' | 'practices';
+type View = 'new' | 'history' | 'doctors' | 'patients' | 'practices' | 'admin-practices';
 
 function App() {
   return (
@@ -49,7 +50,7 @@ function AppContent() {
     { key: 'history', label: 'Historial', icon: History, color: 'text-gray-600' },
     { key: 'doctors', label: 'Médicos', icon: User, color: 'text-blue-600' },
     { key: 'patients', label: 'Pacientes', icon: Users, color: 'text-green-600' },
-    { key: 'practices', label: 'Prácticas', icon: Activity, color: 'text-purple-600' }
+    { key: 'admin-practices', label: 'Administrar Prácticas', icon: Activity, color: 'text-purple-600' }
   ];
 
   if (viewingPrescription) {
@@ -125,7 +126,7 @@ function AppContent() {
         )}
         {currentView === 'doctors' && <DoctorManager />}
         {currentView === 'patients' && <PatientManager />}
-        {currentView === 'practices' && <PracticeManager />}
+        {currentView === 'admin-practices' && <PracticeAdmin />}
       </div>
     </div>
   );
