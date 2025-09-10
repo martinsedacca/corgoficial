@@ -27,95 +27,43 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
 
   // Generar las prácticas en formato de dos columnas como el original
   const generatePracticesGrid = () => {
-    // Obtener todas las prácticas disponibles del sistema
-    const allAvailablePractices = [
-      { name: 'CAMPO VISUAL COMPUTARIZADO', id: '1' },
-      { name: 'PAQUIMETRÍA', id: '2' },
-      { name: 'TOPOGRAFÍA CORNEAL COMPUTADA', id: '3' },
-      { name: 'OCT MACULAR', id: '4' },
-      { name: 'OCT CÁMARA ANTERIOR', id: '5' },
-      { name: 'HRT (TOMOGRAFÍA CONFOCAL DE RETINA)', id: '6' },
-      { name: 'ANGIO OCT', id: '7' },
-      { name: 'RETINOGRAFÍA COLOR', id: '8' },
-      { name: 'RECUENTO ENDOTELIAL', id: '9' },
-      { name: 'ABERROMETRÍA', id: '10' },
-      { name: 'O.B.I.', id: '11' },
-      { name: 'REFRACTOMETRÍA COMPUTARIZADA', id: '12' },
-      { name: 'SCREENING NEONATAL (0 A 3 AÑOS)', id: '13' },
-      { name: 'TEST DE MIRADA PREFERENCIAL', id: '14' },
-      { name: 'VISIÓN CROMÁTICA', id: '15' },
-      { name: 'GONIOSCOPIA CON LENTE DE 3 O 4 ESPEJOS', id: '16' },
-      { name: 'ECOGRAFÍA OFTALMOLÓGICA', id: '17' },
-      { name: 'PODER CORNEAL CENTRAL', id: '26' },
-      { name: 'MEIBOGRAFÍA', id: '28' },
-      { name: 'OJO SECO DIGITAL', id: '29' }
-    ];
-
-    // Crear un mapa de las prácticas seleccionadas en la receta
-    const selectedPracticesMap = new Map();
-    prescription.items.forEach(item => {
+    // Crear HTML solo con las prácticas seleccionadas en la receta
+    let practicesHtml = '<div style="margin: 8px 0;">';
+    
+    // Mostrar solo las prácticas seleccionadas en la receta
+    prescription.items.forEach((item, index) => {
       const practiceName = item.practice.name.toUpperCase();
-      selectedPracticesMap.set(practiceName, item.ao || 'AO');
+      const selectedAO = item.ao || 'AO';
+      
+      practicesHtml += `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding: 2px 0; border-bottom: 1px dotted #ccc;">
+          <span style="font-weight: bold; color: #1E40AF; font-size: 10px;">✓ ${practiceName}</span>
+          <div style="display: flex; gap: 3px; align-items: center;">
+            <span style="font-size: 8px; color: #666; margin-right: 5px;">${selectedAO}</span>
+            <span style="border: 1px solid #1E40AF; width: 10px; height: 10px; display: inline-block; text-align: center; font-size: 8px; background: ${selectedAO === 'AO' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'AO' ? 'white' : '#1E40AF'}; font-weight: bold;">${selectedAO === 'AO' ? '✓' : ''}</span>
+            <span style="border: 1px solid #1E40AF; width: 10px; height: 10px; display: inline-block; text-align: center; font-size: 8px; background: ${selectedAO === 'OI' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'OI' ? 'white' : '#1E40AF'}; font-weight: bold;">${selectedAO === 'OI' ? '✓' : ''}</span>
+            <span style="border: 1px solid #1E40AF; width: 10px; height: 10px; display: inline-block; text-align: center; font-size: 8px; background: ${selectedAO === 'OD' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'OD' ? 'white' : '#1E40AF'}; font-weight: bold;">${selectedAO === 'OD' ? '✓' : ''}</span>
+          </div>
+        </div>
+      `;
+      
+      // Agregar notas específicas de la práctica si las hay
+      if (item.notes) {
+        practicesHtml += `
+          <div style="margin-left: 20px; margin-bottom: 4px; font-size: 8px; color: #666; font-style: italic;">
+            Nota: ${item.notes}
+          </div>
+        `;
+      }
     });
     
-    let practicesHtml = '<div style="display: flex; justify-content: space-between; margin: 8px 0;">';
-    practicesHtml += '<div style="width: 48%; font-size: 8px; line-height: 1.4;">';
+    practicesHtml += '</div>';
     
-    // Columna izquierda
-    for (let i = 0; i < Math.ceil(allAvailablePractices.length / 2); i++) {
-      const practice = allAvailablePractices[i];
-      if (practice && practice.name) {
-        const isSelected = selectedPracticesMap.has(practice.name);
-        const selectedAO = selectedPracticesMap.get(practice.name);
-        
-        practicesHtml += `
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; color: #4A5568;">
-            <span style="font-weight: ${isSelected ? 'bold' : 'normal'}; color: ${isSelected ? '#1E40AF' : '#4A5568'};">${practice.name}</span>
-            <div style="display: flex; gap: 2px;">
-              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedAO === 'AO' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'AO' ? 'white' : 'black'};">${selectedAO === 'AO' ? '✓' : ''}</span>
-              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedAO === 'OI' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'OI' ? 'white' : 'black'};">${selectedAO === 'OI' ? '✓' : ''}</span>
-              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedAO === 'OD' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'OD' ? 'white' : 'black'};">${selectedAO === 'OD' ? '✓' : ''}</span>
-            </div>
-          </div>
-        `;
-      }
-    }
-    
-    practicesHtml += '</div><div style="width: 48%; font-size: 8px; line-height: 1.4;">';
-    
-    // Columna derecha
-    for (let i = Math.ceil(allAvailablePractices.length / 2); i < allAvailablePractices.length; i++) {
-      const practice = allAvailablePractices[i];
-      if (practice && practice.name) {
-        const isSelected = selectedPracticesMap.has(practice.name);
-        const selectedAO = selectedPracticesMap.get(practice.name);
-        
-        practicesHtml += `
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; color: #4A5568;">
-            <span style="font-weight: ${isSelected ? 'bold' : 'normal'}; color: ${isSelected ? '#1E40AF' : '#4A5568'};">${practice.name}</span>
-            <div style="display: flex; gap: 2px;">
-              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedAO === 'AO' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'AO' ? 'white' : 'black'};">${selectedAO === 'AO' ? '✓' : ''}</span>
-              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedAO === 'OI' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'OI' ? 'white' : 'black'};">${selectedAO === 'OI' ? '✓' : ''}</span>
-              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedAO === 'OD' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'OD' ? 'white' : 'black'};">${selectedAO === 'OD' ? '✓' : ''}</span>
-            </div>
-          </div>
-        `;
-      }
-    }
-    
-    practicesHtml += '</div></div>';
-    
-    // Agregar notas adicionales si las hay
-    const additionalNotes = prescription.items
-      .filter(item => item.notes)
-      .map(item => `★ ${item.notes}`)
-      .join('<br>');
-    
-    if (additionalNotes || prescription.additionalNotes) {
+    // Agregar observaciones generales si las hay
+    if (prescription.additionalNotes) {
       practicesHtml += `
-        <div style="margin-top: 8px; font-size: 8px; color: #1E40AF;">
-          ${additionalNotes ? additionalNotes + '<br>' : ''}
-          ${prescription.additionalNotes ? `★ ${prescription.additionalNotes}` : ''}
+        <div style="margin-top: 10px; padding: 4px; background-color: #f0f8ff; border-left: 3px solid #1E40AF; font-size: 9px; color: #333;">
+          <strong>Observaciones:</strong> ${prescription.additionalNotes}
         </div>
       `;
     }
