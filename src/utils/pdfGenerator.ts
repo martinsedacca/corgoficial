@@ -27,37 +27,54 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
 
   // Generar las prácticas en formato de dos columnas como el original
   const generatePracticesGrid = () => {
-    const allPractices = [
-      'CAMPO VISUAL COMPUTARIZADO', 'ABERROMETRÍA',
-      'PAQUIMETRÍA', 'O.B.I.',
-      'TOPOGRAFÍA CORNEAL COMPUTADA', 'REFRACTOMETRÍA COMPUTARIZADA',
-      'OCT MACULAR', 'SCREENING NEONATAL (0 A 3 AÑOS)',
-      'OCT CÁMARA ANTERIOR', 'TEST DE MIRADA PREFERENCIAL',
-      'HRT (TOMOGRAFÍA CONFOCAL DE RETINA)', 'VISIÓN CROMÁTICA',
-      'ANGIO OCT', 'GONIOSCOPIA CON LENTE DE 3 O 4 ESPEJOS',
-      'RETINOGRAFÍA COLOR', 'ECOGRAFÍA OFTALMOLÓGICA',
-      'RECUENTO ENDOTELIAL', ''
+    // Obtener todas las prácticas disponibles del sistema
+    const allAvailablePractices = [
+      { name: 'CAMPO VISUAL COMPUTARIZADO', id: '1' },
+      { name: 'PAQUIMETRÍA', id: '2' },
+      { name: 'TOPOGRAFÍA CORNEAL COMPUTADA', id: '3' },
+      { name: 'OCT MACULAR', id: '4' },
+      { name: 'OCT CÁMARA ANTERIOR', id: '5' },
+      { name: 'HRT (TOMOGRAFÍA CONFOCAL DE RETINA)', id: '6' },
+      { name: 'ANGIO OCT', id: '7' },
+      { name: 'RETINOGRAFÍA COLOR', id: '8' },
+      { name: 'RECUENTO ENDOTELIAL', id: '9' },
+      { name: 'ABERROMETRÍA', id: '10' },
+      { name: 'O.B.I.', id: '11' },
+      { name: 'REFRACTOMETRÍA COMPUTARIZADA', id: '12' },
+      { name: 'SCREENING NEONATAL (0 A 3 AÑOS)', id: '13' },
+      { name: 'TEST DE MIRADA PREFERENCIAL', id: '14' },
+      { name: 'VISIÓN CROMÁTICA', id: '15' },
+      { name: 'GONIOSCOPIA CON LENTE DE 3 O 4 ESPEJOS', id: '16' },
+      { name: 'ECOGRAFÍA OFTALMOLÓGICA', id: '17' },
+      { name: 'PODER CORNEAL CENTRAL', id: '26' },
+      { name: 'MEIBOGRAFÍA', id: '28' },
+      { name: 'OJO SECO DIGITAL', id: '29' }
     ];
 
-    const selectedPractices = prescription.items.map(item => item.practice.name.toUpperCase());
+    // Crear un mapa de las prácticas seleccionadas en la receta
+    const selectedPracticesMap = new Map();
+    prescription.items.forEach(item => {
+      const practiceName = item.practice.name.toUpperCase();
+      selectedPracticesMap.set(practiceName, item.ao || 'AO');
+    });
     
     let practicesHtml = '<div style="display: flex; justify-content: space-between; margin: 8px 0;">';
     practicesHtml += '<div style="width: 48%; font-size: 8px; line-height: 1.4;">';
     
     // Columna izquierda
-    for (let i = 0; i < Math.ceil(allPractices.length / 2); i++) {
-      const practice = allPractices[i];
-      if (practice) {
-        const isSelected = selectedPractices.includes(practice);
-        const selectedItem = prescription.items.find(item => item.practice.name.toUpperCase() === practice);
+    for (let i = 0; i < Math.ceil(allAvailablePractices.length / 2); i++) {
+      const practice = allAvailablePractices[i];
+      if (practice && practice.name) {
+        const isSelected = selectedPracticesMap.has(practice.name);
+        const selectedAO = selectedPracticesMap.get(practice.name);
         
         practicesHtml += `
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; color: #4A5568;">
-            <span style="font-weight: ${isSelected ? 'bold' : 'normal'}; color: ${isSelected ? '#1E40AF' : '#4A5568'};">${practice}</span>
+            <span style="font-weight: ${isSelected ? 'bold' : 'normal'}; color: ${isSelected ? '#1E40AF' : '#4A5568'};">${practice.name}</span>
             <div style="display: flex; gap: 2px;">
-              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedItem?.ao === 'AO' ? '#1E40AF' : 'white'}; color: ${selectedItem?.ao === 'AO' ? 'white' : 'black'};">${selectedItem?.ao === 'AO' ? '✓' : ''}</span>
-              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedItem?.ao === 'OI' ? '#1E40AF' : 'white'}; color: ${selectedItem?.ao === 'OI' ? 'white' : 'black'};">${selectedItem?.ao === 'OI' ? '✓' : ''}</span>
-              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedItem?.ao === 'OD' ? '#1E40AF' : 'white'}; color: ${selectedItem?.ao === 'OD' ? 'white' : 'black'};">${selectedItem?.ao === 'OD' ? '✓' : ''}</span>
+              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedAO === 'AO' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'AO' ? 'white' : 'black'};">${selectedAO === 'AO' ? '✓' : ''}</span>
+              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedAO === 'OI' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'OI' ? 'white' : 'black'};">${selectedAO === 'OI' ? '✓' : ''}</span>
+              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedAO === 'OD' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'OD' ? 'white' : 'black'};">${selectedAO === 'OD' ? '✓' : ''}</span>
             </div>
           </div>
         `;
@@ -67,19 +84,19 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     practicesHtml += '</div><div style="width: 48%; font-size: 8px; line-height: 1.4;">';
     
     // Columna derecha
-    for (let i = Math.ceil(allPractices.length / 2); i < allPractices.length; i++) {
-      const practice = allPractices[i];
-      if (practice) {
-        const isSelected = selectedPractices.includes(practice);
-        const selectedItem = prescription.items.find(item => item.practice.name.toUpperCase() === practice);
+    for (let i = Math.ceil(allAvailablePractices.length / 2); i < allAvailablePractices.length; i++) {
+      const practice = allAvailablePractices[i];
+      if (practice && practice.name) {
+        const isSelected = selectedPracticesMap.has(practice.name);
+        const selectedAO = selectedPracticesMap.get(practice.name);
         
         practicesHtml += `
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; color: #4A5568;">
-            <span style="font-weight: ${isSelected ? 'bold' : 'normal'}; color: ${isSelected ? '#1E40AF' : '#4A5568'};">${practice}</span>
+            <span style="font-weight: ${isSelected ? 'bold' : 'normal'}; color: ${isSelected ? '#1E40AF' : '#4A5568'};">${practice.name}</span>
             <div style="display: flex; gap: 2px;">
-              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedItem?.ao === 'AO' ? '#1E40AF' : 'white'}; color: ${selectedItem?.ao === 'AO' ? 'white' : 'black'};">${selectedItem?.ao === 'AO' ? '✓' : ''}</span>
-              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedItem?.ao === 'OI' ? '#1E40AF' : 'white'}; color: ${selectedItem?.ao === 'OI' ? 'white' : 'black'};">${selectedItem?.ao === 'OI' ? '✓' : ''}</span>
-              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedItem?.ao === 'OD' ? '#1E40AF' : 'white'}; color: ${selectedItem?.ao === 'OD' ? 'white' : 'black'};">${selectedItem?.ao === 'OD' ? '✓' : ''}</span>
+              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedAO === 'AO' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'AO' ? 'white' : 'black'};">${selectedAO === 'AO' ? '✓' : ''}</span>
+              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedAO === 'OI' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'OI' ? 'white' : 'black'};">${selectedAO === 'OI' ? '✓' : ''}</span>
+              <span style="border: 1px solid #666; width: 8px; height: 8px; display: inline-block; text-align: center; font-size: 6px; background: ${selectedAO === 'OD' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'OD' ? 'white' : 'black'};">${selectedAO === 'OD' ? '✓' : ''}</span>
             </div>
           </div>
         `;
