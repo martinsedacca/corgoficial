@@ -13,9 +13,11 @@ interface AutoCompleteProps {
   onChange: (value: string, option?: Option) => void;
   placeholder: string;
   label: string;
+  onCreateNew?: (value: string) => void;
+  createNewLabel?: string;
 }
 
-export function AutoComplete({ options, value, onChange, placeholder, label }: AutoCompleteProps) {
+export function AutoComplete({ options, value, onChange, placeholder, label, onCreateNew, createNewLabel }: AutoCompleteProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -78,8 +80,22 @@ export function AutoComplete({ options, value, onChange, placeholder, label }: A
       {isOpen && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
           {filteredOptions.length === 0 ? (
-            <div className="px-3 py-2 text-gray-500 text-sm">
-              No se encontraron resultados
+            <div>
+              <div className="px-3 py-2 text-gray-500 text-sm">
+                No se encontraron resultados
+              </div>
+              {onCreateNew && value.trim() && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onCreateNew(value.trim());
+                    setIsOpen(false);
+                  }}
+                  className="w-full px-3 py-2 text-left hover:bg-primary-50 focus:bg-primary-50 focus:outline-none border-t border-gray-200 text-primary-600 font-medium"
+                >
+                  + {createNewLabel || 'Crear nuevo'}: "{value.trim()}"
+                </button>
+              )}
             </div>
           ) : (
             filteredOptions.map((option) => (

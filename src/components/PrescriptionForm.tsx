@@ -12,6 +12,15 @@ interface PrescriptionFormProps {
 
 export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: PrescriptionFormProps) {
   const { doctors, patients, practices, getNextPrescriptionNumber, addPrescription, updatePrescription } = useData();
+  const [showPatientForm, setShowPatientForm] = useState(false);
+  const [newPatientData, setNewPatientData] = useState({
+    name: '',
+    socialWork: '',
+    affiliateNumber: '',
+    phone: '',
+    email: '',
+    address: ''
+  });
   const [nextNumber, setNextNumber] = useState<number | null>(null);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
@@ -84,6 +93,38 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
     setPatientSearch(value);
     if (option) {
       setSelectedPatient(option.value);
+    }
+  };
+
+  const handleCreatePatient = (name: string) => {
+    setNewPatientData({ ...newPatientData, name });
+    setShowPatientForm(true);
+  };
+
+  const handleSaveNewPatient = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const { addPatient } = useData();
+      await addPatient(newPatientData);
+      // Buscar el paciente recién creado
+      const { patients } = useData();
+      const newPatient = patients.find(p => p.name === newPatientData.name);
+      if (newPatient) {
+        setSelectedPatient(newPatient);
+        setPatientSearch(newPatient.name);
+      }
+      setShowPatientForm(false);
+      setNewPatientData({
+        name: '',
+        socialWork: '',
+        affiliateNumber: '',
+        phone: '',
+        email: '',
+        address: ''
+      });
+    } catch (error) {
+      console.error('Error creating patient:', error);
+      alert('Error al crear el paciente. Por favor, intente nuevamente.');
     }
   };
 
@@ -223,13 +264,113 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
         />
 
         {/* Paciente */}
-        <AutoComplete
-          options={patientOptions}
-          value={patientSearch}
-          onChange={handlePatientChange}
-          placeholder="Buscar paciente..."
-          label="Paciente"
-        />
+        <div>
+          <AutoComplete
+            options={patientOptions}
+            value={patientSearch}
+            onChange={handlePatientChange}
+            placeholder="Buscar paciente..."
+            label="Paciente"
+            onCreateNew={handleCreatePatient}
+            createNewLabel="Crear paciente"
+          />
+          
+          {/* Formulario para crear nuevo paciente */}
+          {showPatientForm && (
+            <div className="mt-4 p-4 border border-primary-200 rounded-lg bg-primary-50">
+              <h4 className="text-lg font-medium text-primary-800 mb-3">Crear Nuevo Paciente</h4>
+              <form onSubmit={handleSaveNewPatient} className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Nombre Completo *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newPatientData.name}
+                      onChange={(e) => setNewPatientData({...newPatientData, name: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Obra Social *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newPatientData.socialWork}
+                      onChange={(e) => setNewPatientData({...newPatientData, socialWork: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      placeholder="OSDE, Swiss Medical, IOMA, etc."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Número de Afiliado *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newPatientData.affiliateNumber}
+                      onChange={(e) => setNewPatientData({...newPatientData, affiliateNumber: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Teléfono
+                    </label>
+                    <input
+                      type="tel"
+                      value={newPatientData.phone}
+                      onChange={(e) => setNewPatientData({...newPatientData, phone: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={newPatientData.email}
+                      onChange={(e) => setNewPatientData({...newPatientData, email: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Dirección
+                    </label>
+                    <input
+                      type="text"
+                      value={newPatientData.address}
+                      onChange={(e) => setNewPatientData({...newPatientData, address: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+                  >
+                    Crear Paciente
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowPatientForm(false)}
+                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+        </div>
 
         {/* Prácticas en formato de grid como el PDF */}
         <div>
