@@ -5,7 +5,7 @@ export async function applyMigrations() {
     console.log('Aplicando migraciones de base de datos...');
 
     // Crear función para actualizar timestamps
-    await supabase.rpc('exec_sql', {
+    const { error: functionCreateError } = await supabase.rpc('exec_sql', {
       sql: `
         CREATE OR REPLACE FUNCTION update_updated_at_column()
         RETURNS TRIGGER AS $$
@@ -15,9 +15,11 @@ export async function applyMigrations() {
         END;
         $$ language 'plpgsql';
       `
-    }).catch(() => {
-      // Si falla, intentamos con SQL directo
     });
+
+    if (functionCreateError) {
+      console.warn('Error creating update function:', functionCreateError);
+    }
 
     // Crear tabla doctors
     const { error: doctorsError } = await supabase.rpc('exec_sql', {
