@@ -4,6 +4,25 @@ import { Prescription } from '../types';
 import { companyInfo } from '../data/mockData';
 
 export const generatePrescriptionPDF = async (prescription: Prescription): Promise<void> => {
+  // Convertir el logo a base64 para incluirlo en el PDF
+  const getLogoBase64 = async (): Promise<string> => {
+    try {
+      const response = await fetch('/Logo-corg-copy.png');
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error loading logo:', error);
+      return '';
+    }
+  };
+
+  const logoBase64 = await getLogoBase64();
+
   // Crear el contenido HTML para el PDF que replica exactamente el formato original
   const pdfContent = document.createElement('div');
   pdfContent.style.width = '148mm'; // Mitad de A4 horizontal
@@ -74,9 +93,11 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
   pdfContent.innerHTML = `
     <!-- Header exacto como el original -->
     <div style="text-align: center; margin-bottom: 15px;">
-      <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
-        <img src="/Logo-corg-copy.png" alt="CORG Logo" style="height: 40px; width: auto;" onerror="this.style.display='none'" />
-      </div>
+      ${logoBase64 ? `
+        <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
+          <img src="${logoBase64}" alt="CORG Logo" style="height: 40px; width: auto;" />
+        </div>
+      ` : ''}
       <div style="font-size: 11px; margin-bottom: 2px; color: #666; letter-spacing: 1px;">${companyInfo.subtitle}</div>
       <div style="font-size: 9px; margin-bottom: 1px; color: #666; font-weight: bold;">DIRECTOR MÉDICO</div>
       <div style="font-size: 9px; margin-bottom: 1px; color: #333;">${companyInfo.director}</div>
