@@ -239,10 +239,10 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
           
           {/* Header de columnas */}
           <div className="grid grid-cols-2 gap-8 mb-2">
-            <div className="text-right text-xs font-medium text-gray-600 pr-6">
+            <div className="text-right text-xs font-medium text-gray-600 pr-3">
               AO &nbsp;&nbsp; OI &nbsp;&nbsp; OD
             </div>
-            <div className="text-right text-xs font-medium text-gray-600 pr-6">
+            <div className="text-right text-xs font-medium text-gray-600 pr-3">
               AO &nbsp;&nbsp; OI &nbsp;&nbsp; OD
             </div>
           </div>
