@@ -101,7 +101,6 @@ export function DoctorManager() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="Dr. Juan Pérez"
                 />
@@ -115,7 +114,6 @@ export function DoctorManager() {
                   required
                   value={formData.specialty}
                   onChange={(e) => setFormData({...formData, specialty: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="Oftalmología"
                 />
@@ -129,7 +127,6 @@ export function DoctorManager() {
                   required
                   value={formData.license}
                   onChange={(e) => setFormData({...formData, license: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="M.P. 1234"
                 />
@@ -142,7 +139,6 @@ export function DoctorManager() {
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="02966 123456"
                 />
@@ -155,7 +151,6 @@ export function DoctorManager() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="doctor@email.com"
                 />
@@ -193,7 +188,6 @@ export function DoctorManager() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-lg font-semibold text-gray-900">{doctor.name}</h3>
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
                     <span className="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-sm">
                       {doctor.specialty}
                     </span>
