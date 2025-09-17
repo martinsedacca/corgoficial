@@ -136,20 +136,22 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                 </div>
                 
                 <div className="ml-4">
-                  <button
-                    onClick={() => onViewPrescription(prescription)}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    <Eye className="h-4 w-4" />
-                    Ver
-                  </button>
-                  <button
-                    onClick={() => onEditPrescription(prescription)}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors ml-2"
-                  >
-                    <Edit3 className="h-4 w-4" />
-                    Editar
-                  </button>
+                  <div className="flex items-center justify-center gap-3">
+                    <button
+                      onClick={() => onViewPrescription(prescription)}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      <Eye className="h-4 w-4" />
+                      Ver
+                    </button>
+                    <button
+                      onClick={() => onEditPrescription(prescription)}
+                      className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      <Edit3 className="h-4 w-4" />
+                      Editar
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
