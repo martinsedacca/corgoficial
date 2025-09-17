@@ -73,12 +73,12 @@ export function DoctorManager() {
     <div className="bg-white rounded-lg shadow-lg p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <User className="h-6 w-6 text-blue-600" />
+          <User className="h-6 w-6 text-primary-600" />
           <h2 className="text-xl font-semibold text-gray-900">Gestión de Médicos</h2>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
           <UserPlus className="h-4 w-4" />
           Nuevo Médico
@@ -102,6 +102,7 @@ export function DoctorManager() {
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="Dr. Juan Pérez"
                 />
               </div>
@@ -115,6 +116,7 @@ export function DoctorManager() {
                   value={formData.specialty}
                   onChange={(e) => setFormData({...formData, specialty: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="Oftalmología"
                 />
               </div>
@@ -128,6 +130,7 @@ export function DoctorManager() {
                   value={formData.license}
                   onChange={(e) => setFormData({...formData, license: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="M.P. 1234"
                 />
               </div>
@@ -140,6 +143,7 @@ export function DoctorManager() {
                   value={formData.phone}
                   onChange={(e) => setFormData({...formData, phone: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="02966 123456"
                 />
               </div>
@@ -152,6 +156,7 @@ export function DoctorManager() {
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="doctor@email.com"
                 />
               </div>
@@ -159,7 +164,7 @@ export function DoctorManager() {
             <div className="flex gap-3">
               <button
                 type="submit"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
               >
                 {editingDoctor ? 'Actualizar' : 'Crear'}
               </button>
@@ -189,6 +194,7 @@ export function DoctorManager() {
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-lg font-semibold text-gray-900">{doctor.name}</h3>
                     <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                    <span className="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-sm">
                       {doctor.specialty}
                     </span>
                   </div>
@@ -211,7 +217,7 @@ export function DoctorManager() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEdit(doctor)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
                   >
                     <Edit3 className="h-4 w-4" />
                   </button>

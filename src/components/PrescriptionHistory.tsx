@@ -33,7 +33,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
       <div className="flex items-center gap-2 mb-6">
-        <FileText className="h-6 w-6 text-blue-600" />
+        <FileText className="h-6 w-6 text-primary-600" />
         <h2 className="text-xl font-semibold text-gray-900">
           Historial de Recetas
         </h2>
@@ -49,7 +49,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
               placeholder="Buscar por paciente, médico o número de receta..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
         </div>
@@ -57,7 +57,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           >
             <option value="all">Todos los tipos</option>
             <option value="studies">Estudios</option>
@@ -89,12 +89,12 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-4 mb-2">
-                    <div className="text-lg font-semibold text-blue-700">
+                    <div className="text-lg font-semibold text-primary-700">
                       #{prescription.number}
                     </div>
                     <div className={`px-3 py-1 rounded-full text-xs font-medium ${
                       prescription.type === 'studies' 
-                        ? 'bg-blue-100 text-blue-800'
+                        ? 'bg-primary-100 text-primary-800'
                         : prescription.type === 'treatments'
                         ? 'bg-green-100 text-green-800'
                         : 'bg-purple-100 text-purple-800'
@@ -139,7 +139,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                   <div className="flex items-center justify-center gap-3">
                     <button
                       onClick={() => onViewPrescription(prescription)}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                     >
                       <Eye className="h-4 w-4" />
                       Ver

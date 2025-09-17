@@ -161,7 +161,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
       <div className="flex items-center gap-2 mb-6">
-        <FileText className="h-6 w-6 text-blue-600" />
+        <FileText className="h-6 w-6 text-primary-600" />
         <h2 className="text-xl font-semibold text-gray-900">
           {editingPrescription ? `Editar Receta #${editingPrescription.number}` : `Nueva Receta #${nextNumber || '...'}`}
         </h2>
@@ -179,7 +179,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
               onClick={() => setPrescriptionType('studies')}
               className={`p-3 rounded-lg border-2 transition-colors ${
                 prescriptionType === 'studies'
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
+                  ? 'border-primary-500 bg-primary-50 text-primary-700'
                   : 'border-gray-300 hover:border-gray-400'
               }`}
             >
@@ -191,7 +191,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
               onClick={() => setPrescriptionType('treatments')}
               className={`p-3 rounded-lg border-2 transition-colors ${
                 prescriptionType === 'treatments'
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
+                  ? 'border-primary-500 bg-primary-50 text-primary-700'
                   : 'border-gray-300 hover:border-gray-400'
               }`}
             >
@@ -203,7 +203,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
               onClick={() => setPrescriptionType('authorization')}
               className={`p-3 rounded-lg border-2 transition-colors ${
                 prescriptionType === 'authorization'
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
+                  ? 'border-primary-500 bg-primary-50 text-primary-700'
                   : 'border-gray-300 hover:border-gray-400'
               }`}
             >
@@ -254,7 +254,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
               <div className="space-y-2">
                 {leftColumnPractices.map((practice) => (
                   <div key={practice.id} className="flex items-center justify-between text-sm">
-                    <span className={`flex-1 ${selectedPractices[practice.id] ? 'font-semibold text-blue-700' : 'text-gray-700'}`}>
+                    <span className={`flex-1 ${selectedPractices[practice.id] ? 'font-semibold text-primary-700' : 'text-gray-700'}`}>
                       {practice.name.toUpperCase()}
                     </span>
                     <div className="flex gap-1 ml-2">
@@ -265,7 +265,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                           onClick={() => handlePracticeToggle(practice.id, ao)}
                           className={`w-6 h-6 border border-gray-400 text-xs font-bold transition-colors ${
                             selectedPractices[practice.id] === ao
-                              ? 'bg-blue-600 text-white border-blue-600'
+                              ? 'bg-primary-600 text-white border-primary-600'
                               : 'bg-white text-gray-400 hover:bg-gray-100'
                           }`}
                         >
@@ -281,7 +281,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
               <div className="space-y-2">
                 {rightColumnPractices.map((practice) => (
                   <div key={practice.id} className="flex items-center justify-between text-sm">
-                    <span className={`flex-1 ${selectedPractices[practice.id] ? 'font-semibold text-blue-700' : 'text-gray-700'}`}>
+                    <span className={`flex-1 ${selectedPractices[practice.id] ? 'font-semibold text-primary-700' : 'text-gray-700'}`}>
                       {practice.name.toUpperCase()}
                     </span>
                     <div className="flex gap-1 ml-2">
@@ -292,7 +292,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                           onClick={() => handlePracticeToggle(practice.id, ao)}
                           className={`w-6 h-6 border border-gray-400 text-xs font-bold transition-colors ${
                             selectedPractices[practice.id] === ao
-                              ? 'bg-blue-600 text-white border-blue-600'
+                              ? 'bg-primary-600 text-white border-primary-600'
                               : 'bg-white text-gray-400 hover:bg-gray-100'
                           }`}
                         >
@@ -308,11 +308,11 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
 
           {/* Resumen de selecciones */}
           {Object.keys(selectedPractices).length > 0 && (
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <div className="text-sm font-medium text-blue-800 mb-2">
+            <div className="mt-4 p-3 bg-primary-50 rounded-lg">
+              <div className="text-sm font-medium text-primary-800 mb-2">
                 Prácticas seleccionadas ({Object.keys(selectedPractices).length}):
               </div>
-              <div className="text-sm text-blue-700">
+              <div className="text-sm text-primary-700">
                 {Object.entries(selectedPractices).map(([practiceId, ao]) => {
                   const practice = practices.find(p => p.id === practiceId);
                   return practice ? `${practice.name} (${ao})` : '';
@@ -332,7 +332,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
             onChange={(e) => setAdditionalNotes(e.target.value)}
             placeholder="Observaciones adicionales sobre la receta..."
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
         </div>
 
@@ -340,7 +340,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
         <div className="flex gap-4 pt-6">
           <button
             type="submit"
-            className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 bg-primary-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-primary-700 transition-colors"
           >
             <Save className="h-5 w-5" />
             {editingPrescription ? 'Actualizar Receta' : 'Crear Receta'}

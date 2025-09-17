@@ -63,6 +63,7 @@ export function AutoComplete({ options, value, onChange, placeholder, label }: A
           onFocus={() => setIsOpen(true)}
           placeholder={placeholder}
           className="w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
         />
         <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
         <button
