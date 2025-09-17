@@ -37,6 +37,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [practices, setPractices] = useState<Practice[]>([]);
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
+  const [socialWorks, setSocialWorks] = useState<SocialWork[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
