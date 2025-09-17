@@ -53,10 +53,8 @@ async function seedDoctors() {
     try {
       await supabase
         .from('doctors')
-        .upsert(doctor, { 
-          onConflict: 'license',
-          ignoreDuplicates: true 
-        });
+        .insert(doctor)
+        .select();
     } catch (error) {
       console.log('Doctor ya existe o error insertando:', error);
     }
@@ -74,10 +72,8 @@ async function seedPatients() {
     try {
       await supabase
         .from('patients')
-        .upsert(patient, { 
-          onConflict: 'affiliate_number',
-          ignoreDuplicates: true 
-        });
+        .insert(patient)
+        .select();
     } catch (error) {
       console.log('Paciente ya existe o error insertando:', error);
     }
@@ -99,10 +95,8 @@ async function seedPractices() {
     try {
       await supabase
         .from('practices')
-        .upsert(practice, { 
-          onConflict: 'code',
-          ignoreDuplicates: true 
-        });
+        .insert(practice)
+        .select();
     } catch (error) {
       console.log('Práctica ya existe o error insertando:', error);
     }
