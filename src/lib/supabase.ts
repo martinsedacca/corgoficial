@@ -170,6 +170,32 @@ export interface Database {
           created_at?: string;
         };
       };
+      social_works: {
+        Row: {
+          id: string;
+          name: string;
+          code: string | null;
+          description: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          code?: string | null;
+          description?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          code?: string | null;
+          description?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Functions: {
       get_next_prescription_number: {

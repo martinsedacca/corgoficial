@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import { AutoComplete } from './AutoComplete';
+import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
 import { PrescriptionItem, Doctor, Patient, Practice, Prescription } from '../types';
 import { Plus, Trash2, FileText, Save, X } from 'lucide-react';
 
@@ -294,16 +295,10 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Obra Social *
-                    </label>
-                    <input
-                      type="text"
-                      required
+                    <SocialWorkAutocomplete
                       value={newPatientData.socialWork}
-                      onChange={(e) => setNewPatientData({...newPatientData, socialWork: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                      placeholder="OSDE, Swiss Medical, IOMA, etc."
+                      onChange={(value) => setNewPatientData({...newPatientData, socialWork: value})}
+                      required
                     />
                   </div>
                   <div>

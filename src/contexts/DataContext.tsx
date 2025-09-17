@@ -226,6 +226,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     deletePrescription,
     getNextPrescriptionNumber,
     refreshData
+    addSocialWork,
+    updateSocialWork,
+    deleteSocialWork
   };
 
   return (

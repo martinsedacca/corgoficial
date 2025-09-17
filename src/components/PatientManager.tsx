@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import { Patient } from '../types';
+import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
 import { UserPlus, Edit3, Trash2, Users, Phone, Mail, MapPin } from 'lucide-react';
 
 export function PatientManager() {
@@ -109,16 +110,10 @@ export function PatientManager() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Obra Social *
-                </label>
-                <input
-                  type="text"
-                  required
+                <SocialWorkAutocomplete
                   value={formData.socialWork}
-                  onChange={(e) => setFormData({...formData, socialWork: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  placeholder="OSDE, Swiss Medical, IOMA, etc."
+                  onChange={(value) => setFormData({...formData, socialWork: value})}
+                  required
                 />
               </div>
               <div>

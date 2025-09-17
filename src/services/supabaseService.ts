@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { Doctor, Patient, Practice, Prescription, PrescriptionItem } from '../types';
+import { Doctor, Patient, Practice, Prescription, PrescriptionItem, SocialWork } from '../types';
 
 // Servicios para Médicos
 export const doctorService = {
@@ -422,6 +422,59 @@ export const prescriptionService = {
   async delete(id: string): Promise<void> {
     const { error } = await supabase
       .from('prescriptions')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  }
+};
+
+// Servicios para Obras Sociales
+export const socialWorkService = {
+  async getAll(): Promise<SocialWork[]> {
+    const { data, error } = await supabase
+      .from('social_works')
+      .select('*')
+      .order('name');
+    
+    if (error) throw error;
+    return data || [];
+  },
+
+  async create(socialWork: Omit<SocialWork, 'id'>): Promise<SocialWork> {
+    const { data, error } = await supabase
+      .from('social_works')
+      .insert({
+        name: socialWork.name,
+        code: socialWork.code || null,
+        description: socialWork.description || null
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async update(id: string, updates: Partial<SocialWork>): Promise<SocialWork> {
+    const { data, error } = await supabase
+      .from('social_works')
+      .update({
+        name: updates.name,
+        code: updates.code || null,
+        description: updates.description || null
+      })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async delete(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('social_works')
       .delete()
       .eq('id', id);
     

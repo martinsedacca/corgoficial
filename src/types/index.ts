@@ -57,4 +57,3 @@ export interface CompanyInfo {
   whatsapp: string;
   social: string;
   location: string;
-}
