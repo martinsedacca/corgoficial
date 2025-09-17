@@ -60,8 +60,15 @@ function AppContent() {
   // Mostrar loading mientras se cargan los datos
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <LoadingSpinner size="lg" text="Cargando datos desde Supabase..." />
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+        <div className="mb-8">
+          <img 
+            src="/Logo-corg.png" 
+            alt="CORG Logo" 
+            className="h-20 w-auto"
+          />
+        </div>
+        <LoadingSpinner size="lg" text="Cargando" />
       </div>
     );
   }
