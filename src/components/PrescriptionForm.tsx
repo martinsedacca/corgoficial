@@ -237,16 +237,6 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
             Solicito:
           </label>
           
-          {/* Header de columnas */}
-          <div className="grid grid-cols-2 gap-8 mb-2">
-            <div className="text-right text-xs font-medium text-gray-600 pr-3">
-              AO &nbsp;&nbsp; OI &nbsp;&nbsp; OD
-            </div>
-            <div className="text-right text-xs font-medium text-gray-600 pr-3">
-              AO &nbsp;&nbsp; OI &nbsp;&nbsp; OD
-            </div>
-          </div>
-
           {/* Grid de prácticas */}
           <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
             <div className="grid grid-cols-2 gap-8">
@@ -263,13 +253,13 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                           key={ao}
                           type="button"
                           onClick={() => handlePracticeToggle(practice.id, ao)}
-                          className={`w-6 h-6 border border-gray-400 text-xs font-bold transition-colors ${
+                          className={`w-8 h-6 border border-gray-400 text-xs font-bold transition-colors flex items-center justify-center ${
                             selectedPractices[practice.id] === ao
                               ? 'bg-primary-600 text-white border-primary-600'
                               : 'bg-white text-gray-400 hover:bg-gray-100'
                           }`}
                         >
-                          {selectedPractices[practice.id] === ao ? '✓' : ''}
+                          {selectedPractices[practice.id] === ao ? ao : ao}
                         </button>
                       ))}
                     </div>
@@ -290,13 +280,13 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                           key={ao}
                           type="button"
                           onClick={() => handlePracticeToggle(practice.id, ao)}
-                          className={`w-6 h-6 border border-gray-400 text-xs font-bold transition-colors ${
+                          className={`w-8 h-6 border border-gray-400 text-xs font-bold transition-colors flex items-center justify-center ${
                             selectedPractices[practice.id] === ao
                               ? 'bg-primary-600 text-white border-primary-600'
                               : 'bg-white text-gray-400 hover:bg-gray-100'
                           }`}
                         >
-                          {selectedPractices[practice.id] === ao ? '✓' : ''}
+                          {selectedPractices[practice.id] === ao ? ao : ao}
                         </button>
                       ))}
                     </div>
