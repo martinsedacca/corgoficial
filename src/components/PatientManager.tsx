@@ -18,12 +18,21 @@ export function PatientManager() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingPatient) {
-      updatePatient(editingPatient.id, formData);
-    } else {
-      addPatient(formData);
-    }
-    resetForm();
+    const handleAsync = async () => {
+      try {
+        if (editingPatient) {
+          await updatePatient(editingPatient.id, formData);
+        } else {
+          await addPatient(formData);
+        }
+        resetForm();
+      } catch (error) {
+        console.error('Error saving patient:', error);
+        alert('Error al guardar el paciente. Por favor, intente nuevamente.');
+      }
+    };
+    
+    handleAsync();
   };
 
   const handleEdit = (patient: Patient) => {
@@ -39,9 +48,14 @@ export function PatientManager() {
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm('¿Está seguro de eliminar este paciente?')) {
-      deletePatient(id);
+      try {
+        await deletePatient(id);
+      } catch (error) {
+        console.error('Error deleting patient:', error);
+        alert('Error al eliminar el paciente. Verifique que no tenga recetas asociadas.');
+      }
     }
   };
 

@@ -17,12 +17,21 @@ export function DoctorManager() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingDoctor) {
-      updateDoctor(editingDoctor.id, formData);
-    } else {
-      addDoctor(formData);
-    }
-    resetForm();
+    const handleAsync = async () => {
+      try {
+        if (editingDoctor) {
+          await updateDoctor(editingDoctor.id, formData);
+        } else {
+          await addDoctor(formData);
+        }
+        resetForm();
+      } catch (error) {
+        console.error('Error saving doctor:', error);
+        alert('Error al guardar el médico. Por favor, intente nuevamente.');
+      }
+    };
+    
+    handleAsync();
   };
 
   const handleEdit = (doctor: Doctor) => {
@@ -37,9 +46,14 @@ export function DoctorManager() {
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm('¿Está seguro de eliminar este médico?')) {
-      deleteDoctor(id);
+      try {
+        await deleteDoctor(id);
+      } catch (error) {
+        console.error('Error deleting doctor:', error);
+        alert('Error al eliminar el médico. Verifique que no tenga recetas asociadas.');
+      }
     }
   };
 

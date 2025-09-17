@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DataProvider } from './contexts/DataContext';
+import { useData } from './contexts/DataContext';
 import { PrescriptionForm } from './components/PrescriptionForm';
 import { PrescriptionViewer } from './components/PrescriptionViewer';
 import PrescriptionHistory from './components/PrescriptionHistory';
@@ -7,6 +8,8 @@ import { DoctorManager } from './components/DoctorManager';
 import { PatientManager } from './components/PatientManager';
 import { PracticeManager } from './components/PracticeManager';
 import { PracticeAdmin } from './components/PracticeAdmin';
+import { LoadingSpinner } from './components/LoadingSpinner';
+import { ErrorMessage } from './components/ErrorMessage';
 import { Prescription } from './types';
 import { FileText, History, User, Users, Activity, Stethoscope, Download } from 'lucide-react';
 
@@ -21,6 +24,7 @@ function App() {
 }
 
 function AppContent() {
+  const { loading, error, refreshData } = useData();
   const [currentView, setCurrentView] = useState<View>('new');
   const [viewingPrescription, setViewingPrescription] = useState<Prescription | null>(null);
   const [editingPrescription, setEditingPrescription] = useState<Prescription | null>(null);
@@ -52,6 +56,29 @@ function AppContent() {
     { key: 'patients', label: 'Pacientes', icon: Users, color: 'text-green-600' },
     { key: 'admin-practices', label: 'Administrar Prácticas', icon: Activity, color: 'text-purple-600' }
   ];
+
+  // Mostrar loading mientras se cargan los datos
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner size="lg" text="Cargando datos desde Supabase..." />
+      </div>
+    );
+  }
+
+  // Mostrar error si hay problemas de conexión
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <ErrorMessage 
+            message={`Error de conexión con Supabase: ${error}`}
+            onRetry={refreshData}
+          />
+        </div>
+      </div>
+    );
+  }
 
   if (viewingPrescription) {
     return (

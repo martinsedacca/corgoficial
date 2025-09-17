@@ -53,12 +53,21 @@ export function PracticeAdmin() {
       return;
     }
 
-    if (editingPractice) {
-      updatePractice(editingPractice.id, formData);
-    } else {
-      addPractice(formData);
-    }
-    resetForm();
+    const handleAsync = async () => {
+      try {
+        if (editingPractice) {
+          await updatePractice(editingPractice.id, formData);
+        } else {
+          await addPractice(formData);
+        }
+        resetForm();
+      } catch (error) {
+        console.error('Error saving practice:', error);
+        alert('Error al guardar la práctica. Por favor, intente nuevamente.');
+      }
+    };
+    
+    handleAsync();
   };
 
   const handleEdit = (practice: Practice) => {
@@ -72,9 +81,14 @@ export function PracticeAdmin() {
     setShowForm(true);
   };
 
-  const handleDelete = (practice: Practice) => {
+  const handleDelete = async (practice: Practice) => {
     if (window.confirm(`¿Está seguro de eliminar la práctica "${practice.name}"?\n\nEsta acción no se puede deshacer.`)) {
-      deletePractice(practice.id);
+      try {
+        await deletePractice(practice.id);
+      } catch (error) {
+        console.error('Error deleting practice:', error);
+        alert('Error al eliminar la práctica. Verifique que no esté siendo utilizada en recetas.');
+      }
     }
   };
 

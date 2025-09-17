@@ -12,6 +12,7 @@ interface PrescriptionFormProps {
 
 export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: PrescriptionFormProps) {
   const { doctors, patients, practices, getNextPrescriptionNumber, addPrescription, updatePrescription } = useData();
+  const [nextNumber, setNextNumber] = useState<number | null>(null);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [prescriptionType, setPrescriptionType] = useState<'studies' | 'treatments' | 'authorization'>('studies');
@@ -19,6 +20,21 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [doctorSearch, setDoctorSearch] = useState('');
   const [patientSearch, setPatientSearch] = useState('');
+
+  // Cargar el siguiente número de receta
+  useEffect(() => {
+    if (!editingPrescription) {
+      const loadNextNumber = async () => {
+        try {
+          const number = await getNextPrescriptionNumber();
+          setNextNumber(number);
+        } catch (error) {
+          console.error('Error loading next prescription number:', error);
+        }
+      };
+      loadNextNumber();
+    }
+  }, [editingPrescription, getNextPrescriptionNumber]);
 
   // Inicializar formulario si estamos editando
   useEffect(() => {
@@ -121,13 +137,21 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       date: editingPrescription?.date || new Date().toISOString().split('T')[0]
     };
 
-    if (editingPrescription) {
-      updatePrescription(editingPrescription.id, prescriptionData);
-    } else {
-      addPrescription(prescriptionData);
-    }
+    const handleAsync = async () => {
+      try {
+        if (editingPrescription) {
+          await updatePrescription(editingPrescription.id, prescriptionData);
+        } else {
+          await addPrescription(prescriptionData);
+        }
+        onSubmit(prescriptionData);
+      } catch (error) {
+        console.error('Error saving prescription:', error);
+        alert('Error al guardar la receta. Por favor, intente nuevamente.');
+      }
+    };
     
-    onSubmit(prescriptionData);
+    handleAsync();
   };
 
   // Organizar prácticas en dos columnas como en el PDF
@@ -139,7 +163,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       <div className="flex items-center gap-2 mb-6">
         <FileText className="h-6 w-6 text-blue-600" />
         <h2 className="text-xl font-semibold text-gray-900">
-          {editingPrescription ? `Editar Receta #${editingPrescription.number}` : `Nueva Receta #${getNextPrescriptionNumber()}`}
+          {editingPrescription ? `Editar Receta #${editingPrescription.number}` : `Nueva Receta #${nextNumber || '...'}`}
         </h2>
       </div>
 
