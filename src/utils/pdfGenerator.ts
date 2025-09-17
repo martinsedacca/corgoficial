@@ -7,7 +7,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
   // Convertir el logo a base64 para incluirlo en el PDF
   const getLogoBase64 = async (): Promise<string> => {
     try {
-      const response = await fetch('/Logo-corg-copy.png');
+      const response = await fetch('/Logo-corg.png');
       const blob = await response.blob();
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
