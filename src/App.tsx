@@ -96,7 +96,7 @@ function AppContent() {
           <div className="mb-6">
             <button
               onClick={() => setViewingPrescription(null)}
-              className="text-blue-600 hover:text-blue-800 font-medium"
+              className="text-primary-600 hover:text-primary-800 font-medium"
             >
               ← Volver al historial
             </button>
