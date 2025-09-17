@@ -75,7 +75,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     <!-- Header exacto como el original -->
     <div style="text-align: center; margin-bottom: 15px;">
       <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
-        <img src="/Logo-corg.png" alt="CORG Logo" style="height: 40px; width: auto;" />
+        <img src="/Logo-corg-copy.png" alt="CORG Logo" style="height: 40px; width: auto;" onerror="this.style.display='none'" />
       </div>
       <div style="font-size: 11px; margin-bottom: 2px; color: #666; letter-spacing: 1px;">${companyInfo.subtitle}</div>
       <div style="font-size: 9px; margin-bottom: 1px; color: #666; font-weight: bold;">DIRECTOR MÉDICO</div>
