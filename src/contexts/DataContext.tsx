@@ -1,6 +1,7 @@
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { Doctor, Patient, Practice, Prescription } from '../types';
 import { doctorService, patientService, practiceService, prescriptionService } from '../services/supabaseService';
+import { applyMigrations } from '../lib/migrations';
 
 interface DataContextType {
   doctors: Doctor[];
@@ -40,6 +41,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       setError(null);
+      
+      // Intentar aplicar migraciones primero
+      await applyMigrations();
       
       const [doctorsData, patientsData, practicesData, prescriptionsData] = await Promise.all([
         doctorService.getAll(),
