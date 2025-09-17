@@ -1,6 +1,6 @@
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { Doctor, Patient, Practice, Prescription } from '../types';
-import { doctorService, patientService, practiceService, prescriptionService } from '../services/supabaseService';
+import { Doctor, Patient, Practice, Prescription, SocialWork } from '../types';
+import { doctorService, patientService, practiceService, prescriptionService, socialWorkService } from '../services/supabaseService';
 import { applyMigrations } from '../lib/migrations';
 
 interface DataContextType {
@@ -8,6 +8,7 @@ interface DataContextType {
   patients: Patient[];
   practices: Practice[];
   prescriptions: Prescription[];
+  socialWorks: SocialWork[];
   loading: boolean;
   error: string | null;
   addDoctor: (doctor: Omit<Doctor, 'id'>) => Promise<void>;
@@ -22,6 +23,9 @@ interface DataContextType {
   addPrescription: (prescription: Omit<Prescription, 'id' | 'number' | 'createdAt'>) => Promise<void>;
   updatePrescription: (id: string, prescription: Partial<Prescription>) => Promise<void>;
   deletePrescription: (id: string) => Promise<void>;
+  addSocialWork: (socialWork: Omit<SocialWork, 'id'>) => Promise<void>;
+  updateSocialWork: (id: string, socialWork: Partial<SocialWork>) => Promise<void>;
+  deleteSocialWork: (id: string) => Promise<void>;
   getNextPrescriptionNumber: () => Promise<number>;
   refreshData: () => Promise<void>;
 }
@@ -45,17 +49,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
       // Intentar aplicar migraciones primero
       await applyMigrations();
       
-      const [doctorsData, patientsData, practicesData, prescriptionsData] = await Promise.all([
+      const [doctorsData, patientsData, practicesData, prescriptionsData, socialWorksData] = await Promise.all([
         doctorService.getAll(),
         patientService.getAll(),
         practiceService.getAll(),
-        prescriptionService.getAll()
+        prescriptionService.getAll(),
+        socialWorkService.getAll()
       ]);
       
       setDoctors(doctorsData);
       setPatients(patientsData);
       setPractices(practicesData);
       setPrescriptions(prescriptionsData);
+      setSocialWorks(socialWorksData);
     } catch (err) {
       console.error('Error loading data:', err);
       setError(err instanceof Error ? err.message : 'Error desconocido');
@@ -205,11 +211,43 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Funciones para obras sociales
+  const addSocialWork = async (socialWorkData: Omit<SocialWork, 'id'>) => {
+    try {
+      const newSocialWork = await socialWorkService.create(socialWorkData);
+      setSocialWorks(prev => [...prev, newSocialWork]);
+    } catch (err) {
+      console.error('Error adding social work:', err);
+      throw err;
+    }
+  };
+
+  const updateSocialWork = async (id: string, socialWorkData: Partial<SocialWork>) => {
+    try {
+      const updatedSocialWork = await socialWorkService.update(id, socialWorkData);
+      setSocialWorks(prev => prev.map(sw => sw.id === id ? updatedSocialWork : sw));
+    } catch (err) {
+      console.error('Error updating social work:', err);
+      throw err;
+    }
+  };
+
+  const deleteSocialWork = async (id: string) => {
+    try {
+      await socialWorkService.delete(id);
+      setSocialWorks(prev => prev.filter(sw => sw.id !== id));
+    } catch (err) {
+      console.error('Error deleting social work:', err);
+      throw err;
+    }
+  };
+
   const value = {
     doctors,
     patients,
     practices,
     prescriptions,
+    socialWorks,
     loading,
     error,
     addDoctor,
@@ -224,11 +262,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
     addPrescription,
     updatePrescription,
     deletePrescription,
-    getNextPrescriptionNumber,
-    refreshData
     addSocialWork,
     updateSocialWork,
-    deleteSocialWork
+    deleteSocialWork,
+    getNextPrescriptionNumber,
+    refreshData
   };
 
   return (
