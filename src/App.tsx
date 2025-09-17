@@ -50,9 +50,9 @@ function AppContent() {
   };
 
   const menuItems = [
-    { key: 'new', label: 'Nueva Receta', icon: FileText, color: 'text-blue-600' },
+    { key: 'new', label: 'Nueva Receta', icon: FileText, color: 'text-primary-600' },
     { key: 'history', label: 'Historial', icon: History, color: 'text-gray-600' },
-    { key: 'doctors', label: 'Médicos', icon: User, color: 'text-blue-600' },
+    { key: 'doctors', label: 'Médicos', icon: User, color: 'text-primary-600' },
     { key: 'patients', label: 'Pacientes', icon: Users, color: 'text-green-600' },
     { key: 'admin-practices', label: 'Administrar Prácticas', icon: Activity, color: 'text-purple-600' }
   ];
@@ -107,9 +107,13 @@ function AppContent() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <Stethoscope className="h-8 w-8 text-blue-600" />
-                <div>
+              <img 
+                src="/Logo-corg.png" 
+                alt="CORG Logo" 
+                className="h-10 w-auto"
+              />
                   <h1 className="text-xl font-bold text-blue-700">CORG</h1>
-                  <p className="text-xs text-gray-500">Sistema de Recetas Médicas</p>
+                <h1 className="text-xl font-bold text-primary-900">CORG</h1>
                 </div>
               </div>
             </div>
@@ -122,11 +126,11 @@ function AppContent() {
                     onClick={() => setCurrentView(item.key as View)}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                       currentView === item.key
-                        ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                        ? 'bg-primary-100 text-primary-700 border border-primary-200'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <Icon className={`h-4 w-4 ${currentView === item.key ? 'text-blue-600' : item.color}`} />
+                    <Icon className={`h-4 w-4 ${currentView === item.key ? 'text-primary-600' : currentView === item.key ? 'text-primary-600' : item.color.replace('blue', 'primary')}`} />
                     <span>{item.label}</span>
                   </button>
                 );

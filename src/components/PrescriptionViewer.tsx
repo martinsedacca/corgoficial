@@ -27,9 +27,15 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
   return (
     <div className="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
       {/* Header */}
-      <div className="text-center mb-8 pb-6 border-b-2 border-blue-700">
+      <div className="text-center mb-8 pb-6 border-b-2 border-primary-900">
         <div className="mb-4">
-          <div className="text-4xl font-bold text-blue-700 mb-2">CORG</div>
+          <div className="flex justify-center mb-4">
+            <img 
+              src="/Logo-corg.png" 
+              alt="CORG Logo" 
+              className="h-16 w-auto"
+            />
+          </div>
           <div className="text-lg font-medium text-gray-600 mb-1">
             {companyInfo.subtitle}
           </div>
@@ -49,7 +55,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       <div className="grid grid-cols-2 gap-6 mb-6">
         <div className="space-y-1">
           <div className="text-sm text-gray-600">Receta N°:</div>
-          <div className="text-lg font-bold text-blue-700">#{prescription.number}</div>
+          <div className="text-lg font-bold text-primary-900">#{prescription.number}</div>
         </div>
         <div className="space-y-1 text-right">
           <div className="text-sm text-gray-600">Fecha:</div>
@@ -59,8 +65,8 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
       {/* Type */}
       <div className="mb-6">
-        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
-          <div className="text-lg font-semibold text-blue-800">
+        <div className="bg-primary-50 border-l-4 border-primary-500 p-4 rounded-lg">
+          <div className="text-lg font-semibold text-primary-800">
             {typeLabels[prescription.type]}
           </div>
         </div>
@@ -104,7 +110,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
                     </div>
                   )}
                 </div>
-                <div className="text-sm font-medium text-blue-700 ml-4">
+                <div className="text-sm font-medium text-primary-700 ml-4">
                   {item.ao}
                 </div>
               </div>
@@ -145,24 +151,24 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       </div>
 
       {/* Footer */}
-      <div className="bg-blue-700 text-white p-4 rounded-lg text-sm">
+      <div className="bg-primary-900 text-white p-4 rounded-lg text-sm">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center">
-                <span className="text-blue-700 text-xs">📍</span>
+                <span className="text-primary-900 text-xs">📍</span>
               </div>
               <span>{companyInfo.address}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center">
-                <span className="text-blue-700 text-xs">📞</span>
+                <span className="text-primary-900 text-xs">📞</span>
               </div>
               <span>Turnos al Tel.: {companyInfo.phone1}/{companyInfo.phone2}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center">
-                <span className="text-blue-700 text-xs">📱</span>
+                <span className="text-primary-900 text-xs">📱</span>
               </div>
               <span>WhatsApp: {companyInfo.whatsapp}</span>
             </div>
@@ -171,16 +177,16 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
             <div className="flex items-center justify-end gap-2">
               <span>{companyInfo.social}</span>
               <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center">
-                <span className="text-blue-700 text-xs">📘</span>
+                <span className="text-primary-900 text-xs">📘</span>
               </div>
               <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center">
-                <span className="text-blue-700 text-xs">📷</span>
+                <span className="text-primary-900 text-xs">📷</span>
               </div>
             </div>
             <div className="flex items-center justify-end gap-2">
               <span>{companyInfo.location}</span>
               <div className="w-4 h-4 rounded-full bg-white flex items-center justify-center">
-                <span className="text-blue-700 text-xs">📍</span>
+                <span className="text-primary-900 text-xs">📍</span>
               </div>
             </div>
           </div>

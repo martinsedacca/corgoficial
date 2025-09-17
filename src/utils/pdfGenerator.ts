@@ -37,12 +37,12 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       
       practicesHtml += `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding: 2px 0; border-bottom: 1px dotted #ccc;">
-          <span style="font-weight: bold; color: #1E40AF; font-size: 10px;">✓ ${practiceName}</span>
+          <span style="font-weight: bold; color: #152741; font-size: 10px;">✓ ${practiceName}</span>
           <div style="display: flex; gap: 3px; align-items: center;">
             <span style="font-size: 8px; color: #666; margin-right: 5px;">${selectedAO}</span>
-            <span style="border: 1px solid #1E40AF; width: 10px; height: 10px; display: inline-block; text-align: center; font-size: 8px; background: ${selectedAO === 'AO' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'AO' ? 'white' : '#1E40AF'}; font-weight: bold;">${selectedAO === 'AO' ? '✓' : ''}</span>
-            <span style="border: 1px solid #1E40AF; width: 10px; height: 10px; display: inline-block; text-align: center; font-size: 8px; background: ${selectedAO === 'OI' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'OI' ? 'white' : '#1E40AF'}; font-weight: bold;">${selectedAO === 'OI' ? '✓' : ''}</span>
-            <span style="border: 1px solid #1E40AF; width: 10px; height: 10px; display: inline-block; text-align: center; font-size: 8px; background: ${selectedAO === 'OD' ? '#1E40AF' : 'white'}; color: ${selectedAO === 'OD' ? 'white' : '#1E40AF'}; font-weight: bold;">${selectedAO === 'OD' ? '✓' : ''}</span>
+            <span style="border: 1px solid #152741; width: 10px; height: 10px; display: inline-block; text-align: center; font-size: 8px; background: ${selectedAO === 'AO' ? '#152741' : 'white'}; color: ${selectedAO === 'AO' ? 'white' : '#152741'}; font-weight: bold;">${selectedAO === 'AO' ? '✓' : ''}</span>
+            <span style="border: 1px solid #152741; width: 10px; height: 10px; display: inline-block; text-align: center; font-size: 8px; background: ${selectedAO === 'OI' ? '#152741' : 'white'}; color: ${selectedAO === 'OI' ? 'white' : '#152741'}; font-weight: bold;">${selectedAO === 'OI' ? '✓' : ''}</span>
+            <span style="border: 1px solid #152741; width: 10px; height: 10px; display: inline-block; text-align: center; font-size: 8px; background: ${selectedAO === 'OD' ? '#152741' : 'white'}; color: ${selectedAO === 'OD' ? 'white' : '#152741'}; font-weight: bold;">${selectedAO === 'OD' ? '✓' : ''}</span>
           </div>
         </div>
       `;
@@ -50,7 +50,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       // Agregar notas específicas de la práctica si las hay
       if (item.notes) {
         practicesHtml += `
-          <div style="margin-left: 20px; margin-bottom: 4px; font-size: 8px; color: #666; font-style: italic;">
+          <div style="margin-top: 10px; padding: 4px; background-color: #f0f4f8; border-left: 3px solid #152741; font-size: 9px; color: #333;">
             Nota: ${item.notes}
           </div>
         `;
@@ -74,7 +74,9 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
   pdfContent.innerHTML = `
     <!-- Header exacto como el original -->
     <div style="text-align: center; margin-bottom: 15px;">
-      <div style="color: #1E40AF; font-size: 32px; font-weight: bold; margin-bottom: 3px; letter-spacing: 2px;">CORG</div>
+      <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
+        <img src="/Logo-corg.png" alt="CORG Logo" style="height: 40px; width: auto;" />
+      </div>
       <div style="font-size: 11px; margin-bottom: 2px; color: #666; letter-spacing: 1px;">${companyInfo.subtitle}</div>
       <div style="font-size: 9px; margin-bottom: 1px; color: #666; font-weight: bold;">DIRECTOR MÉDICO</div>
       <div style="font-size: 9px; margin-bottom: 1px; color: #333;">${companyInfo.director}</div>
@@ -146,7 +148,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     </div>
     
     <!-- Footer azul exacto como el original -->
-    <div style="background-color: #1E40AF; color: white; padding: 6px 8px; margin-top: auto; font-size: 7px; position: absolute; bottom: 8mm; left: 8mm; right: 8mm;">
+    <div style="background-color: #152741; color: white; padding: 6px 8px; margin-top: auto; font-size: 7px; position: absolute; bottom: 8mm; left: 8mm; right: 8mm;">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div style="line-height: 1.3;">
           <div style="margin-bottom: 1px;">📍 ${companyInfo.address}</div>
