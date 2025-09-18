@@ -161,6 +161,16 @@ export function UserRegistration() {
               </button>
             </form>
           </div>
+          
+          {/* Enlace para volver al login */}
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => window.location.reload()}
+              className="text-sm text-red-600 hover:text-red-800 font-medium underline"
+            >
+              ← Volver al Login
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -307,6 +317,16 @@ export function UserRegistration() {
               </button>
             </div>
           </form>
+        </div>
+        
+        {/* Enlace para volver al login */}
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => window.location.reload()}
+            className="text-sm text-green-600 hover:text-green-800 font-medium underline"
+          >
+            ← Volver al Login
+          </button>
         </div>
       </div>
     </div>
