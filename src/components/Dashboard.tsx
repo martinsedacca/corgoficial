@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useData } from '../contexts/DataContext';
+import { generateStatisticsReport } from '../utils/reportGenerator';
 import { BarChart3, Calendar, User, Activity, TrendingUp, FileText, Filter, Download } from 'lucide-react';
 
 export function Dashboard() {
@@ -132,24 +133,29 @@ export function Dashboard() {
   };
 
   const exportData = () => {
-    const data = {
+    const reportData = {
       periodo: `${dateRange.startDate} a ${dateRange.endDate}`,
       totalRecetas: filteredPrescriptions.length,
       estadisticasPorDia: dailyStats,
       estadisticasPorMedico: doctorStats,
       estadisticasPorPractica: practiceStats,
+      estadisticasPorPractica: practiceStats.map(stat => ({
+        practice: stat.practice,
+        category: stat.category,
+        count: stat.count
+      })),
       estadisticasPorTipo: typeStats
     };
+    const handleAsync = async () => {
+      try {
+        await generateStatisticsReport(reportData);
+      } catch (error) {
+        console.error('Error exporting report:', error);
+        alert('Error al generar el reporte PDF. Por favor, intente nuevamente.');
+      }
+    };
     
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `estadisticas-${dateRange.startDate}-${dateRange.endDate}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    handleAsync();
   };
 
   return (
@@ -177,7 +183,7 @@ export function Dashboard() {
               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
             >
               <Download className="h-4 w-4" />
-              Exportar
+              Exportar PDF
             </button>
           </div>
         </div>
