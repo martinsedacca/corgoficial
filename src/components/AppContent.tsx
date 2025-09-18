@@ -41,12 +41,12 @@ export function AppContent() {
     return <UserRegistration />;
   }
 
-  // Mostrar formulario de login si no está autenticado
+  // Mostrar formulario de login si no hay usuario autenticado
   if (!user) {
     return <LoginForm onShowRegistration={() => setShowUserRegistration(true)} />;
   }
 
-  // Si el usuario está autenticado pero no tiene perfil, mostrar mensaje
+  // Si hay usuario autenticado pero no tiene perfil válido, mostrar mensaje de error
   if (!profile) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
@@ -81,6 +81,7 @@ export function AppContent() {
     );
   }
 
+  // Si llegamos aquí, el usuario está autenticado y tiene perfil válido
   const handlePrescriptionSubmit = (prescriptionData: any) => {
     // La receta ya se guardó en PrescriptionForm, solo cambiamos la vista
     setEditingPrescription(null);
