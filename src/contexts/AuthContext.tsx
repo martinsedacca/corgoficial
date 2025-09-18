@@ -36,57 +36,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
-
-    const initializeAuth = async () => {
+    // Función para cargar el perfil del usuario
+    const loadProfile = async (userId: string) => {
       try {
-        // Obtener sesión actual
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (!mounted) return;
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('is_active', true)
+          .single();
 
         if (error) {
-          console.error('Error getting session:', error);
-          setSession(null);
-          setUser(null);
+          console.log('No profile found:', error);
           setProfile(null);
-          setLoading(false);
-          return;
-        }
-
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        if (session?.user) {
-          await loadUserProfile(session.user.id);
         } else {
-          setProfile(null);
+          setProfile(data);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
-        setSession(null);
-        setUser(null);
+        console.error('Error loading profile:', error);
         setProfile(null);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
       }
     };
 
-    initializeAuth();
-
-    // Escuchar cambios de autenticación
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!mounted) return;
-
-        console.log('Auth state change:', event);
+    // Función de inicialización
+    const initialize = async () => {
+      try {
+        // Obtener sesión actual
+        const { data: { session } } = await supabase.auth.getSession();
+        
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await loadUserProfile(session.user.id);
+          await loadProfile(session.user.id);
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Ejecutar inicialización
+    initialize();
+
+    // Listener para cambios de autenticación
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth event:', event);
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          await loadProfile(session.user.id);
         } else {
           setProfile(null);
         }
@@ -94,31 +97,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
 
     return () => {
-      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
-
-  const loadUserProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('is_active', true)
-        .single();
-
-      if (error) {
-        console.log('No profile found for user:', userId);
-        setProfile(null);
-      } else {
-        setProfile(data);
-      }
-    } catch (error) {
-      console.error('Error loading profile:', error);
-      setProfile(null);
-    }
-  };
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -129,18 +110,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      setSession(null);
-      setUser(null);
-      setProfile(null);
-    } catch (error) {
-      console.error('Error signing out:', error);
-      // Limpiar estados de todas formas
-      setSession(null);
-      setUser(null);
-      setProfile(null);
-    }
+    await supabase.auth.signOut();
+    setSession(null);
+    setUser(null);
+    setProfile(null);
   };
 
   const hasPermission = (permission: string): boolean => {
