@@ -31,38 +31,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Obtener sesión inicial
-    const getInitialSession = async () => {
-      try {
-        setLoading(true);
-        const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          await loadUserProfile(session.user.id);
-        } else {
-          setProfile(null);
-        }
-      } catch (error) {
-        console.error('Error getting initial session:', error);
-        setUser(null);
-        setProfile(null);
-        setSession(null);
-      } finally {
-        setLoading(false);
+    // Verificar sesión inicial de forma síncrona
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        loadUserProfile(session.user.id);
       }
-    };
-
-    getInitialSession();
+    });
 
     // Escuchar cambios de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state change:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -70,10 +54,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await loadUserProfile(session.user.id);
         } else {
           setProfile(null);
-        }
-        
-        if (loading) {
-          setLoading(false);
         }
       }
     );
@@ -91,16 +71,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (error) {
-        if (error.code !== 'PGRST116') { // No rows found
-          console.error('Error loading user profile:', error);
-        }
         setProfile(null);
         return;
       }
 
       setProfile(data);
     } catch (error) {
-      console.error('Error loading user profile:', error);
       setProfile(null);
     }
   };

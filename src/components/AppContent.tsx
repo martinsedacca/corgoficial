@@ -24,28 +24,6 @@ export function AppContent() {
   const [editingPrescription, setEditingPrescription] = useState<Prescription | null>(null);
   const [showUserRegistration, setShowUserRegistration] = useState(false);
 
-  // Mostrar loading mientras se verifica la autenticación
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
-        <div className="mb-8">
-          <img 
-            src="/Logo-corg.png" 
-            alt="CORG Logo" 
-            className="h-20 w-auto"
-          />
-        </div>
-        <LoadingSpinner size="lg" text="Verificando autenticación..." />
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-4 text-sm text-gray-500 hover:text-gray-700 underline"
-        >
-          Si tarda mucho, haga clic aquí para recargar
-        </button>
-      </div>
-    );
-  }
-
   // Mostrar registro de usuario si se solicita
   if (showUserRegistration) {
     return <UserRegistration />;
