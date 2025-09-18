@@ -40,6 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setProfile(null);
     setSession(null);
+    setLoading(true);
     
     // Verificar sesión inicial
     supabase.auth.getSession().then(({ data: { session } }) => {
