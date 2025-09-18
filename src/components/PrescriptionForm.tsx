@@ -30,6 +30,9 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [doctorSearch, setDoctorSearch] = useState('');
   const [patientSearch, setPatientSearch] = useState('');
+  
+  // Como eliminamos la autenticación, definimos isDoctor como false por defecto
+  const isDoctor = false;
 
   // Cargar el siguiente número de receta
   useEffect(() => {
