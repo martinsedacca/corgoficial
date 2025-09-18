@@ -25,8 +25,14 @@ export function AppContent() {
   const [showUserRegistration, setShowUserRegistration] = useState(false);
 
   const handleSignOut = async () => {
-    if (window.confirm('¿Está seguro que desea cerrar sesión?')) {
+    try {
       await signOut();
+      // Forzar recarga de la página para asegurar que vuelva al login
+      window.location.reload();
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+      // Aún así intentar recargar la página
+      window.location.reload();
     }
   };
 
