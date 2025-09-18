@@ -24,6 +24,12 @@ export function AppContent() {
   const [editingPrescription, setEditingPrescription] = useState<Prescription | null>(null);
   const [showUserRegistration, setShowUserRegistration] = useState(false);
 
+  const handleSignOut = async () => {
+    if (window.confirm('¿Está seguro que desea cerrar sesión?')) {
+      await signOut();
+    }
+  };
+
   // Mostrar registro de usuario si se solicita
   if (showUserRegistration) {
     return <UserRegistration />;
@@ -106,12 +112,6 @@ export function AppContent() {
   };
 
   const menuItems = getMenuItems();
-
-  const handleSignOut = async () => {
-    if (window.confirm('¿Está seguro que desea cerrar sesión?')) {
-      await signOut();
-    }
-  };
 
   if (viewingPrescription) {
     return (
