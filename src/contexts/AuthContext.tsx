@@ -36,67 +36,86 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Función para cargar el perfil del usuario
-    const loadProfile = async (userId: string) => {
-      try {
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('user_id', userId)
-          .eq('is_active', true)
-          .single();
+    let mounted = true;
 
-        if (error) {
-          console.log('No profile found:', error);
-          setProfile(null);
-        } else {
-          setProfile(data);
-        }
-      } catch (error) {
-        console.error('Error loading profile:', error);
-        setProfile(null);
-      }
-    };
-
-    // Función de inicialización
-    const initialize = async () => {
+    const initAuth = async () => {
       try {
         // Obtener sesión actual
         const { data: { session } } = await supabase.auth.getSession();
         
-        setSession(session);
-        setUser(session?.user ?? null);
+        if (!mounted) return;
         
         if (session?.user) {
-          await loadProfile(session.user.id);
+          setSession(session);
+          setUser(session.user);
+          
+          // Intentar cargar perfil
+          try {
+            const { data: profileData } = await supabase
+              .from('user_profiles')
+              .select('*')
+              .eq('user_id', session.user.id)
+              .eq('is_active', true)
+              .single();
+            
+            if (mounted && profileData) {
+              setProfile(profileData);
+            }
+          } catch (profileError) {
+            console.log('No profile found or error loading profile');
+            // No hacer nada, dejar profile como null
+          }
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
+        // No hacer nada, dejar todo como null
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
-    // Ejecutar inicialización
-    initialize();
+    initAuth();
 
     // Listener para cambios de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!mounted) return;
+        
         console.log('Auth event:', event);
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await loadProfile(session.user.id);
+          try {
+            const { data: profileData } = await supabase
+              .from('user_profiles')
+              .select('*')
+              .eq('user_id', session.user.id)
+              .eq('is_active', true)
+              .single();
+            
+            if (mounted) {
+              setProfile(profileData || null);
+            }
+          } catch (error) {
+            console.log('Error loading profile after auth change');
+            if (mounted) {
+              setProfile(null);
+            }
+          }
         } else {
-          setProfile(null);
+          if (mounted) {
+            setProfile(null);
+          }
         }
       }
     );
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);

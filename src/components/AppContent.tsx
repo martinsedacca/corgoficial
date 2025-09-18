@@ -39,16 +39,16 @@ export function AppContent() {
     return <UserRegistration />;
   }
 
-  // Mostrar loading mientras se verifica la autenticación
+  // SIEMPRE mostrar loading mientras se verifica la autenticación
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <LoadingSpinner text="Verificando autenticación..." />
+        <LoadingSpinner text="Cargando..." />
       </div>
     );
   }
 
-  // Mostrar formulario de login si no hay usuario autenticado
+  // SIEMPRE mostrar formulario de login si no hay usuario autenticado
   if (!user) {
     return <LoginForm onShowRegistration={() => setShowUserRegistration(true)} />;
   }
