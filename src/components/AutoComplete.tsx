@@ -78,7 +78,7 @@ export function AutoComplete({ options, value, onChange, placeholder, label, onC
       </div>
       
       {isOpen && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
           {filteredOptions.length === 0 ? (
             <div>
               <div className="px-3 py-2 text-gray-500 text-sm">
@@ -91,7 +91,7 @@ export function AutoComplete({ options, value, onChange, placeholder, label, onC
                     onCreateNew(value.trim());
                     setIsOpen(false);
                   }}
-                  className="w-full px-3 py-2 text-left hover:bg-primary-50 focus:bg-primary-50 focus:outline-none border-t border-gray-200 text-primary-600 font-medium"
+                  className="w-full px-3 py-2 text-left hover:bg-primary-50 focus:bg-primary-50 focus:outline-none border-t border-gray-200 text-primary-600 font-medium text-sm"
                 >
                   + {createNewLabel || 'Crear nuevo'}: "{value.trim()}"
                 </button>
@@ -103,7 +103,7 @@ export function AutoComplete({ options, value, onChange, placeholder, label, onC
                 key={option.id}
                 type="button"
                 onClick={() => handleSelect(option)}
-                className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 text-sm"
               >
                 <div className="font-medium">{option.label}</div>
               </button>

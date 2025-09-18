@@ -92,7 +92,7 @@ export function SocialWorkAutocomplete({
       </div>
       
       {isOpen && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
           {filteredOptions.length === 0 ? (
             <div>
               <div className="px-3 py-2 text-gray-500 text-sm">
@@ -102,7 +102,7 @@ export function SocialWorkAutocomplete({
                 <button
                   type="button"
                   onClick={() => handleCreateNew(value.trim())}
-                  className="w-full px-3 py-2 text-left hover:bg-primary-50 focus:bg-primary-50 focus:outline-none border-t border-gray-200 text-primary-600 font-medium flex items-center gap-2"
+                  className="w-full px-3 py-2 text-left hover:bg-primary-50 focus:bg-primary-50 focus:outline-none border-t border-gray-200 text-primary-600 font-medium flex items-center gap-2 text-sm"
                 >
                   <Plus className="h-4 w-4" />
                   Crear nueva obra social: "{value.trim()}"
@@ -116,7 +116,7 @@ export function SocialWorkAutocomplete({
                   key={socialWork.id}
                   type="button"
                   onClick={() => handleSelect(socialWork)}
-                  className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                  className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 text-sm"
                 >
                   <div className="flex items-center justify-between">
                     <div className="font-medium">{socialWork.name}</div>
@@ -133,7 +133,7 @@ export function SocialWorkAutocomplete({
                 <button
                   type="button"
                   onClick={() => handleCreateNew(value.trim())}
-                  className="w-full px-3 py-2 text-left hover:bg-primary-50 focus:bg-primary-50 focus:outline-none border-t border-gray-200 text-primary-600 font-medium flex items-center gap-2"
+                  className="w-full px-3 py-2 text-left hover:bg-primary-50 focus:bg-primary-50 focus:outline-none border-t border-gray-200 text-primary-600 font-medium flex items-center gap-2 text-sm"
                 >
                   <Plus className="h-4 w-4" />
                   Crear nueva obra social: "{value.trim()}"

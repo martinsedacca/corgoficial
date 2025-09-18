@@ -201,10 +201,10 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const rightColumnPractices = filteredPractices.slice(Math.ceil(filteredPractices.length / 2));
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
       <div className="flex items-center gap-2 mb-6">
         <FileText className="h-6 w-6 text-primary-600" />
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
           {editingPrescription ? `Editar Receta #${editingPrescription.number}` : `Nueva Receta #${nextNumber || '...'}`}
         </h2>
       </div>
@@ -219,38 +219,38 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
             <button
               type="button"
               onClick={() => setPrescriptionType('studies')}
-              className={`p-3 rounded-lg border-2 transition-colors ${
+              className={`p-2 sm:p-3 rounded-lg border-2 transition-colors ${
                 prescriptionType === 'studies'
                   ? 'border-primary-500 bg-primary-50 text-primary-700'
                   : 'border-gray-300 hover:border-gray-400'
               }`}
             >
-              <div className="font-medium">Estudios</div>
-              <div className="text-xs text-gray-500">Autorización de estudios</div>
+              <div className="text-sm sm:text-base font-medium">Estudios</div>
+              <div className="text-xs text-gray-500 hidden sm:block">Autorización de estudios</div>
             </button>
             <button
               type="button"
               onClick={() => setPrescriptionType('treatments')}
-              className={`p-3 rounded-lg border-2 transition-colors ${
+              className={`p-2 sm:p-3 rounded-lg border-2 transition-colors ${
                 prescriptionType === 'treatments'
                   ? 'border-primary-500 bg-primary-50 text-primary-700'
                   : 'border-gray-300 hover:border-gray-400'
               }`}
             >
-              <div className="font-medium">Tratamientos</div>
-              <div className="text-xs text-gray-500">Procedimientos láser</div>
+              <div className="text-sm sm:text-base font-medium">Tratamientos</div>
+              <div className="text-xs text-gray-500 hidden sm:block">Procedimientos láser</div>
             </button>
             <button
               type="button"
               onClick={() => setPrescriptionType('authorization')}
-              className={`p-3 rounded-lg border-2 transition-colors ${
+              className={`p-2 sm:p-3 rounded-lg border-2 transition-colors ${
                 prescriptionType === 'authorization'
                   ? 'border-primary-500 bg-primary-50 text-primary-700'
                   : 'border-gray-300 hover:border-gray-400'
               }`}
             >
-              <div className="font-medium">Autorización</div>
-              <div className="text-xs text-gray-500">Cirugías</div>
+              <div className="text-sm sm:text-base font-medium">Autorización</div>
+              <div className="text-xs text-gray-500 hidden sm:block">Cirugías</div>
             </button>
           </div>
         </div>
@@ -278,7 +278,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
           
           {/* Formulario para crear nuevo paciente */}
           {showPatientForm && (
-            <div className="mt-4 p-4 border border-primary-200 rounded-lg bg-primary-50">
+            <div className="mt-4 p-3 sm:p-4 border border-primary-200 rounded-lg bg-primary-50">
               <h4 className="text-lg font-medium text-primary-800 mb-3">Crear Nuevo Paciente</h4>
               <form onSubmit={handleSaveNewPatient} className="space-y-3">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -374,22 +374,22 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
           </label>
           
           {/* Grid de prácticas */}
-          <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-            <div className="grid grid-cols-2 gap-8">
+          <div className="border border-gray-200 rounded-lg p-3 sm:p-4 bg-gray-50">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
               {/* Columna izquierda */}
               <div className="space-y-2">
                 {leftColumnPractices.map((practice) => (
-                  <div key={practice.id} className="flex items-center justify-between text-sm">
+                  <div key={practice.id} className="flex items-center justify-between text-xs sm:text-sm">
                     <span className={`flex-1 ${selectedPractices[practice.id] ? 'font-semibold text-primary-700' : 'text-gray-700'}`}>
                       {practice.name.toUpperCase()}
                     </span>
-                    <div className="flex gap-1 ml-2">
+                    <div className="flex gap-1 ml-1 sm:ml-2">
                       {(['AO', 'OI', 'OD'] as const).map((ao) => (
                         <button
                           key={ao}
                           type="button"
                           onClick={() => handlePracticeToggle(practice.id, ao)}
-                          className={`w-8 h-6 border border-gray-400 text-xs font-bold transition-colors flex items-center justify-center ${
+                          className={`w-6 h-5 sm:w-8 sm:h-6 border border-gray-400 text-xs font-bold transition-colors flex items-center justify-center ${
                             selectedPractices[practice.id] === ao
                               ? 'bg-primary-600 text-white border-primary-600'
                               : 'bg-white text-gray-400 hover:bg-gray-100'
@@ -404,19 +404,46 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
               </div>
 
               {/* Columna derecha */}
-              <div className="space-y-2">
+              <div className="space-y-2 lg:block hidden">
                 {rightColumnPractices.map((practice) => (
-                  <div key={practice.id} className="flex items-center justify-between text-sm">
+                  <div key={practice.id} className="flex items-center justify-between text-xs sm:text-sm">
                     <span className={`flex-1 ${selectedPractices[practice.id] ? 'font-semibold text-primary-700' : 'text-gray-700'}`}>
                       {practice.name.toUpperCase()}
                     </span>
-                    <div className="flex gap-1 ml-2">
+                    <div className="flex gap-1 ml-1 sm:ml-2">
                       {(['AO', 'OI', 'OD'] as const).map((ao) => (
                         <button
                           key={ao}
                           type="button"
                           onClick={() => handlePracticeToggle(practice.id, ao)}
-                          className={`w-8 h-6 border border-gray-400 text-xs font-bold transition-colors flex items-center justify-center ${
+                          className={`w-6 h-5 sm:w-8 sm:h-6 border border-gray-400 text-xs font-bold transition-colors flex items-center justify-center ${
+                            selectedPractices[practice.id] === ao
+                              ? 'bg-primary-600 text-white border-primary-600'
+                              : 'bg-white text-gray-400 hover:bg-gray-100'
+                          }`}
+                        >
+                          {selectedPractices[practice.id] === ao ? ao : ao}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Mostrar columna derecha en móvil */}
+              <div className="space-y-2 lg:hidden">
+                {rightColumnPractices.map((practice) => (
+                  <div key={practice.id} className="flex items-center justify-between text-xs sm:text-sm">
+                    <span className={`flex-1 ${selectedPractices[practice.id] ? 'font-semibold text-primary-700' : 'text-gray-700'}`}>
+                      {practice.name.toUpperCase()}
+                    </span>
+                    <div className="flex gap-1 ml-1 sm:ml-2">
+                      {(['AO', 'OI', 'OD'] as const).map((ao) => (
+                        <button
+                          key={ao}
+                          type="button"
+                          onClick={() => handlePracticeToggle(practice.id, ao)}
+                          className={`w-6 h-5 sm:w-8 sm:h-6 border border-gray-400 text-xs font-bold transition-colors flex items-center justify-center ${
                             selectedPractices[practice.id] === ao
                               ? 'bg-primary-600 text-white border-primary-600'
                               : 'bg-white text-gray-400 hover:bg-gray-100'
@@ -463,7 +490,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
         </div>
 
         {/* Botones de acción */}
-        <div className="flex gap-4 pt-6">
+        <div className="flex flex-col sm:flex-row gap-4 pt-6">
           <button
             type="submit"
             className="flex-1 flex items-center justify-center gap-2 bg-primary-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-primary-700 transition-colors"

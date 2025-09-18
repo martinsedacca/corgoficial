@@ -31,10 +31,10 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
       <div className="flex items-center gap-2 mb-6">
         <FileText className="h-6 w-6 text-primary-600" />
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
           Historial de Recetas
         </h2>
       </div>
@@ -84,12 +84,12 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           filteredPrescriptions.map((prescription) => (
             <div
               key={prescription.id}
-              className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+              className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors"
             >
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-2">
-                    <div className="text-lg font-semibold text-primary-700">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-2">
+                    <div className="text-base sm:text-lg font-semibold text-primary-700">
                       #{prescription.number}
                     </div>
                     <div className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -103,7 +103,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-600">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4" />
                       <span>
@@ -125,7 +125,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                   </div>
                   
                   <div className="mt-3">
-                    <div className="text-sm text-gray-700">
+                    <div className="text-xs sm:text-sm text-gray-700">
                       <strong>Prácticas ({prescription.items.length}):</strong>
                       <span className="ml-2">
                         {prescription.items.slice(0, 3).map(item => item.practice.name).join(', ')}
@@ -135,21 +135,21 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                   </div>
                 </div>
                 
-                <div className="ml-4">
-                  <div className="flex items-center justify-center gap-3">
+                <div className="lg:ml-4">
+                  <div className="flex items-center justify-center gap-2 sm:gap-3">
                     <button
                       onClick={() => onViewPrescription(prescription)}
-                      className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                      className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
                     >
                       <Eye className="h-4 w-4" />
-                      Ver
+                      <span className="hidden sm:inline">Ver</span>
                     </button>
                     <button
                       onClick={() => onEditPrescription(prescription)}
-                      className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                      className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
                     >
                       <Edit3 className="h-4 w-4" />
-                      Editar
+                      <span className="hidden sm:inline">Editar</span>
                     </button>
                   </div>
                 </div>

@@ -111,30 +111,31 @@ function AppContent() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between py-3 sm:h-16">
             <div className="flex items-center space-x-2">
               <img 
                 src="/Logo-corg.png" 
                 alt="CORG Logo" 
-                className="h-10 w-auto"
+                className="h-8 sm:h-10 w-auto"
               />
             </div>
-            <div className="flex items-center space-x-1">
+            <div className="flex flex-wrap items-center justify-center gap-1 mt-2 sm:mt-0 sm:space-x-1">
               {menuItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <button
                     key={item.key}
                     onClick={() => setCurrentView(item.key as View)}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
                       currentView === item.key
                         ? 'bg-primary-100 text-primary-700 border border-primary-200'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <Icon className={`h-4 w-4 ${currentView === item.key ? 'text-primary-600' : currentView === item.key ? 'text-primary-600' : item.color.replace('blue', 'primary')}`} />
-                    <span>{item.label}</span>
+                    <Icon className={`h-3 w-3 sm:h-4 sm:w-4 ${currentView === item.key ? 'text-primary-600' : currentView === item.key ? 'text-primary-600' : item.color.replace('blue', 'primary')}`} />
+                    <span className="hidden sm:inline">{item.label}</span>
+                    <span className="sm:hidden text-xs">{item.label.split(' ')[0]}</span>
                   </button>
                 );
               })}
@@ -144,7 +145,7 @@ function AppContent() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
         {currentView === 'new' && (
           <PrescriptionForm
             onSubmit={handlePrescriptionSubmit}

@@ -112,40 +112,41 @@ export function PracticeAdmin() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Activity className="h-8 w-8 text-purple-600" />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Administración de Prácticas Médicas</h1>
-              <p className="text-gray-600">Gestione estudios, tratamientos y cirugías</p>
+              <h1 className="text-lg sm:text-2xl font-bold text-gray-900">Administración de Prácticas Médicas</h1>
+              <p className="text-sm sm:text-base text-gray-600">Gestione estudios, tratamientos y cirugías</p>
             </div>
           </div>
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm sm:text-base"
           >
             <Plus className="h-5 w-5" />
-            Nueva Práctica
+            <span className="hidden sm:inline">Nueva Práctica</span>
+            <span className="sm:hidden">Nueva</span>
           </button>
         </div>
 
         {/* Estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
           <div className="bg-gray-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-gray-900">{practices.length}</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">{practices.length}</div>
             <div className="text-sm text-gray-600">Total de Prácticas</div>
           </div>
           <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-blue-700">{practicesByCategory.study.length}</div>
+            <div className="text-xl sm:text-2xl font-bold text-blue-700">{practicesByCategory.study.length}</div>
             <div className="text-sm text-blue-600">Estudios</div>
           </div>
           <div className="bg-green-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-green-700">{practicesByCategory.treatment.length}</div>
+            <div className="text-xl sm:text-2xl font-bold text-green-700">{practicesByCategory.treatment.length}</div>
             <div className="text-sm text-green-600">Tratamientos</div>
           </div>
           <div className="bg-purple-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-purple-700">{practicesByCategory.surgery.length}</div>
+            <div className="text-xl sm:text-2xl font-bold text-purple-700">{practicesByCategory.surgery.length}</div>
             <div className="text-sm text-purple-600">Cirugías</div>
           </div>
         </div>
@@ -153,10 +154,10 @@ export function PracticeAdmin() {
 
       {/* Formulario */}
       {showForm && (
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
           <div className="flex items-center gap-2 mb-6">
             <Activity className="h-6 w-6 text-purple-600" />
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
               {editingPractice ? 'Editar Práctica' : 'Nueva Práctica'}
             </h2>
           </div>
@@ -245,7 +246,7 @@ export function PracticeAdmin() {
       )}
 
       {/* Filtros */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
@@ -280,7 +281,7 @@ export function PracticeAdmin() {
         if (categoryPractices.length === 0) return null;
 
         return (
-          <div key={category} className="bg-white rounded-lg shadow-lg p-6">
+          <div key={category} className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className={`px-3 py-1 rounded-full text-sm font-medium ${categoryColors[category as keyof typeof categoryColors]}`}>
                 {categoryLabels[category as keyof typeof categoryLabels]} ({categoryPractices.length})
@@ -289,11 +290,11 @@ export function PracticeAdmin() {
             
             <div className="grid gap-3">
               {categoryPractices.map((practice) => (
-                <div key={practice.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center justify-between">
+                <div key={practice.id} className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">{practice.name}</h3>
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900">{practice.name}</h3>
                         <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm font-mono">
                           {practice.code}
                         </span>
@@ -302,7 +303,7 @@ export function PracticeAdmin() {
                         <p className="text-sm text-gray-600">{practice.description}</p>
                       )}
                     </div>
-                    <div className="flex gap-2 ml-4">
+                    <div className="flex gap-2 sm:ml-4">
                       <button
                         onClick={() => handleEdit(practice)}
                         className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"

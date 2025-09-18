@@ -70,23 +70,24 @@ export function DoctorManager() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <User className="h-6 w-6 text-primary-600" />
-          <h2 className="text-xl font-semibold text-gray-900">Gestión de Médicos</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Gestión de Médicos</h2>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base"
         >
           <UserPlus className="h-4 w-4" />
-          Nuevo Médico
+          <span className="hidden sm:inline">Nuevo Médico</span>
+          <span className="sm:hidden">Nuevo</span>
         </button>
       </div>
 
       {showForm && (
-        <div className="mb-6 bg-gray-50 p-4 rounded-lg">
+        <div className="mb-6 bg-gray-50 p-3 sm:p-4 rounded-lg">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
             {editingDoctor ? 'Editar Médico' : 'Nuevo Médico'}
           </h3>
@@ -183,11 +184,11 @@ export function DoctorManager() {
           </div>
         ) : (
           doctors.map((doctor) => (
-            <div key={doctor.id} className="border border-gray-200 rounded-lg p-4">
-              <div className="flex items-center justify-between">
+            <div key={doctor.id} className="border border-gray-200 rounded-lg p-3 sm:p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">{doctor.name}</h3>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900">{doctor.name}</h3>
                     <span className="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-sm">
                       {doctor.specialty}
                     </span>
@@ -208,7 +209,7 @@ export function DoctorManager() {
                     )}
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 sm:ml-4">
                   <button
                     onClick={() => handleEdit(doctor)}
                     className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
