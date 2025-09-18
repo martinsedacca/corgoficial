@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, LogIn, AlertCircle, UserPlus } from 'lucide-react';
 
-export function LoginForm() {
+interface LoginFormProps {
+  onShowRegistration?: () => void;
+}
+
+export function LoginForm({ onShowRegistration }: LoginFormProps) {
   const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -139,6 +143,15 @@ export function LoginForm() {
             <p className="text-sm text-gray-500">
               Contacte al administrador del sistema
             </p>
+            {onShowRegistration && (
+              <button
+                onClick={onShowRegistration}
+                className="mt-4 flex items-center gap-2 text-sm text-primary-600 hover:text-primary-800 font-medium mx-auto"
+              >
+                <UserPlus className="h-4 w-4" />
+                Crear primer usuario administrador
+              </button>
+            )}
           </div>
         </div>
 

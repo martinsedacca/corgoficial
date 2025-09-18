@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { LoginForm } from './LoginForm';
+import { UserRegistration } from './UserRegistration';
 import { UserManager } from './UserManager';
 import { LoadingSpinner } from './LoadingSpinner';
 import { PrescriptionForm } from './PrescriptionForm';
@@ -21,6 +22,7 @@ export function AppContent() {
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [viewingPrescription, setViewingPrescription] = useState<Prescription | null>(null);
   const [editingPrescription, setEditingPrescription] = useState<Prescription | null>(null);
+  const [showUserRegistration, setShowUserRegistration] = useState(false);
 
   // Mostrar loading mientras se verifica la autenticación
   if (authLoading) {
@@ -38,9 +40,14 @@ export function AppContent() {
     );
   }
 
+  // Mostrar registro de usuario si se solicita
+  if (showUserRegistration) {
+    return <UserRegistration />;
+  }
+
   // Mostrar formulario de login si no está autenticado
   if (!user) {
-    return <LoginForm />;
+    return <LoginForm onShowRegistration={() => setShowUserRegistration(true)} />;
   }
 
   // Si el usuario está autenticado pero no tiene perfil, mostrar mensaje
@@ -59,12 +66,20 @@ export function AppContent() {
           <p className="text-gray-600 mb-6">
             Su cuenta no tiene un perfil asignado. Contacte al administrador del sistema.
           </p>
-          <button
-            onClick={() => signOut()}
-            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Cerrar Sesión
-          </button>
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={() => setShowUserRegistration(true)}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              Crear Usuario Admin
+            </button>
+            <button
+              onClick={() => signOut()}
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Cerrar Sesión
+            </button>
+          </div>
         </div>
       </div>
     );
