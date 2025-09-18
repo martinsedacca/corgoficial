@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
+import { useAuth } from '../contexts/AuthContext';
 import { AutoComplete } from './AutoComplete';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
 import { PrescriptionItem, Doctor, Patient, Practice, Prescription } from '../types';
@@ -13,6 +14,7 @@ interface PrescriptionFormProps {
 
 export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: PrescriptionFormProps) {
   const { doctors, patients, practices, getNextPrescriptionNumber, addPrescription, updatePrescription } = useData();
+  const { profile, isDoctor } = useAuth();
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [newPatientData, setNewPatientData] = useState({
     name: '',
@@ -62,8 +64,15 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
         practicesMap[item.practiceId] = item.ao || 'AO';
       });
       setSelectedPractices(practicesMap);
+    } else if (isDoctor && profile?.doctor_id) {
+      // Si es médico, preseleccionar sus datos
+      const doctorData = doctors.find(d => d.id === profile.doctor_id);
+      if (doctorData) {
+        setSelectedDoctor(doctorData);
+        setDoctorSearch(doctorData.name);
+      }
     }
-  }, [editingPrescription]);
+  }, [editingPrescription, isDoctor, profile, doctors]);
 
   const doctorOptions = doctors.map(doctor => ({
     id: doctor.id,
@@ -256,13 +265,24 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
         </div>
 
         {/* Médico */}
-        <AutoComplete
-          options={doctorOptions}
-          value={doctorSearch}
-          onChange={handleDoctorChange}
-          placeholder="Buscar médico..."
-          label="Médico"
-        />
+        {isDoctor ? (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Médico
+            </label>
+            <div className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700">
+              {selectedDoctor?.name} - {selectedDoctor?.specialty}
+            </div>
+          </div>
+        ) : (
+          <AutoComplete
+            options={doctorOptions}
+            value={doctorSearch}
+            onChange={handleDoctorChange}
+            placeholder="Buscar médico..."
+            label="Médico"
+          />
+        )}
 
         {/* Paciente */}
         <div>

@@ -196,11 +196,58 @@ export interface Database {
           updated_at?: string;
         };
       };
+      user_profiles: {
+        Row: {
+          id: string;
+          user_id: string;
+          email: string;
+          full_name: string;
+          role: 'admin' | 'secretary' | 'doctor';
+          doctor_id: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          email: string;
+          full_name: string;
+          role: 'admin' | 'secretary' | 'doctor';
+          doctor_id?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          email?: string;
+          full_name?: string;
+          role?: 'admin' | 'secretary' | 'doctor';
+          doctor_id?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Functions: {
       get_next_prescription_number: {
         Args: Record<PropertyKey, never>;
         Returns: number;
+      };
+      get_current_user_profile: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          id: string;
+          user_id: string;
+          email: string;
+          full_name: string;
+          role: string;
+          doctor_id: string | null;
+          is_active: boolean;
+        }[];
       };
     };
   };
