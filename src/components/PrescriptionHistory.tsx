@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useData } from '../contexts/DataContext';
-import { useAuth } from '../contexts/AuthContext';
 import { Prescription } from '../types';
 import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3 } from 'lucide-react';
 
@@ -11,7 +10,6 @@ interface PrescriptionHistoryProps {
 
 export default function PrescriptionHistory({ onViewPrescription, onEditPrescription }: PrescriptionHistoryProps) {
   const { prescriptions } = useData();
-  const { profile, isDoctor } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
 
@@ -21,10 +19,8 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     authorization: 'Autorización'
   };
 
-  // Filtrar recetas según el rol del usuario
-  const availablePrescriptions = isDoctor && profile?.doctor_id
-    ? prescriptions.filter(p => p.doctorId === profile.doctor_id)
-    : prescriptions;
+  // Usar todas las prescripciones (modo público)
+  const availablePrescriptions = prescriptions;
 
   const filteredPrescriptions = availablePrescriptions.filter(prescription => {
     const matchesSearch = 
@@ -80,12 +76,12 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           <div className="text-center py-12">
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg mb-2">
-              {isDoctor ? 'No tiene recetas creadas' : 'No se encontraron recetas'}
+              No se encontraron recetas
             </p>
             <p className="text-gray-400">
               {searchTerm || filterType !== 'all' 
                 ? 'Intente ajustar los filtros de búsqueda'
-                : isDoctor ? 'Cree su primera receta' : 'Aún no hay recetas creadas'
+                : 'Aún no hay recetas creadas'
               }
             </p>
           </div>

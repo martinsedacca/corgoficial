@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { useData } from '../contexts/DataContext';
-import { useAuth } from '../contexts/AuthContext';
 import { Patient } from '../types';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
 import { UserPlus, Edit3, Trash2, Users, Phone, Mail, MapPin } from 'lucide-react';
 
 export function PatientManager() {
   const { patients, addPatient, updatePatient, deletePatient } = useData();
-  const { hasPermission } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [formData, setFormData] = useState({
@@ -234,14 +232,12 @@ export function PatientManager() {
                   >
                     <Edit3 className="h-4 w-4" />
                   </button>
-                  {hasPermission('delete_patients') && (
-                    <button
-                      onClick={() => handleDelete(patient.id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  )}
+                  <button
+                    onClick={() => handleDelete(patient.id)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
             </div>

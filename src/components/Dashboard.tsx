@@ -1,12 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useData } from '../contexts/DataContext';
-import { useAuth } from '../contexts/AuthContext';
 import { generateStatisticsReport } from '../utils/reportGenerator';
 import { BarChart3, Calendar, User, Activity, TrendingUp, FileText, Filter, Download } from 'lucide-react';
 
 export function Dashboard() {
   const { prescriptions, doctors, practices } = useData();
-  const { profile, isDoctor, hasPermission } = useAuth();
   const [dateRange, setDateRange] = useState({
     startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 días atrás
     endDate: new Date().toISOString().split('T')[0]
@@ -15,21 +13,8 @@ export function Dashboard() {
   const [selectedPractice, setSelectedPractice] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
 
-  // Verificar permisos
-  if (!hasPermission('view_dashboard')) {
-    return (
-      <div className="bg-white rounded-lg shadow-lg p-6 text-center">
-        <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Dashboard no disponible</h3>
-        <p className="text-gray-600">No tiene permisos para ver las estadísticas del sistema.</p>
-      </div>
-    );
-  }
-
-  // Filtrar prescripciones base según el rol
-  const basePrescriptions = isDoctor && profile?.doctor_id
-    ? prescriptions.filter(p => p.doctorId === profile.doctor_id)
-    : prescriptions;
+  // Usar todas las prescripciones (modo público)
+  const basePrescriptions = prescriptions;
 
   // Filtrar prescripciones según los filtros aplicados
   const filteredPrescriptions = useMemo(() => {
@@ -186,7 +171,7 @@ export function Dashboard() {
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard de Estadísticas</h1>
               <p className="text-sm sm:text-base text-gray-600">
-                {isDoctor ? 'Análisis de sus recetas médicas' : 'Análisis de recetas médicas'}
+                Análisis de recetas médicas
               </p>
             </div>
           </div>
@@ -235,23 +220,21 @@ export function Dashboard() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-          {!isDoctor && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Médico
-              </label>
-              <select
-                value={selectedDoctor}
-                onChange={(e) => setSelectedDoctor(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="all">Todos los médicos</option>
-                {doctors.map(doctor => (
-                  <option key={doctor.id} value={doctor.id}>{doctor.name}</option>
-                ))}
-              </select>
-            </div>
-          )}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Médico
+            </label>
+            <select
+              value={selectedDoctor}
+              onChange={(e) => setSelectedDoctor(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="all">Todos los médicos</option>
+              {doctors.map(doctor => (
+                <option key={doctor.id} value={doctor.id}>{doctor.name}</option>
+              ))}
+            </select>
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Tipo
