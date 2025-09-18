@@ -18,7 +18,7 @@ import { FileText, History, User, Users, Activity, Building2, BarChart3, LogOut,
 type View = 'dashboard' | 'new' | 'history' | 'doctors' | 'patients' | 'practices' | 'admin-practices' | 'social-works' | 'users';
 
 export function AppContent() {
-  const { user, profile, loading: authLoading, signOut, hasPermission } = useAuth();
+  const { user, profile, loading, signOut, hasPermission } = useAuth();
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [viewingPrescription, setViewingPrescription] = useState<Prescription | null>(null);
   const [editingPrescription, setEditingPrescription] = useState<Prescription | null>(null);
@@ -27,11 +27,9 @@ export function AppContent() {
   const handleSignOut = async () => {
     try {
       await signOut();
-      // Forzar recarga de la página para asegurar que vuelva al login
       window.location.reload();
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
-      // Aún así intentar recargar la página
       window.location.reload();
     }
   };
@@ -39,6 +37,15 @@ export function AppContent() {
   // Mostrar registro de usuario si se solicita
   if (showUserRegistration) {
     return <UserRegistration />;
+  }
+
+  // Mostrar loading mientras se verifica la autenticación
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner text="Verificando autenticación..." />
+      </div>
+    );
   }
 
   // Mostrar formulario de login si no hay usuario autenticado
@@ -83,7 +90,6 @@ export function AppContent() {
 
   // Si llegamos aquí, el usuario está autenticado y tiene perfil válido
   const handlePrescriptionSubmit = (prescriptionData: any) => {
-    // La receta ya se guardó en PrescriptionForm, solo cambiamos la vista
     setEditingPrescription(null);
     setCurrentView('history');
   };
