@@ -19,15 +19,19 @@ export function LoginForm() {
       const { error } = await signIn(email, password);
       
       if (error) {
-        if (error.message.includes('Invalid login credentials')) {
+        console.error('Login error:', error);
+        if (error.message.includes('Invalid login credentials') || error.message.includes('invalid_credentials')) {
           setError('Email o contraseña incorrectos');
         } else if (error.message.includes('Email not confirmed')) {
           setError('Por favor confirme su email antes de iniciar sesión');
+        } else if (error.message.includes('signup_disabled')) {
+          setError('El registro está deshabilitado. Contacte al administrador.');
         } else {
-          setError('Error al iniciar sesión. Intente nuevamente.');
+          setError(`Error al iniciar sesión: ${error.message}`);
         }
       }
     } catch (err) {
+      console.error('Login catch error:', err);
       setError('Error de conexión. Verifique su conexión a internet.');
     } finally {
       setLoading(false);

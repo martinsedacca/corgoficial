@@ -47,8 +47,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       setError(null);
       
-      // Intentar aplicar migraciones primero
-      await applyMigrations();
+      // Solo aplicar migraciones si no hay datos
+      try {
+        await applyMigrations();
+      } catch (migrationError) {
+        console.warn('Migration warning:', migrationError);
+        // Continuar aunque las migraciones fallen
+      }
       
       const [doctorsData, patientsData, practicesData, prescriptionsData, socialWorksData] = await Promise.all([
         doctorService.getAll(),

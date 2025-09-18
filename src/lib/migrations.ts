@@ -2,23 +2,38 @@ import { supabase } from './supabase';
 
 export async function applyMigrations() {
   try {
-    console.log('Verificando y cargando datos iniciales...');
+    console.log('Verificando datos iniciales...');
 
     // Verificar si ya existen datos en las tablas principales
-    const { data: existingDoctors } = await supabase
+    const { data: existingDoctors, error: doctorsError } = await supabase
       .from('doctors')
       .select('id')
       .limit(1);
 
-    const { data: existingPatients } = await supabase
+    if (doctorsError) {
+      console.warn('Error checking doctors table:', doctorsError);
+      return true; // Continuar sin cargar datos de ejemplo
+    }
+
+    const { data: existingPatients, error: patientsError } = await supabase
       .from('patients')
       .select('id')
       .limit(1);
 
-    const { data: existingPractices } = await supabase
+    if (patientsError) {
+      console.warn('Error checking patients table:', patientsError);
+      return true;
+    }
+
+    const { data: existingPractices, error: practicesError } = await supabase
       .from('practices')
       .select('id')
       .limit(1);
+
+    if (practicesError) {
+      console.warn('Error checking practices table:', practicesError);
+      return true;
+    }
 
     // Solo insertar datos si las tablas están vacías
     if (!existingDoctors || existingDoctors.length === 0) {
