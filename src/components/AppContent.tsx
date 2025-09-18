@@ -36,6 +36,12 @@ export function AppContent() {
           />
         </div>
         <LoadingSpinner size="lg" text="Verificando autenticación..." />
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 text-sm text-gray-500 hover:text-gray-700 underline"
+        >
+          Si tarda mucho, haga clic aquí para recargar
+        </button>
       </div>
     );
   }

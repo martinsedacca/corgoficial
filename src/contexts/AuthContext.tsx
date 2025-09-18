@@ -37,15 +37,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Obtener sesión inicial
     const getInitialSession = async () => {
       try {
+        setLoading(true);
         const { data: { session } } = await supabase.auth.getSession();
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
           await loadUserProfile(session.user.id);
+        } else {
+          setProfile(null);
         }
       } catch (error) {
         console.error('Error getting initial session:', error);
+        setUser(null);
+        setProfile(null);
+        setSession(null);
       } finally {
         setLoading(false);
       }
@@ -56,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Escuchar cambios de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -65,7 +72,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setProfile(null);
         }
         
-        setLoading(false);
+        if (loading) {
+          setLoading(false);
+        }
       }
     );
 
@@ -82,13 +91,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (error) {
-        console.error('Error loading user profile:', error);
+        if (error.code !== 'PGRST116') { // No rows found
+          console.error('Error loading user profile:', error);
+        }
+        setProfile(null);
         return;
       }
 
       setProfile(data);
     } catch (error) {
       console.error('Error loading user profile:', error);
+      setProfile(null);
     }
   };
 
