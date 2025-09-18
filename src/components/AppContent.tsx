@@ -39,11 +39,11 @@ export function AppContent() {
     return <UserRegistration />;
   }
 
-  // Mostrar loading solo brevemente
+  // Mostrar loading mientras se verifica autenticación
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <LoadingSpinner text="Iniciando..." />
+        <LoadingSpinner text="Verificando autenticación..." />
       </div>
     );
   }
