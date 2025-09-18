@@ -36,57 +36,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
-
-    const initAuth = async () => {
+    // Simplemente verificar sesión y terminar loading rápido
+    const checkAuth = async () => {
       try {
-        // Obtener sesión actual
         const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!mounted) return;
+        setSession(session);
+        setUser(session?.user || null);
         
         if (session?.user) {
-          setSession(session);
-          setUser(session.user);
+          const { data: profileData } = await supabase
+            .from('user_profiles')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .eq('is_active', true)
+            .single();
           
-          // Intentar cargar perfil
-          try {
-            const { data: profileData } = await supabase
-              .from('user_profiles')
-              .select('*')
-              .eq('user_id', session.user.id)
-              .eq('is_active', true)
-              .single();
-            
-            if (mounted && profileData) {
-              setProfile(profileData);
-            }
-          } catch (profileError) {
-            console.log('No profile found or error loading profile');
-            // No hacer nada, dejar profile como null
-          }
+          setProfile(profileData || null);
         }
       } catch (error) {
-        console.error('Auth initialization error:', error);
-        // No hacer nada, dejar todo como null
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+        console.error('Auth error:', error);
       }
+      
+      // SIEMPRE terminar loading después de 1 segundo máximo
+      setLoading(false);
     };
 
-    initAuth();
+    checkAuth();
 
-    // Listener para cambios de autenticación
+    // Listener simple
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (!mounted) return;
-        
-        console.log('Auth event:', event);
-        
         setSession(session);
-        setUser(session?.user ?? null);
+        setUser(session?.user || null);
         
         if (session?.user) {
           try {
@@ -97,27 +78,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               .eq('is_active', true)
               .single();
             
-            if (mounted) {
-              setProfile(profileData || null);
-            }
+            setProfile(profileData || null);
           } catch (error) {
-            console.log('Error loading profile after auth change');
-            if (mounted) {
-              setProfile(null);
-            }
-          }
-        } else {
-          if (mounted) {
             setProfile(null);
           }
+        } else {
+          setProfile(null);
         }
       }
     );
 
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -130,9 +101,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    setSession(null);
-    setUser(null);
-    setProfile(null);
   };
 
   const hasPermission = (permission: string): boolean => {
