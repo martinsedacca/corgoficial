@@ -58,7 +58,7 @@ export function AppContent() {
               Crear Usuario Admin
             </button>
             <button
-              onClick={() => signOut()}
+              onClick={handleSignOut}
               className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
             >
               Cerrar Sesión
