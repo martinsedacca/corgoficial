@@ -63,7 +63,8 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       });
       setSelectedPractices(practicesMap);
     }
-  }, [editingPrescription, doctors]);
+  }, [editingPrescription]);
+
   const doctorOptions = doctors.map(doctor => ({
     id: doctor.id,
     label: `${doctor.name} - ${doctor.specialty}`,
@@ -255,13 +256,24 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
         </div>
 
         {/* Médico */}
-        <AutoComplete
-          options={doctorOptions}
-          value={doctorSearch}
-          onChange={handleDoctorChange}
-          placeholder="Buscar médico..."
-          label="Médico"
-        />
+        {isDoctor ? (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Médico
+            </label>
+            <div className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700">
+              {selectedDoctor?.name} - {selectedDoctor?.specialty}
+            </div>
+          </div>
+        ) : (
+          <AutoComplete
+            options={doctorOptions}
+            value={doctorSearch}
+            onChange={handleDoctorChange}
+            placeholder="Buscar médico..."
+            label="Médico"
+          />
+        )}
 
         {/* Paciente */}
         <div>
