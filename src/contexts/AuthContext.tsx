@@ -36,28 +36,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Limpiar cualquier estado previo
-    setUser(null);
-    setProfile(null);
-    setSession(null);
-    setLoading(true);
-    
-    // Verificar sesión inicial
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        loadUserProfile(session.user.id);
-      } else {
-        setLoading(false);
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        // Obtener sesión actual
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (!mounted) return;
+
+        if (error) {
+          console.error('Error getting session:', error);
+          setSession(null);
+          setUser(null);
+          setProfile(null);
+          setLoading(false);
+          return;
+        }
+
+        setSession(session);
+        setUser(session?.user ?? null);
+
+        if (session?.user) {
+          await loadUserProfile(session.user.id);
+        } else {
+          setProfile(null);
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        setSession(null);
+        setUser(null);
+        setProfile(null);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
       }
-    });
+    };
+
+    initializeAuth();
 
     // Escuchar cambios de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state change:', event, session?.user?.email);
+        if (!mounted) return;
+
+        console.log('Auth state change:', event);
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -65,17 +89,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await loadUserProfile(session.user.id);
         } else {
           setProfile(null);
-          setLoading(false);
         }
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const loadUserProfile = async (userId: string) => {
     try {
-      setLoading(true);
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
@@ -92,8 +117,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error loading profile:', error);
       setProfile(null);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -108,14 +131,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
+      setSession(null);
+      setUser(null);
+      setProfile(null);
     } catch (error) {
       console.error('Error signing out:', error);
+      // Limpiar estados de todas formas
+      setSession(null);
+      setUser(null);
+      setProfile(null);
     }
-    // Limpiar estados manualmente
-    setSession(null);
-    setUser(null);
-    setProfile(null);
-    setLoading(false);
   };
 
   const hasPermission = (permission: string): boolean => {
