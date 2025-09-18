@@ -58,3 +58,10 @@ export interface CompanyInfo {
   social: string;
   location: string;
 }
+
+export interface SocialWork {
+  id: string;
+  name: string;
+  code?: string;
+  description?: string;
+}

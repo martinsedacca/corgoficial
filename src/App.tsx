@@ -9,12 +9,13 @@ import { PatientManager } from './components/PatientManager';
 import { PracticeManager } from './components/PracticeManager';
 import { PracticeAdmin } from './components/PracticeAdmin';
 import { SocialWorkManager } from './components/SocialWorkManager';
+import { Dashboard } from './components/Dashboard';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { ErrorMessage } from './components/ErrorMessage';
 import { Prescription } from './types';
-import { FileText, History, User, Users, Activity, Stethoscope, Download, Building2 } from 'lucide-react';
+import { FileText, History, User, Users, Activity, Stethoscope, Download, Building2, BarChart3 } from 'lucide-react';
 
-type View = 'new' | 'history' | 'doctors' | 'patients' | 'practices' | 'admin-practices' | 'social-works';
+type View = 'dashboard' | 'new' | 'history' | 'doctors' | 'patients' | 'practices' | 'admin-practices' | 'social-works';
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
 
 function AppContent() {
   const { loading, error, refreshData } = useData();
-  const [currentView, setCurrentView] = useState<View>('new');
+  const [currentView, setCurrentView] = useState<View>('dashboard');
   const [viewingPrescription, setViewingPrescription] = useState<Prescription | null>(null);
   const [editingPrescription, setEditingPrescription] = useState<Prescription | null>(null);
 
@@ -51,6 +52,7 @@ function AppContent() {
   };
 
   const menuItems = [
+    { key: 'dashboard', label: 'Dashboard', icon: BarChart3, color: 'text-blue-600' },
     { key: 'new', label: 'Nueva Receta', icon: FileText, color: 'text-primary-600' },
     { key: 'history', label: 'Historial', icon: History, color: 'text-gray-600' },
     { key: 'doctors', label: 'Médicos', icon: User, color: 'text-primary-600' },
@@ -146,6 +148,7 @@ function AppContent() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+        {currentView === 'dashboard' && <Dashboard />}
         {currentView === 'new' && (
           <PrescriptionForm
             onSubmit={handlePrescriptionSubmit}
