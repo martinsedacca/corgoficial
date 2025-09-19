@@ -3,6 +3,22 @@ import { supabase } from './supabase';
 export async function applyMigrations() {
   try {
     console.log('Verificando datos iniciales...');
+    
+    // Test Supabase connection first
+    try {
+      const { error: connectionError } = await supabase
+        .from('doctors')
+        .select('id')
+        .limit(1);
+      
+      if (connectionError) {
+        console.warn('Supabase connection test failed:', connectionError);
+        return true; // Continue without loading sample data
+      }
+    } catch (error) {
+      console.warn('Cannot connect to Supabase:', error);
+      return true; // Continue without loading sample data
+    }
 
     // Verificar si ya existen datos en las tablas principales
     const { data: existingDoctors, error: doctorsError } = await supabase

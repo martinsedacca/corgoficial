@@ -51,17 +51,46 @@ export function DataProvider({ children }: { children: ReactNode }) {
       try {
         await applyMigrations();
       } catch (migrationError) {
-        console.warn('Migration warning:', migrationError);
+        console.warn('Migration warning - continuing without sample data:', migrationError);
         // Continuar aunque las migraciones fallen
       }
       
-      const [doctorsData, patientsData, practicesData, prescriptionsData, socialWorksData] = await Promise.all([
-        doctorService.getAll(),
-        patientService.getAll(),
-        practiceService.getAll(),
-        prescriptionService.getAll(),
-        socialWorkService.getAll()
-      ]);
+      // Load data with individual error handling
+      let doctorsData = [];
+      let patientsData = [];
+      let practicesData = [];
+      let prescriptionsData = [];
+      let socialWorksData = [];
+      
+      try {
+        doctorsData = await doctorService.getAll();
+      } catch (error) {
+        console.warn('Error loading doctors:', error);
+      }
+      
+      try {
+        patientsData = await patientService.getAll();
+      } catch (error) {
+        console.warn('Error loading patients:', error);
+      }
+      
+      try {
+        practicesData = await practiceService.getAll();
+      } catch (error) {
+        console.warn('Error loading practices:', error);
+      }
+      
+      try {
+        prescriptionsData = await prescriptionService.getAll();
+      } catch (error) {
+        console.warn('Error loading prescriptions:', error);
+      }
+      
+      try {
+        socialWorksData = await socialWorkService.getAll();
+      } catch (error) {
+        console.warn('Error loading social works:', error);
+      }
       
       setDoctors(doctorsData);
       setPatients(patientsData);
