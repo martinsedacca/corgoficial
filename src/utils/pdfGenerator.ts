@@ -149,14 +149,15 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     </div>
     
     <!-- Footer con fecha y firma pegadas -->
-    <div style="position: absolute; bottom: 8mm; left: 8mm; right: 8mm;">
+    <div style="position: absolute; bottom: 18mm; left: 8mm; right: 8mm;">
       <!-- Firma y fecha pegadas al footer -->
-      <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px;">
         <div style="text-align: center; width: 45%; font-size: 8px;">
-          <div style="font-size: 9px; color: #000; margin-bottom: 5px;">${new Date(prescription.date).toLocaleDateString('es-AR')}</div>
+          <div style="font-size: 9px; color: #000; margin-bottom: 8px;">${new Date(prescription.date).toLocaleDateString('es-AR')}</div>
           <div style="border-top: 1px dotted #000; padding-top: 3px; font-weight: bold; color: #4A5568;">FECHA</div>
         </div>
         <div style="text-align: center; width: 45%; font-size: 8px;">
+          <div style="height: 17px;"></div>
           <div style="border-top: 1px dotted #000; padding-top: 3px; font-weight: bold; color: #4A5568;">FIRMA Y SELLO</div>
         </div>
       </div>
