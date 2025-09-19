@@ -107,7 +107,8 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
                     ✓ {item.practice.name}
                   </div>
                   {item.notes && (
-                    <div className="text-sm text-gray-600 italic">
+                        {prescription.patient.socialWork}
+                        {prescription.patient.plan && prescription.patient.plan.trim() !== '' ? ` - ${prescription.patient.plan}` : ''}
                       {item.notes}
                     </div>
                   )}
