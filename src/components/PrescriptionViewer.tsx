@@ -89,6 +89,12 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
           <div className="mt-2">
             <span className="text-sm text-gray-600">N° Afiliado: </span>
             <span className="font-medium">{prescription.patient.affiliateNumber}</span>
+            {prescription.patient.plan && (
+              <>
+                <span className="text-sm text-gray-600 ml-4">Plan: </span>
+                <span className="font-medium">{prescription.patient.plan}</span>
+              </>
+            )}
           </div>
         </div>
       </div>
