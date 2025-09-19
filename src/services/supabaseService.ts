@@ -72,7 +72,7 @@ export const patientService = {
       name: patient.name,
       socialWork: patient.social_work,
       affiliateNumber: patient.affiliate_number,
-      plan: patient.plan,
+      plan: patient.plan || null,
       phone: patient.phone,
       email: patient.email,
       address: patient.address
@@ -100,7 +100,7 @@ export const patientService = {
       name: data.name,
       socialWork: data.social_work,
       affiliateNumber: data.affiliate_number,
-      plan: data.plan,
+      plan: data.plan || null,
       phone: data.phone,
       email: data.email,
       address: data.address
@@ -129,7 +129,7 @@ export const patientService = {
       name: data.name,
       socialWork: data.social_work,
       affiliateNumber: data.affiliate_number,
-      plan: data.plan,
+      plan: data.plan || null,
       phone: data.phone,
       email: data.email,
       address: data.address
