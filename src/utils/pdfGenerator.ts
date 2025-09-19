@@ -93,7 +93,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
   pdfContent.innerHTML = `
     <!-- Número de receta sutil arriba a la izquierda -->
     <div style="text-align: left; margin-bottom: 10px;">
-      <div style="font-size: 9px; color: #000; font-weight: normal;">RECETA N° ${prescription.number}</div>
+      <div style="font-size: 9px; color: #000; font-weight: normal;">R: ${prescription.number}</div>
     </div>
     
     <div style="text-align: center; margin-bottom: 15px;">
@@ -120,7 +120,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
         <span style="margin-right: 8px;">Obra Social:</span>
         <div style="flex: 1; border-bottom: 1px dotted #666; padding-bottom: 2px; font-weight: bold; color: #000;">
-          ${prescription.patient.socialWork}
+          ${prescription.patient.socialWork}${prescription.patient.plan ? ` - ${prescription.patient.plan}` : ''}
         </div>
       </div>
       
@@ -144,16 +144,8 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     <!-- Vale por estudios -->
     <div style="margin-bottom: 15px; font-size: 9px; color: #4A5568;">
       <span>Vale X:</span>
-      <span style="border-bottom: 1px dotted #666; padding-bottom: 1px; margin-left: 8px; margin-right: 8px; display: inline-block; width: 60px;"></span>
+      <span style="border-bottom: 1px dotted #666; margin-left: 8px; margin-right: 8px; display: inline-block; width: 60px; height: 12px;"></span>
       <span>Estudio/s</span>
-    </div>
-    
-    <!-- Médico -->
-    <div style="margin-bottom: 20px; font-size: 9px; color: #4A5568;">
-      <span>Dx:</span>
-      <div style="margin-top: 4px; font-weight: bold; color: #000; font-size: 10px;">
-        ${prescription.doctor.name}
-      </div>
     </div>
     
     <!-- Footer con fecha y firma pegadas -->
@@ -161,6 +153,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       <!-- Firma y fecha pegadas al footer -->
       <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
         <div style="text-align: center; width: 45%; font-size: 8px;">
+          <div style="font-size: 9px; color: #000; margin-bottom: 2px;">${new Date(prescription.date).toLocaleDateString('es-AR')}</div>
           <div style="border-top: 1px dotted #000; padding-top: 3px; font-weight: bold; color: #4A5568;">FECHA</div>
         </div>
         <div style="text-align: center; width: 45%; font-size: 8px;">
