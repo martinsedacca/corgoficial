@@ -55,21 +55,16 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       const selectedAO = item.ao || 'AO';
       
       practicesHtml += `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding: 2px 0; border-bottom: 1px dotted #ccc;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 3px 0; border-bottom: 1px dotted #ccc;">
           <span style="font-weight: bold; color: #152741; font-size: 10px;">✓ ${practiceName}</span>
-          <div style="display: flex; gap: 3px; align-items: center;">
-            <span style="font-size: 8px; color: #666; margin-right: 5px;">${selectedAO}</span>
-            <span style="border: 1px solid #152741; width: 10px; height: 10px; display: inline-block; text-align: center; font-size: 8px; background: ${selectedAO === 'AO' ? '#152741' : 'white'}; color: ${selectedAO === 'AO' ? 'white' : '#152741'}; font-weight: bold;">${selectedAO === 'AO' ? '✓' : ''}</span>
-            <span style="border: 1px solid #152741; width: 10px; height: 10px; display: inline-block; text-align: center; font-size: 8px; background: ${selectedAO === 'OI' ? '#152741' : 'white'}; color: ${selectedAO === 'OI' ? 'white' : '#152741'}; font-weight: bold;">${selectedAO === 'OI' ? '✓' : ''}</span>
-            <span style="border: 1px solid #152741; width: 10px; height: 10px; display: inline-block; text-align: center; font-size: 8px; background: ${selectedAO === 'OD' ? '#152741' : 'white'}; color: ${selectedAO === 'OD' ? 'white' : '#152741'}; font-weight: bold;">${selectedAO === 'OD' ? '✓' : ''}</span>
-          </div>
+          <span style="font-size: 10px; color: #152741; font-weight: bold; background: #f0f4f8; padding: 2px 6px; border-radius: 3px;">${selectedAO}</span>
         </div>
       `;
       
       // Agregar notas específicas de la práctica si las hay
       if (item.notes) {
         practicesHtml += `
-          <div style="margin-top: 10px; padding: 4px; background-color: #f0f4f8; border-left: 3px solid #152741; font-size: 9px; color: #333;">
+          <div style="margin-top: 8px; margin-bottom: 8px; padding: 4px; background-color: #f0f4f8; border-left: 3px solid #152741; font-size: 9px; color: #333;">
             Nota: ${item.notes}
           </div>
         `;
@@ -81,7 +76,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     // Agregar observaciones generales si las hay
     if (prescription.additionalNotes) {
       practicesHtml += `
-        <div style="margin-top: 10px; padding: 4px; background-color: #f0f8ff; border-left: 3px solid #1E40AF; font-size: 9px; color: #333;">
+        <div style="margin-top: 12px; padding: 4px; background-color: #f0f8ff; border-left: 3px solid #1E40AF; font-size: 9px; color: #333;">
           <strong>Observaciones:</strong> ${prescription.additionalNotes}
         </div>
       `;
@@ -112,21 +107,21 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     <div style="margin-bottom: 12px;">
       <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
         <span style="margin-right: 8px;">Nombre y Apellido:</span>
-        <div style="flex: 1; border-bottom: 1px dotted #666; padding-bottom: 2px; font-weight: bold; color: #000;">
+        <div style="flex: 1; border-bottom: 1px dotted #666; padding-bottom: 4px; margin-bottom: 3px; font-weight: bold; color: #000;">
           ${prescription.patient.name}
         </div>
       </div>
       
       <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
         <span style="margin-right: 8px;">Obra Social:</span>
-        <div style="flex: 1; border-bottom: 1px dotted #666; padding-bottom: 2px; font-weight: bold; color: #000;">
+        <div style="flex: 1; border-bottom: 1px dotted #666; padding-bottom: 4px; margin-bottom: 3px; font-weight: bold; color: #000;">
           ${prescription.patient.socialWork}${prescription.patient.plan ? ` - ${prescription.patient.plan}` : ''}
         </div>
       </div>
       
       <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
         <span style="margin-right: 8px;">N° AFILIADO</span>
-        <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 2px; font-weight: bold; color: #000;">
+        <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 4px; margin-bottom: 3px; font-weight: bold; color: #000;">
           ${prescription.patient.affiliateNumber}
         </div>
       </div>
@@ -134,7 +129,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     
     <!-- Solicito -->
     <div style="margin-bottom: 12px;">
-      <div style="color: #4A5568; font-size: 10px; margin-bottom: 6px; border-bottom: 1px solid #666; padding-bottom: 2px;">
+      <div style="color: #4A5568; font-size: 10px; margin-bottom: 11px; border-bottom: 1px solid #666; padding-bottom: 2px;">
         Solicito:
       </div>
       
