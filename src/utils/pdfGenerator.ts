@@ -133,6 +133,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     <!-- Solicito -->
     <div style="margin-bottom: 12px;">
       <div style="color: #4A5568; font-size: 10px; margin-bottom: 11px; border-bottom: 1px solid #666; padding-bottom: 2px;">
+      <div style="color: #4A5568; font-size: 10px; margin-bottom: 11px; border-bottom: 1px solid #666; padding-bottom: 6px;">
         Solicito:
       </div>
       
