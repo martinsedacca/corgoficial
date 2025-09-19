@@ -90,8 +90,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
             <span className="text-sm text-gray-600">N° Afiliado: </span>
             <span className="font-medium">{prescription.patient.affiliateNumber}</span>
             <span className="text-sm text-gray-600 ml-4">Plan: </span>
-            <span className="font-medium">{prescription.patient.plan ? prescription.patient.plan : 'Sin plan'}</span>
-            <span className="text-xs text-red-500 ml-2">[DEBUG: {JSON.stringify(prescription.patient.plan)}]</span>
+            <span className="font-medium">{prescription.patient.plan || 'Sin plan'}</span>
           </div>
         </div>
       </div>
