@@ -51,6 +51,7 @@ export interface Database {
           name: string;
           social_work: string;
           affiliate_number: string;
+          plan: string | null;
           phone: string | null;
           email: string | null;
           address: string | null;
@@ -62,6 +63,7 @@ export interface Database {
           name: string;
           social_work: string;
           affiliate_number: string;
+          plan?: string | null;
           phone?: string | null;
           email?: string | null;
           address?: string | null;
@@ -73,6 +75,7 @@ export interface Database {
           name?: string;
           social_work?: string;
           affiliate_number?: string;
+          plan?: string | null;
           phone?: string | null;
           email?: string | null;
           address?: string | null;

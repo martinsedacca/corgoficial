@@ -83,7 +83,10 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
             </div>
             <div>
               <span className="text-sm text-gray-600">Obra Social: </span>
-              <span className="font-medium">{prescription.patient.socialWork}</span>
+              <span className="font-medium">
+                {prescription.patient.socialWork}
+                {prescription.patient.plan && ` - ${prescription.patient.plan}`}
+              </span>
             </div>
           </div>
           <div className="mt-2">

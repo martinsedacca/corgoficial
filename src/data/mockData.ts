@@ -46,6 +46,7 @@ export const mockPatients: Patient[] = [
     name: 'Juan Carlos Martínez',
     socialWork: 'OSDE',
     affiliateNumber: '123456789',
+    plan: 'Plan 210',
     phone: '2966 123456',
     email: 'juan.martinez@email.com',
     address: 'Av. Kirchner 456'
@@ -55,6 +56,7 @@ export const mockPatients: Patient[] = [
     name: 'María Elena Fernández',
     socialWork: 'Swiss Medical',
     affiliateNumber: '987654321',
+    plan: 'Plan SMG02',
     phone: '2966 654321',
     email: 'maria.fernandez@email.com',
     address: 'Belgrano 789'

@@ -12,6 +12,7 @@ export function PatientManager() {
     name: '',
     socialWork: '',
     affiliateNumber: '',
+    plan: '',
     phone: '',
     email: '',
     address: ''
@@ -42,6 +43,7 @@ export function PatientManager() {
       name: patient.name,
       socialWork: patient.socialWork,
       affiliateNumber: patient.affiliateNumber,
+      plan: patient.plan || '',
       phone: patient.phone || '',
       email: patient.email || '',
       address: patient.address || ''
@@ -65,6 +67,7 @@ export function PatientManager() {
       name: '',
       socialWork: '',
       affiliateNumber: '',
+      plan: '',
       phone: '',
       email: '',
       address: ''
@@ -128,6 +131,18 @@ export function PatientManager() {
                   onChange={(e) => setFormData({...formData, affiliateNumber: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="123456789"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Plan
+                </label>
+                <input
+                  type="text"
+                  value={formData.plan}
+                  onChange={(e) => setFormData({...formData, plan: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  placeholder="Plan 210, Plan Premium, etc."
                 />
               </div>
               <div>
@@ -205,6 +220,9 @@ export function PatientManager() {
                   </div>
                   <div className="text-sm text-gray-600 space-y-1">
                     <p><strong>N° Afiliado:</strong> {patient.affiliateNumber}</p>
+                    {patient.plan && (
+                      <p><strong>Plan:</strong> {patient.plan}</p>
+                    )}
                     {patient.phone && (
                       <p className="flex items-center gap-1">
                         <Phone className="h-3 w-3" />

@@ -78,8 +78,8 @@ async function seedDoctors() {
 
 async function seedPatients() {
   const samplePatients = [
-    { name: 'Ana Martínez', social_work: 'OSDE', affiliate_number: '123456789', phone: '+54 11 9876-5432', email: 'ana.martinez@email.com', address: 'Av. Corrientes 1234, CABA' },
-    { name: 'Pedro López', social_work: 'Swiss Medical', affiliate_number: '987654321', phone: '+54 11 8765-4321', email: 'pedro.lopez@email.com', address: 'Av. Santa Fe 5678, CABA' },
+    { name: 'Ana Martínez', social_work: 'OSDE', affiliate_number: '123456789', plan: 'Plan 210', phone: '+54 11 9876-5432', email: 'ana.martinez@email.com', address: 'Av. Corrientes 1234, CABA' },
+    { name: 'Pedro López', social_work: 'Swiss Medical', affiliate_number: '987654321', plan: 'Plan SMG02', phone: '+54 11 8765-4321', email: 'pedro.lopez@email.com', address: 'Av. Santa Fe 5678, CABA' },
     { name: 'Laura Fernández', social_work: 'Galeno', affiliate_number: '456789123', phone: '+54 11 7654-3210', email: 'laura.fernandez@email.com', address: 'Av. Rivadavia 9012, CABA' }
   ];
 
