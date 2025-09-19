@@ -57,7 +57,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       practicesHtml += `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 3px 0; border-bottom: 1px dotted #ccc;">
           <span style="font-weight: bold; color: #152741; font-size: 10px;">✓ ${practiceName}</span>
-          <span style="font-size: 10px; color: #152741; font-weight: bold; background: #f0f4f8; padding: 2px 6px; border-radius: 3px;">${selectedAO}</span>
+          <span style="font-size: 10px; color: #152741; font-weight: bold; background: #f0f4f8; padding: 2px 6px; border-radius: 3px; display: flex; align-items: center; justify-content: center; min-height: 16px;">${selectedAO}</span>
         </div>
       `;
       
@@ -107,22 +107,25 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     <div style="margin-bottom: 12px;">
       <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
         <span style="margin-right: 8px;">Nombre y Apellido:</span>
-        <div style="flex: 1; border-bottom: 1px dotted #666; padding-bottom: 4px; margin-bottom: 3px; font-weight: bold; color: #000;">
+        <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
           ${prescription.patient.name}
+          <div style="position: absolute; bottom: -3px; left: 0; right: 0; border-bottom: 1px dotted #666;"></div>
         </div>
       </div>
       
       <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
         <span style="margin-right: 8px;">Obra Social:</span>
-        <div style="flex: 1; border-bottom: 1px dotted #666; padding-bottom: 4px; margin-bottom: 3px; font-weight: bold; color: #000;">
+        <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
           ${prescription.patient.socialWork}${prescription.patient.plan ? ` - ${prescription.patient.plan}` : ''}
+          <div style="position: absolute; bottom: -3px; left: 0; right: 0; border-bottom: 1px dotted #666;"></div>
         </div>
       </div>
       
       <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
         <span style="margin-right: 8px;">N° AFILIADO</span>
-        <div style="flex: 1; border-bottom: 1px solid #000; padding-bottom: 4px; margin-bottom: 3px; font-weight: bold; color: #000;">
+        <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
           ${prescription.patient.affiliateNumber}
+          <div style="position: absolute; bottom: -3px; left: 0; right: 0; border-bottom: 1px solid #000;"></div>
         </div>
       </div>
     </div>
