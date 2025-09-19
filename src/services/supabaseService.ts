@@ -232,6 +232,7 @@ export const prescriptionService = {
         name: prescription.patient.name,
         socialWork: prescription.patient.social_work,
         affiliateNumber: prescription.patient.affiliate_number,
+        plan: prescription.patient.plan,
         phone: prescription.patient.phone,
         email: prescription.patient.email,
         address: prescription.patient.address
