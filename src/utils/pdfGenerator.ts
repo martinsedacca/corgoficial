@@ -93,7 +93,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
   pdfContent.innerHTML = `
     <!-- Número de receta sutil arriba a la izquierda -->
     <div style="text-align: left; margin-bottom: 10px;">
-      <div style="font-size: 9px; color: #000; font-weight: normal;">R: ${prescription.number}</div>
+      <div style="font-size: 11px; color: #000; font-weight: normal;">R: ${prescription.number}</div>
     </div>
     
     <div style="text-align: center; margin-bottom: 15px;">
@@ -153,7 +153,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       <!-- Firma y fecha pegadas al footer -->
       <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
         <div style="text-align: center; width: 45%; font-size: 8px;">
-          <div style="font-size: 9px; color: #000; margin-bottom: 2px;">${new Date(prescription.date).toLocaleDateString('es-AR')}</div>
+          <div style="font-size: 9px; color: #000; margin-bottom: 5px;">${new Date(prescription.date).toLocaleDateString('es-AR')}</div>
           <div style="border-top: 1px dotted #000; padding-top: 3px; font-weight: bold; color: #4A5568;">FECHA</div>
         </div>
         <div style="text-align: center; width: 45%; font-size: 8px;">
