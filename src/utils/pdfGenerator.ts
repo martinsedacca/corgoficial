@@ -92,6 +92,10 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
 
   pdfContent.innerHTML = `
     <!-- Header exacto como el original -->
+    <div style="text-align: center; margin-bottom: 15px; padding: 8px; border: 2px solid #152741; background-color: #f8f9fa;">
+      <div style="font-size: 18px; font-weight: bold; color: #152741;">RECETA N° ${prescription.number}</div>
+    </div>
+    
     <div style="text-align: center; margin-bottom: 15px;">
       ${logoBase64 ? `
         <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 8px;">
@@ -134,12 +138,6 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
         Solicito:
       </div>
       
-      <!-- Header de columnas AO OI OD -->
-      <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 8px; color: #4A5568; font-weight: bold;">
-        <div style="width: 48%; text-align: right; padding-right: 25px;">AO OI OD</div>
-        <div style="width: 48%; text-align: right; padding-right: 25px;">AO OI OD</div>
-      </div>
-      
       ${generatePracticesGrid()}
     </div>
     
@@ -158,17 +156,19 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       </div>
     </div>
     
-    <!-- Firma y fecha -->
-    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; margin-top: 25px;">
-      <div style="text-align: center; width: 45%; font-size: 8px;">
-        <div style="border-top: 1px dotted #000; padding-top: 3px; font-weight: bold; color: #4A5568;">FECHA</div>
-      </div>
-      <div style="text-align: center; width: 45%; font-size: 8px;">
-        <div style="border-top: 1px dotted #000; padding-top: 3px; font-weight: bold; color: #4A5568;">FIRMA Y SELLO</div>
+    <!-- Footer azul exacto como el original -->
+    <div style="margin-top: 30px; margin-bottom: 15px;">
+      <!-- Firma y fecha antes del footer -->
+      <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+        <div style="text-align: center; width: 45%; font-size: 8px;">
+          <div style="border-top: 1px dotted #000; padding-top: 3px; font-weight: bold; color: #4A5568;">FECHA</div>
+        </div>
+        <div style="text-align: center; width: 45%; font-size: 8px;">
+          <div style="border-top: 1px dotted #000; padding-top: 3px; font-weight: bold; color: #4A5568;">FIRMA Y SELLO</div>
+        </div>
       </div>
     </div>
     
-    <!-- Footer azul exacto como el original -->
     <div style="background-color: #152741; color: white; padding: 6px 8px; margin-top: auto; font-size: 7px; position: absolute; bottom: 8mm; left: 8mm; right: 8mm;">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div style="line-height: 1.3;">
