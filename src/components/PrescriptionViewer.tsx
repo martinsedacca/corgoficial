@@ -26,6 +26,17 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 sm:p-8 max-w-4xl mx-auto">
+      {/* Export Button - Moved to top */}
+      <div className="mb-6 text-center">
+        <button
+          onClick={handleExportPDF}
+          className="flex items-center gap-2 bg-green-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium hover:bg-green-700 transition-colors mx-auto text-sm sm:text-base"
+        >
+          <Download className="h-5 w-5" />
+          Exportar a PDF
+        </button>
+      </div>
+
       {/* Header */}
       <div className="text-center mb-6 sm:mb-8 pb-4 sm:pb-6 border-b-2 border-primary-900">
         <div className="mb-4">
@@ -193,17 +204,6 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Export Button */}
-      <div className="mt-6 text-center">
-        <button
-          onClick={handleExportPDF}
-          className="flex items-center gap-2 bg-green-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium hover:bg-green-700 transition-colors mx-auto text-sm sm:text-base"
-        >
-          <Download className="h-5 w-5" />
-          Exportar a PDF
-        </button>
       </div>
     </div>
   );
