@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import { Prescription } from '../types';
+import { PrescriptionForm } from './PrescriptionForm';
 import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3 } from 'lucide-react';
 
 interface PrescriptionHistoryProps {
@@ -12,6 +13,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   const { prescriptions } = useData();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
+  const [showNewForm, setShowNewForm] = useState(false);
 
   const typeLabels = {
     studies: 'Estudios',
@@ -33,13 +35,32 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     return matchesSearch && matchesType;
   }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
+  if (showNewForm) {
+    return (
+      <PrescriptionForm
+        onSubmit={() => setShowNewForm(false)}
+        onCancel={() => setShowNewForm(false)}
+      />
+    );
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
-      <div className="flex items-center gap-2 mb-6">
-        <FileText className="h-6 w-6 text-primary-600" />
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-          Historial de Recetas
-        </h2>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2">
+          <FileText className="h-6 w-6 text-primary-600" />
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+            Recetas
+          </h2>
+        </div>
+        <button
+          onClick={() => setShowNewForm(true)}
+          className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base"
+        >
+          <FileText className="h-4 w-4" />
+          <span className="hidden sm:inline">Nueva Receta</span>
+          <span className="sm:hidden">Nueva</span>
+        </button>
       </div>
 
       {/* Filtros */}

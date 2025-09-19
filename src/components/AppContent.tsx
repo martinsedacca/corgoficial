@@ -39,8 +39,7 @@ export function AppContent() {
 
   const menuItems = [
     { key: 'dashboard', label: 'Dashboard', icon: BarChart3, color: 'text-blue-600' },
-    { key: 'new', label: 'Nueva Receta', icon: FileText, color: 'text-primary-600' },
-    { key: 'history', label: 'Historial', icon: History, color: 'text-gray-600' },
+    { key: 'history', label: 'Recetas', icon: History, color: 'text-gray-600' },
     { key: 'doctors', label: 'Médicos', icon: User, color: 'text-primary-600' },
     { key: 'patients', label: 'Pacientes', icon: Users, color: 'text-green-600' },
     { key: 'admin-practices', label: 'Administrar Prácticas', icon: Activity, color: 'text-purple-600' },
