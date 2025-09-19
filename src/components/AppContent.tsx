@@ -77,10 +77,6 @@ export function AppContent() {
                 alt="CORG Logo" 
                 className="h-8 sm:h-10 w-auto"
               />
-              <div className="hidden sm:block">
-                <div className="text-sm font-medium text-gray-900">Sistema Público</div>
-                <div className="text-xs text-gray-500">Modo de desarrollo</div>
-              </div>
             </div>
             
             <div className="flex flex-wrap items-center justify-center gap-1 mt-2 sm:mt-0 sm:space-x-1 flex-1 sm:flex-initial">
