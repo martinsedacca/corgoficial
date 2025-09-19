@@ -91,9 +91,9 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
   };
 
   pdfContent.innerHTML = `
-    <!-- Header exacto como el original -->
-    <div style="text-align: center; margin-bottom: 15px; padding: 8px; border: 2px solid #152741; background-color: #f8f9fa;">
-      <div style="font-size: 18px; font-weight: bold; color: #152741;">RECETA N° ${prescription.number}</div>
+    <!-- Número de receta sutil arriba a la izquierda -->
+    <div style="text-align: left; margin-bottom: 10px;">
+      <div style="font-size: 9px; color: #000; font-weight: normal;">RECETA N° ${prescription.number}</div>
     </div>
     
     <div style="text-align: center; margin-bottom: 15px;">
@@ -156,10 +156,10 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       </div>
     </div>
     
-    <!-- Footer azul exacto como el original -->
-    <div style="margin-top: 30px; margin-bottom: 15px;">
-      <!-- Firma y fecha antes del footer -->
-      <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+    <!-- Footer con fecha y firma pegadas -->
+    <div style="position: absolute; bottom: 8mm; left: 8mm; right: 8mm;">
+      <!-- Firma y fecha pegadas al footer -->
+      <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
         <div style="text-align: center; width: 45%; font-size: 8px;">
           <div style="border-top: 1px dotted #000; padding-top: 3px; font-weight: bold; color: #4A5568;">FECHA</div>
         </div>
@@ -167,9 +167,9 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
           <div style="border-top: 1px dotted #000; padding-top: 3px; font-weight: bold; color: #4A5568;">FIRMA Y SELLO</div>
         </div>
       </div>
-    </div>
-    
-    <div style="background-color: #152741; color: white; padding: 6px 8px; margin-top: auto; font-size: 7px; position: absolute; bottom: 8mm; left: 8mm; right: 8mm;">
+      
+      <!-- Footer azul -->
+      <div style="background-color: #152741; color: white; padding: 6px 8px; font-size: 7px;">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div style="line-height: 1.3;">
           <div style="margin-bottom: 1px;">📍 ${companyInfo.address}</div>
@@ -180,6 +180,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
           <div style="margin-bottom: 1px;">📘📷 ${companyInfo.social}</div>
           <div>📍 ${companyInfo.location}</div>
         </div>
+      </div>
       </div>
     </div>
   `;
