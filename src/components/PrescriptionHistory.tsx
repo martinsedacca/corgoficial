@@ -41,8 +41,8 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     const matchesPatient = !filterPatient || prescription.patient.name.toLowerCase().includes(filterPatient.toLowerCase());
     
     const prescriptionDate = new Date(prescription.date);
-    const matchesDateFrom = !filterDateFrom || prescriptionDate >= new Date(filterDateFrom);
-    const matchesDateTo = !filterDateTo || prescriptionDate <= new Date(filterDateTo);
+    const matchesDateFrom = !filterDateFrom || prescriptionDate >= new Date(filterDateFrom + 'T00:00:00');
+    const matchesDateTo = !filterDateTo || prescriptionDate <= new Date(filterDateTo + 'T23:59:59');
     
     const matchesType = filterType === 'all' || prescription.type === filterType;
     
