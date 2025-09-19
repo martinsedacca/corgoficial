@@ -109,7 +109,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
         <span style="margin-right: 8px;">Nombre y Apellido:</span>
         <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
           ${prescription.patient.name}
-          <div style="position: absolute; bottom: -3px; left: 0; right: 0; border-bottom: 1px dotted #666;"></div>
+          <div style="position: absolute; bottom: -6px; left: 0; right: 0; border-bottom: 1px dotted #666;"></div>
         </div>
       </div>
       
@@ -117,7 +117,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
         <span style="margin-right: 8px;">Obra Social:</span>
         <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
           ${prescription.patient.socialWork}${prescription.patient.plan ? ` - ${prescription.patient.plan}` : ''}
-          <div style="position: absolute; bottom: -3px; left: 0; right: 0; border-bottom: 1px dotted #666;"></div>
+          <div style="position: absolute; bottom: -6px; left: 0; right: 0; border-bottom: 1px dotted #666;"></div>
         </div>
       </div>
       
@@ -125,7 +125,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
         <span style="margin-right: 8px;">N° AFILIADO</span>
         <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
           ${prescription.patient.affiliateNumber}
-          <div style="position: absolute; bottom: -3px; left: 0; right: 0; border-bottom: 1px solid #000;"></div>
+          <div style="position: absolute; bottom: -6px; left: 0; right: 0; border-bottom: 1px solid #000;"></div>
         </div>
       </div>
     </div>
