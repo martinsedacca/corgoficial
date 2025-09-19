@@ -320,6 +320,7 @@ export const prescriptionService = {
         name: fullPrescription.patient.name,
         socialWork: fullPrescription.patient.social_work,
         affiliateNumber: fullPrescription.patient.affiliate_number,
+        plan: fullPrescription.patient.plan,
         phone: fullPrescription.patient.phone,
         email: fullPrescription.patient.email,
         address: fullPrescription.patient.address
@@ -409,6 +410,7 @@ export const prescriptionService = {
         name: fullPrescription.patient.name,
         socialWork: fullPrescription.patient.social_work,
         affiliateNumber: fullPrescription.patient.affiliate_number,
+        plan: fullPrescription.patient.plan,
         phone: fullPrescription.patient.phone,
         email: fullPrescription.patient.email,
         address: fullPrescription.patient.address
