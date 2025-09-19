@@ -120,7 +120,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
         <span style="margin-right: 8px;">Obra Social:</span>
         <div style="flex: 1; border-bottom: 1px dotted #666; padding-bottom: 2px; font-weight: bold; color: #000;">
-          ${prescription.patient.socialWork}${prescription.patient.plan && prescription.patient.plan.trim() !== '' ? ` - ${prescription.patient.plan}` : ''}
+          ${prescription.patient.socialWork}${prescription.patient.plan ? ` - ${prescription.patient.plan}` : ''}
         </div>
       </div>
       
