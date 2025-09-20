@@ -3,7 +3,9 @@ import { useData } from '../contexts/DataContext';
 import { Prescription } from '../types';
 import { PrescriptionForm } from './PrescriptionForm';
 import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X, Printer, Clock, CheckCircle } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { printPrescriptionPDF } from '../utils/pdfGenerator';
+import { generateStatisticsReport } from '../utils/reportGenerator';
 import { AlertTriangle } from 'lucide-react';
 
 // Componente Skeleton para la lista de recetas
@@ -166,6 +168,97 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     }
   };
 
+  const handleGenerateReport = async () => {
+    try {
+      // Preparar datos del reporte basados en los filtros actuales
+      const reportData = {
+        periodo: `Filtros aplicados - ${new Date().toLocaleDateString('es-AR')}`,
+        totalRecetas: filteredPrescriptions.length,
+        estadisticasPorDia: generateDailyStats(),
+        estadisticasPorMedico: generateDoctorStats(),
+        estadisticasPorPractica: generatePracticeStats(),
+        estadisticasPorTipo: generateTypeStats()
+      };
+      
+      await generateStatisticsReport(reportData);
+    } catch (error) {
+      console.error('Error generando reporte:', error);
+      setErrorMessage('Error al generar el reporte. Por favor, intente nuevamente.');
+      setShowErrorModal(true);
+    }
+  };
+
+  // Funciones auxiliares para generar estadísticas del reporte
+  const generateDailyStats = () => {
+    const stats: { [key: string]: number } = {};
+    
+    filteredPrescriptions.forEach(prescription => {
+      const date = prescription.date;
+      stats[date] = (stats[date] || 0) + 1;
+    });
+    
+    return Object.entries(stats)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, count]) => ({
+        date: new Date(date).toLocaleDateString('es-AR'),
+        count
+      }));
+  };
+
+  const generateDoctorStats = () => {
+    const stats: { [key: string]: number } = {};
+    
+    filteredPrescriptions.forEach(prescription => {
+      const doctorName = prescription.doctor.name;
+      stats[doctorName] = (stats[doctorName] || 0) + 1;
+    });
+    
+    return Object.entries(stats)
+      .sort(([, a], [, b]) => b - a)
+      .map(([doctor, count]) => ({ doctor, count }));
+  };
+
+  const generatePracticeStats = () => {
+    const stats: { [key: string]: { count: number; practice: any } } = {};
+    
+    filteredPrescriptions.forEach(prescription => {
+      prescription.items.forEach(item => {
+        const practiceId = item.practiceId;
+        if (!stats[practiceId]) {
+          stats[practiceId] = { count: 0, practice: item.practice };
+        }
+        stats[practiceId].count += 1;
+      });
+    });
+    
+    return Object.entries(stats)
+      .sort(([, a], [, b]) => b.count - a.count)
+      .map(([practiceId, { count, practice }]) => ({
+        practice: practice.name,
+        category: practice.category,
+        count
+      }));
+  };
+
+  const generateTypeStats = () => {
+    const stats: { [key: string]: number } = {};
+    
+    filteredPrescriptions.forEach(prescription => {
+      // Obtener todas las categorías únicas de las prácticas en esta receta
+      const categories = [...new Set(prescription.items.map(item => item.practice.category))];
+      categories.forEach(category => {
+        const typeKey = category === 'study' ? 'Estudios' : 
+                       category === 'treatment' ? 'Tratamientos' : 'Cirugías';
+        stats[typeKey] = (stats[typeKey] || 0) + 1;
+      });
+    });
+    
+    return Object.entries(stats).map(([type, count]) => ({
+      type,
+      count
+    }));
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
       <div className="flex items-center justify-between mb-6">
@@ -175,14 +268,25 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
             Recetas
           </h2>
         </div>
-        <button
-          onClick={onNewPrescription}
-          className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base"
-        >
-          <FileText className="h-4 w-4" />
-          <span className="hidden sm:inline">Nueva Receta</span>
-          <span className="sm:hidden">Nueva</span>
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleGenerateReport}
+            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
+            title="Generar reporte con filtros actuales"
+          >
+            <Download className="h-4 w-4" />
+            <span className="hidden sm:inline">Generar Reporte</span>
+            <span className="sm:hidden">Reporte</span>
+          </button>
+          <button
+            onClick={onNewPrescription}
+            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base"
+          >
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">Nueva Receta</span>
+            <span className="sm:hidden">Nueva</span>
+          </button>
+        </div>
       </div>
 
       {/* Búsqueda principal */}
