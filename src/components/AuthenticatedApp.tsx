@@ -13,10 +13,13 @@ export function AuthenticatedApp() {
     loading, 
     hasUser: !!user, 
     hasProfile: !!profile,
-    userEmail: user?.email 
+    userEmail: user?.email,
+    profileRole: profile?.role,
+    profileActive: profile?.is_active
   });
 
   if (loading) {
+    console.log('Mostrando spinner de carga...');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <LoadingSpinner size="lg" text="Cargando aplicación..." />
@@ -26,6 +29,7 @@ export function AuthenticatedApp() {
 
   // Si no hay usuario y se solicita registro
   if (!user && showRegistration) {
+    console.log('Mostrando formulario de registro...');
     return <UserRegistration onBack={() => setShowRegistration(false)} />;
   }
 
@@ -52,6 +56,9 @@ export function AuthenticatedApp() {
           <p className="text-gray-600 mb-6">
             Su cuenta no tiene un perfil válido. Contacte al administrador del sistema.
           </p>
+          <div className="text-sm text-gray-500 mb-4">
+            Usuario: {user.email}
+          </div>
           <button
             onClick={() => window.location.reload()}
             className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"

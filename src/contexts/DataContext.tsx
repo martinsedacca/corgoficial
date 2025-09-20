@@ -56,7 +56,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   // Funciones de carga individuales
   const loadDoctors = async () => {
-    if (loadingDoctors || !user) return;
+    if (loadingDoctors) return;
     
     setLoadingDoctors(true);
     try {
@@ -70,7 +70,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const loadPatients = async () => {
-    if (loadingPatients || !user) return;
+    if (loadingPatients) return;
     
     setLoadingPatients(true);
     try {
@@ -84,7 +84,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const loadPractices = async () => {
-    if (loadingPractices || !user) return;
+    if (loadingPractices) return;
     
     setLoadingPractices(true);
     try {
@@ -98,7 +98,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const loadPrescriptions = async () => {
-    if (loadingPrescriptions || !user) return;
+    if (loadingPrescriptions) return;
     
     setLoadingPrescriptions(true);
     try {
@@ -112,7 +112,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const loadSocialWorks = async () => {
-    if (loadingSocialWorks || !user) return;
+    if (loadingSocialWorks) return;
     
     setLoadingSocialWorks(true);
     try {
@@ -126,8 +126,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshData = async () => {
-    if (!user) return;
-    
     // Recargar todos los datos
     await Promise.all([
       loadDoctors(),

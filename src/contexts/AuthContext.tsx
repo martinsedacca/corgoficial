@@ -34,11 +34,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     let mounted = true;
+    let isInitializing = false;
 
     const initAuth = async () => {
+      if (isInitializing) return;
+      isInitializing = true;
+      
       try {
         console.log('Inicializando autenticación...');
         
@@ -52,6 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUser(null);
             setProfile(null);
             setLoading(false);
+            setInitialized(true);
           }
           return;
         }
@@ -107,12 +113,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (mounted) {
           console.log('Finalizando carga de autenticación');
           setLoading(false);
+          setInitialized(true);
         }
+        isInitializing = false;
       }
     };
 
-    // Ejecutar inicialización
-    initAuth();
+    // Ejecutar inicialización solo si no se ha inicializado
+    if (!initialized) {
+      initAuth();
+    }
 
     // Configurar listener de cambios de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -133,16 +143,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             if (mounted) {
               setProfile(profileData || null);
+              setLoading(false);
             }
           } catch (error) {
             console.log('Error cargando perfil en cambio de estado:', error);
             if (mounted) {
               setProfile(null);
+              setLoading(false);
             }
           }
         } else {
           if (mounted) {
             setProfile(null);
+            setLoading(false);
           }
         }
       }
@@ -152,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [initialized]);
 
   const signIn = async (email: string, password: string) => {
     try {
