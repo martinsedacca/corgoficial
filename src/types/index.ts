@@ -11,6 +11,7 @@ export interface Patient {
   id: string;
   name: string;
   lastName: string;
+  dni: string;
   socialWork: string;
   affiliateNumber: string;
   plan?: string;

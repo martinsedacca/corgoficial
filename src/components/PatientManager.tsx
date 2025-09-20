@@ -11,6 +11,7 @@ export function PatientManager() {
   const [formData, setFormData] = useState({
     name: '',
     lastName: '',
+    dni: '',
     socialWork: '',
     affiliateNumber: '',
     plan: '',
@@ -43,6 +44,7 @@ export function PatientManager() {
     setFormData({
       name: patient.name,
       lastName: patient.lastName,
+      dni: patient.dni,
       socialWork: patient.socialWork,
       affiliateNumber: patient.affiliateNumber,
       plan: patient.plan || '',
@@ -68,6 +70,7 @@ export function PatientManager() {
     setFormData({
       name: '',
       lastName: '',
+      dni: '',
       socialWork: '',
       affiliateNumber: '',
       plan: '',
@@ -127,6 +130,21 @@ export function PatientManager() {
                   onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="Martínez"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  DNI *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.dni}
+                  onChange={(e) => setFormData({...formData, dni: e.target.value.replace(/\D/g, '').slice(0, 8)})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  placeholder="12345678"
+                  maxLength={8}
+                  pattern="[0-9]{8}"
                 />
               </div>
               <div>
@@ -235,6 +253,7 @@ export function PatientManager() {
                     </span>
                   </div>
                   <div className="text-sm text-gray-600 space-y-1">
+                    <p><strong>DNI:</strong> {patient.dni}</p>
                     <p><strong>N° Afiliado:</strong> {patient.affiliateNumber}</p>
                     {patient.plan && (
                       <p><strong>Plan:</strong> {patient.plan}</p>
