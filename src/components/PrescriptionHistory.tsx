@@ -59,7 +59,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           return practiceCategories.includes('study');
         case 'treatments':
           return practiceCategories.includes('treatment');
-        case 'authorization':
+        case 'surgery':
           return practiceCategories.includes('surgery');
         default:
           return true;
