@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
+import { supabase } from '../lib/supabase';
 import { AutoComplete } from './AutoComplete';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
 import { PrescriptionItem, Doctor, Patient, Practice, Prescription } from '../types';
@@ -14,6 +15,11 @@ interface PrescriptionFormProps {
 export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: PrescriptionFormProps) {
   const { doctors, patients, practices, getNextPrescriptionNumber, addPrescription, updatePrescription, addPatient } = useData();
   const [showPatientForm, setShowPatientForm] = useState(false);
+  const [dniValidation, setDniValidation] = useState<{
+    isChecking: boolean;
+    exists: boolean;
+    message: string;
+  }>({ isChecking: false, exists: false, message: '' });
   const [newPatientData, setNewPatientData] = useState({
     name: '',
     lastName: '',
@@ -39,6 +45,56 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   // Como eliminamos la autenticación, definimos isDoctor como false por defecto
   const isDoctor = false;
 
+  // Validar DNI en tiempo real para nuevo paciente
+  const validateDNI = async (dni: string) => {
+    if (dni.length !== 8) {
+      setDniValidation({ isChecking: false, exists: false, message: '' });
+      return;
+    }
+
+    setDniValidation({ isChecking: true, exists: false, message: 'Verificando DNI...' });
+
+    try {
+      const { data, error } = await supabase
+        .from('patients')
+        .select('id, name, last_name')
+        .eq('dni', dni)
+        .limit(1);
+
+      if (error) {
+        console.error('Error checking DNI:', error);
+        setDniValidation({ isChecking: false, exists: false, message: 'Error al verificar DNI' });
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const existingPatient = data[0];
+        setDniValidation({
+          isChecking: false,
+          exists: true,
+          message: `DNI ya registrado para: ${existingPatient.name} ${existingPatient.last_name || ''}`
+        });
+      } else {
+        setDniValidation({ isChecking: false, exists: false, message: '' });
+      }
+    } catch (error) {
+      console.error('Error validating DNI:', error);
+      setDniValidation({ isChecking: false, exists: false, message: 'Error al verificar DNI' });
+    }
+  };
+
+  // Validar si el formulario de nuevo paciente es válido
+  const isNewPatientFormValid = () => {
+    return (
+      newPatientData.name.trim() !== '' &&
+      newPatientData.lastName.trim() !== '' &&
+      newPatientData.dni.length === 8 &&
+      !dniValidation.exists &&
+      !dniValidation.isChecking &&
+      newPatientData.socialWork.trim() !== '' &&
+      newPatientData.affiliateNumber.trim() !== ''
+    );
+  };
   // Cargar el siguiente número de receta
   useEffect(() => {
     if (!editingPrescription) {
@@ -123,6 +179,12 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const handleSaveNewPatient = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation(); // Prevenir que se propague al formulario padre
+    
+    if (!isNewPatientFormValid()) {
+      alert('Por favor complete todos los campos obligatorios correctamente');
+      return;
+    }
+
     setCreatingPatient(true);
     try {
       const createdPatient = await addPatient(newPatientData);
@@ -139,6 +201,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
         setPatientCreationSuccess(false);
         setCreatingPatient(false);
         setShowPatientForm(false);
+        setDniValidation({ isChecking: false, exists: false, message: '' });
         setNewPatientData({
           name: '',
           lastName: '',
@@ -381,13 +444,35 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                       type="text"
                       required
                       value={newPatientData.dni}
-                      onChange={(e) => setNewPatientData({...newPatientData, dni: e.target.value.replace(/\D/g, '').slice(0, 8)})}
+                      onChange={(e) => {
+                        const newDni = e.target.value.replace(/\D/g, '').slice(0, 8);
+                        setNewPatientData({...newPatientData, dni: newDni});
+                        if (newDni.length === 8) {
+                          validateDNI(newDni);
+                        } else {
+                          setDniValidation({ isChecking: false, exists: false, message: '' });
+                        }
+                      }}
                       disabled={creatingPatient}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 transition-colors ${
+                        dniValidation.exists
+                          ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50'
+                          : 'border-gray-300 focus:ring-primary-500 focus:border-primary-500'
+                      }`}
                       placeholder="12345678"
                       maxLength={8}
                       pattern="[0-9]{8}"
                     />
+                    {dniValidation.message && (
+                      <div className={`mt-1 text-sm flex items-center gap-1 ${
+                        dniValidation.exists ? 'text-red-600' : 'text-blue-600'
+                      }`}>
+                        {dniValidation.isChecking && (
+                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
+                        )}
+                        <span>{dniValidation.message}</span>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <SocialWorkAutocomplete
@@ -464,8 +549,12 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                   <button
                     type="button"
                     onClick={handleSaveNewPatient}
-                    className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={creatingPatient || patientCreationSuccess}
+                    disabled={creatingPatient || patientCreationSuccess || !isNewPatientFormValid()}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      isNewPatientFormValid() && !creatingPatient && !patientCreationSuccess
+                        ? 'bg-primary-600 text-white hover:bg-primary-700'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                   >
                     {creatingPatient ? 'Creando...' : patientCreationSuccess ? '¡Creado!' : 'Crear Paciente'}
                   </button>

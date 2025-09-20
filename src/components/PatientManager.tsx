@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useData } from '../contexts/DataContext';
+import { supabase } from '../lib/supabase';
 import { Patient } from '../types';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
 import { UserPlus, Edit3, Trash2, Users, Phone, Mail, MapPin } from 'lucide-react';
@@ -8,6 +9,11 @@ export function PatientManager() {
   const { patients, addPatient, updatePatient, deletePatient } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
+  const [dniValidation, setDniValidation] = useState<{
+    isChecking: boolean;
+    exists: boolean;
+    message: string;
+  }>({ isChecking: false, exists: false, message: '' });
   const [formData, setFormData] = useState({
     name: '',
     lastName: '',
@@ -20,8 +26,69 @@ export function PatientManager() {
     address: ''
   });
 
+  // Validar DNI en tiempo real
+  const validateDNI = async (dni: string) => {
+    if (dni.length !== 8) {
+      setDniValidation({ isChecking: false, exists: false, message: '' });
+      return;
+    }
+
+    setDniValidation({ isChecking: true, exists: false, message: 'Verificando DNI...' });
+
+    try {
+      const { data, error } = await supabase
+        .from('patients')
+        .select('id, name, last_name')
+        .eq('dni', dni)
+        .limit(1);
+
+      if (error) {
+        console.error('Error checking DNI:', error);
+        setDniValidation({ isChecking: false, exists: false, message: 'Error al verificar DNI' });
+        return;
+      }
+
+      if (data && data.length > 0) {
+        // Si estamos editando y el DNI pertenece al mismo paciente, está OK
+        if (editingPatient && data[0].id === editingPatient.id) {
+          setDniValidation({ isChecking: false, exists: false, message: '' });
+        } else {
+          const existingPatient = data[0];
+          setDniValidation({
+            isChecking: false,
+            exists: true,
+            message: `DNI ya registrado para: ${existingPatient.name} ${existingPatient.last_name || ''}`
+          });
+        }
+      } else {
+        setDniValidation({ isChecking: false, exists: false, message: '' });
+      }
+    } catch (error) {
+      console.error('Error validating DNI:', error);
+      setDniValidation({ isChecking: false, exists: false, message: 'Error al verificar DNI' });
+    }
+  };
+
+  // Validar si el formulario es válido
+  const isFormValid = () => {
+    return (
+      formData.name.trim() !== '' &&
+      formData.lastName.trim() !== '' &&
+      formData.dni.length === 8 &&
+      !dniValidation.exists &&
+      !dniValidation.isChecking &&
+      formData.socialWork.trim() !== '' &&
+      formData.affiliateNumber.trim() !== ''
+    );
+  };
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!isFormValid()) {
+      alert('Por favor complete todos los campos obligatorios correctamente');
+      return;
+    }
+
     const handleAsync = async () => {
       try {
         if (editingPatient) {
@@ -78,6 +145,7 @@ export function PatientManager() {
       email: '',
       address: ''
     });
+    setDniValidation({ isChecking: false, exists: false, message: '' });
     setEditingPatient(null);
     setShowForm(false);
   };
@@ -140,12 +208,34 @@ export function PatientManager() {
                   type="text"
                   required
                   value={formData.dni}
-                  onChange={(e) => setFormData({...formData, dni: e.target.value.replace(/\D/g, '').slice(0, 8)})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  onChange={(e) => {
+                    const newDni = e.target.value.replace(/\D/g, '').slice(0, 8);
+                    setFormData({...formData, dni: newDni});
+                    if (newDni.length === 8) {
+                      validateDNI(newDni);
+                    } else {
+                      setDniValidation({ isChecking: false, exists: false, message: '' });
+                    }
+                  }}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 transition-colors ${
+                    dniValidation.exists
+                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50'
+                      : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                  }`}
                   placeholder="12345678"
                   maxLength={8}
                   pattern="[0-9]{8}"
                 />
+                {dniValidation.message && (
+                  <div className={`mt-1 text-sm flex items-center gap-1 ${
+                    dniValidation.exists ? 'text-red-600' : 'text-blue-600'
+                  }`}>
+                    {dniValidation.isChecking && (
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
+                    )}
+                    <span>{dniValidation.message}</span>
+                  </div>
+                )}
               </div>
               <div>
                 <SocialWorkAutocomplete
@@ -219,7 +309,12 @@ export function PatientManager() {
             <div className="flex gap-3">
               <button
                 type="submit"
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                disabled={!isFormValid()}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  isFormValid()
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
               >
                 {editingPatient ? 'Actualizar' : 'Crear'}
               </button>
