@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import { SocialWork } from '../types';
 import { Plus, Edit3, Trash2, Building2, Search, X, AlertTriangle } from 'lucide-react';
