@@ -65,15 +65,15 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
         const selectedAO = item.ao || 'AO';
         
         practicesHtml += `
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding: 2px 0; border-bottom: 1px dotted #ccc;">
-            <span style="font-weight: bold; color: #152741; font-size: 9px;">✓ ${practiceName}</span>
-            <span style="font-size: 9px; color: #152741; font-weight: bold; background: #f0f4f8; padding: 1px 4px; border-radius: 2px; display: flex; align-items: center; justify-content: center; min-height: 14px;">${selectedAO}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; padding: 1px 0; border-bottom: 1px dotted #ccc;">
+            <span style="font-weight: bold; color: #152741; font-size: 8px;">✓ ${practiceName}</span>
+            <span style="font-size: 8px; color: #152741; font-weight: bold;">${selectedAO}</span>
           </div>
         `;
         
         if (item.notes) {
           practicesHtml += `
-            <div style="margin-top: 4px; margin-bottom: 6px; padding: 3px; background-color: #f0f4f8; border-left: 2px solid #152741; font-size: 8px; color: #333;">
+            <div style="margin-top: 2px; margin-bottom: 3px; padding: 2px; background-color: #f0f4f8; border-left: 2px solid #152741; font-size: 7px; color: #333;">
               Nota: ${item.notes}
             </div>
           `;
@@ -88,15 +88,15 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
         const selectedAO = item.ao || 'AO';
         
         practicesHtml += `
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding: 2px 0; border-bottom: 1px dotted #ccc;">
-            <span style="font-weight: bold; color: #152741; font-size: 9px;">✓ ${practiceName}</span>
-            <span style="font-size: 9px; color: #152741; font-weight: bold; background: #f0f4f8; padding: 1px 4px; border-radius: 2px; display: flex; align-items: center; justify-content: center; min-height: 14px;">${selectedAO}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; padding: 1px 0; border-bottom: 1px dotted #ccc;">
+            <span style="font-weight: bold; color: #152741; font-size: 8px;">✓ ${practiceName}</span>
+            <span style="font-size: 8px; color: #152741; font-weight: bold;">${selectedAO}</span>
           </div>
         `;
         
         if (item.notes) {
           practicesHtml += `
-            <div style="margin-top: 4px; margin-bottom: 6px; padding: 3px; background-color: #f0f4f8; border-left: 2px solid #152741; font-size: 8px; color: #333;">
+            <div style="margin-top: 2px; margin-bottom: 3px; padding: 2px; background-color: #f0f4f8; border-left: 2px solid #152741; font-size: 7px; color: #333;">
               Nota: ${item.notes}
             </div>
           `;
@@ -112,15 +112,15 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
         const selectedAO = item.ao || 'AO';
         
         practicesHtml += `
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 3px 0; border-bottom: 1px dotted #ccc;">
-            <span style="font-weight: bold; color: #152741; font-size: 10px;">✓ ${practiceName}</span>
-            <span style="font-size: 10px; color: #152741; font-weight: bold; background: #f0f4f8; padding: 2px 6px; border-radius: 3px; display: flex; align-items: center; justify-content: center; min-height: 16px;">${selectedAO}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; padding: 3px 0; border-bottom: 1px dotted #ccc;">
+            <span style="font-weight: bold; color: #152741; font-size: 8px;">✓ ${practiceName}</span>
+            <span style="font-size: 8px; color: #152741; font-weight: bold;">${selectedAO}</span>
           </div>
         `;
         
         if (item.notes) {
           practicesHtml += `
-            <div style="margin-top: 8px; margin-bottom: 8px; padding: 4px; background-color: #f0f4f8; border-left: 3px solid #152741; font-size: 9px; color: #333;">
+            <div style="margin-top: 3px; margin-bottom: 4px; padding: 2px; background-color: #f0f4f8; border-left: 2px solid #152741; font-size: 7px; color: #333;">
               Nota: ${item.notes}
             </div>
           `;
@@ -346,15 +346,15 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
         const selectedAO = item.ao || 'AO';
         
         practicesHtml += `
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding: 2px 0; border-bottom: 1px dotted #ccc;">
-            <span style="font-weight: bold; color: #152741; font-size: 9px;">✓ ${practiceName}</span>
-            <span style="font-size: 9px; color: #152741; font-weight: bold; background: #f0f4f8; padding: 1px 4px; border-radius: 2px; display: flex; align-items: center; justify-content: center; min-height: 14px;">${selectedAO}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; padding: 1px 0; border-bottom: 1px dotted #ccc;">
+            <span style="font-weight: bold; color: #152741; font-size: 8px;">✓ ${practiceName}</span>
+            <span style="font-size: 8px; color: #152741; font-weight: bold;">${selectedAO}</span>
           </div>
         `;
         
         if (item.notes) {
           practicesHtml += `
-            <div style="margin-top: 4px; margin-bottom: 6px; padding: 3px; background-color: #f0f4f8; border-left: 2px solid #152741; font-size: 8px; color: #333;">
+            <div style="margin-top: 2px; margin-bottom: 3px; padding: 2px; background-color: #f0f4f8; border-left: 2px solid #152741; font-size: 7px; color: #333;">
               Nota: ${item.notes}
             </div>
           `;
@@ -369,15 +369,15 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
         const selectedAO = item.ao || 'AO';
         
         practicesHtml += `
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding: 2px 0; border-bottom: 1px dotted #ccc;">
-            <span style="font-weight: bold; color: #152741; font-size: 9px;">✓ ${practiceName}</span>
-            <span style="font-size: 9px; color: #152741; font-weight: bold; background: #f0f4f8; padding: 1px 4px; border-radius: 2px; display: flex; align-items: center; justify-content: center; min-height: 14px;">${selectedAO}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; padding: 1px 0; border-bottom: 1px dotted #ccc;">
+            <span style="font-weight: bold; color: #152741; font-size: 8px;">✓ ${practiceName}</span>
+            <span style="font-size: 8px; color: #152741; font-weight: bold;">${selectedAO}</span>
           </div>
         `;
         
         if (item.notes) {
           practicesHtml += `
-            <div style="margin-top: 4px; margin-bottom: 6px; padding: 3px; background-color: #f0f4f8; border-left: 2px solid #152741; font-size: 8px; color: #333;">
+            <div style="margin-top: 2px; margin-bottom: 3px; padding: 2px; background-color: #f0f4f8; border-left: 2px solid #152741; font-size: 7px; color: #333;">
               Nota: ${item.notes}
             </div>
           `;
@@ -393,15 +393,15 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
         const selectedAO = item.ao || 'AO';
         
         practicesHtml += `
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 3px 0; border-bottom: 1px dotted #ccc;">
-            <span style="font-weight: bold; color: #152741; font-size: 10px;">✓ ${practiceName}</span>
-            <span style="font-size: 10px; color: #152741; font-weight: bold; background: #f0f4f8; padding: 2px 6px; border-radius: 3px; display: flex; align-items: center; justify-content: center; min-height: 16px;">${selectedAO}</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; padding: 3px 0; border-bottom: 1px dotted #ccc;">
+            <span style="font-weight: bold; color: #152741; font-size: 8px;">✓ ${practiceName}</span>
+            <span style="font-size: 8px; color: #152741; font-weight: bold;">${selectedAO}</span>
           </div>
         `;
         
         if (item.notes) {
           practicesHtml += `
-            <div style="margin-top: 8px; margin-bottom: 8px; padding: 4px; background-color: #f0f4f8; border-left: 3px solid #152741; font-size: 9px; color: #333;">
+            <div style="margin-top: 3px; margin-bottom: 4px; padding: 2px; background-color: #f0f4f8; border-left: 2px solid #152741; font-size: 7px; color: #333;">
               Nota: ${item.notes}
             </div>
           `;
