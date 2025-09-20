@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
+import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { AutoComplete } from './AutoComplete';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
@@ -59,52 +60,6 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const [patientCreationSuccess, setPatientCreationSuccess] = useState(false);
   const [creatingPatient, setCreatingPatient] = useState(false);
   
-  // Cargar datos necesarios para el formulario
-  useEffect(() => {
-    doctors, 
-    patients, 
-    practices, 
-    loadingDoctors,
-    loadingPatients,
-    loadingPractices,
-    loadDoctors,
-    loadPatients,
-    loadPractices,
-    getNextPrescriptionNumber, 
-    addPrescription, 
-    updatePrescription, 
-    addPatient 
-  } = useData();
-  const [showPatientForm, setShowPatientForm] = useState(false);
-  const [dniValidation, setDniValidation] = useState<{
-    isChecking: boolean;
-    exists: boolean;
-    message: string;
-  }>({ isChecking: false, exists: false, message: '' });
-  const [newPatientData, setNewPatientData] = useState({
-    name: '',
-    lastName: '',
-    dni: '',
-    socialWork: '',
-    affiliateNumber: '',
-    plan: '',
-    phone: '',
-    email: '',
-    address: ''
-  });
-  const [nextNumber, setNextNumber] = useState<number | null>(null);
-  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [prescriptionType, setPrescriptionType] = useState<'studies' | 'treatments' | 'authorization'>('studies');
-  const [selectedPractices, setSelectedPractices] = useState<{[key: string]: 'AO' | 'OI' | 'OD' | null}>({});
-  const [additionalNotes, setAdditionalNotes] = useState('');
-  const [doctorSearch, setDoctorSearch] = useState('');
-  const [patientSearch, setPatientSearch] = useState('');
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [patientCreationSuccess, setPatientCreationSuccess] = useState(false);
-  const [creatingPatient, setCreatingPatient] = useState(false);
-
   // Cargar datos necesarios para el formulario
   useEffect(() => {
     loadDoctors();
