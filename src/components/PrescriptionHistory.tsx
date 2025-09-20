@@ -24,6 +24,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   const [filterDateFrom, setFilterDateFrom] = useState('');
   const [filterDateTo, setFilterDateTo] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
+  const [filterAuthorization, setFilterAuthorization] = useState<string>('all');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const typeLabels = {
@@ -54,6 +55,10 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     const matchesDateFrom = !filterDateFrom || prescriptionDate >= new Date(filterDateFrom + 'T00:00:00');
     const matchesDateTo = !filterDateTo || prescriptionDate <= new Date(filterDateTo + 'T23:59:59');
     
+    const matchesAuthorization = filterAuthorization === 'all' || 
+      (filterAuthorization === 'authorized' && prescription.authorized) ||
+      (filterAuthorization === 'pending' && !prescription.authorized);
+    
     // Filtrar por tipo basado en las categorías de prácticas que contiene la receta
     const matchesType = filterType === 'all' || (() => {
       const practiceCategories = [...new Set(prescription.items.map(item => item.practice.category))];
@@ -70,7 +75,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     })();
     
     return matchesSearch && matchesNumber && matchesDoctor && matchesPatient && matchesDNI &&
-           matchesDateFrom && matchesDateTo && matchesType;
+           matchesDateFrom && matchesDateTo && matchesType && matchesAuthorization;
   }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const clearAllFilters = () => {
@@ -82,11 +87,12 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     setFilterDateFrom('');
     setFilterDateTo('');
     setFilterType('all');
+    setFilterAuthorization('all');
   };
 
   const hasActiveFilters = searchTerm || filterNumber || filterDoctor || filterPatient || 
                           filterDNI ||
-                          filterDateFrom || filterDateTo || filterType !== 'all';
+                          filterDateFrom || filterDateTo || filterType !== 'all' || filterAuthorization !== 'all';
 
   const handlePrintPrescription = async (prescription: Prescription) => {
     try {
@@ -228,7 +234,46 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           </div>
         </div>
 
-        <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Estado de Autorización
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setFilterAuthorization('all')}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  filterAuthorization === 'all'
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Todas
+              </button>
+              <button
+                onClick={() => setFilterAuthorization('authorized')}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  filterAuthorization === 'authorized'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Autorizadas
+              </button>
+              <button
+                onClick={() => setFilterAuthorization('pending')}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  filterAuthorization === 'pending'
+                    ? 'bg-orange-600 text-white'
+                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Pendientes
+              </button>
+            </div>
+          </div>
+          
+          <div>
           <label className="block text-xs font-medium text-gray-600 mb-1">
             Tipo de Prácticas
           </label>
@@ -273,6 +318,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
             >
               Cirugías
             </button>
+          </div>
           </div>
         </div>
       </div>
