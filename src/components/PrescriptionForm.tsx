@@ -91,8 +91,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       newPatientData.dni.length === 8 &&
       !dniValidation.exists &&
       !dniValidation.isChecking &&
-      newPatientData.socialWork.trim() !== '' &&
-      newPatientData.affiliateNumber.trim() !== ''
+      newPatientData.socialWork.trim() !== ''
     );
   };
   // Cargar el siguiente número de receta
@@ -484,11 +483,10 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Número de Afiliado *
+                      Número de Afiliado
                     </label>
                     <input
                       type="text"
-                      required
                       value={newPatientData.affiliateNumber}
                       onChange={(e) => setNewPatientData({...newPatientData, affiliateNumber: e.target.value})}
                       disabled={creatingPatient}

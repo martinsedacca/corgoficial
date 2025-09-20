@@ -77,8 +77,7 @@ export function PatientManager() {
       formData.dni.length === 8 &&
       !dniValidation.exists &&
       !dniValidation.isChecking &&
-      formData.socialWork.trim() !== '' &&
-      formData.affiliateNumber.trim() !== ''
+      formData.socialWork.trim() !== ''
     );
   };
   const handleSubmit = (e: React.FormEvent) => {
@@ -246,11 +245,10 @@ export function PatientManager() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Número de Afiliado *
+                  Número de Afiliado
                 </label>
                 <input
                   type="text"
-                  required
                   value={formData.affiliateNumber}
                   onChange={(e) => setFormData({...formData, affiliateNumber: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -349,7 +347,9 @@ export function PatientManager() {
                   </div>
                   <div className="text-sm text-gray-600 space-y-1">
                     <p><strong>DNI:</strong> {patient.dni}</p>
-                    <p><strong>N° Afiliado:</strong> {patient.affiliateNumber}</p>
+                    {patient.affiliateNumber && (
+                      <p><strong>N° Afiliado:</strong> {patient.affiliateNumber}</p>
+                    )}
                     {patient.plan && (
                       <p><strong>Plan:</strong> {patient.plan}</p>
                     )}

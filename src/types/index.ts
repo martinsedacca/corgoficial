@@ -13,7 +13,7 @@ export interface Patient {
   lastName: string;
   dni: string;
   socialWork: string;
-  affiliateNumber: string;
+  affiliateNumber?: string;
   plan?: string;
   phone?: string;
   email?: string;
