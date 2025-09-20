@@ -7,9 +7,10 @@ import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X } 
 interface PrescriptionHistoryProps {
   onViewPrescription: (prescription: Prescription) => void;
   onEditPrescription: (prescription: Prescription) => void;
+  onNewPrescription: () => void;
 }
 
-export default function PrescriptionHistory({ onViewPrescription, onEditPrescription }: PrescriptionHistoryProps) {
+export default function PrescriptionHistory({ onViewPrescription, onEditPrescription, onNewPrescription }: PrescriptionHistoryProps) {
   const { prescriptions } = useData();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterNumber, setFilterNumber] = useState('');
@@ -18,7 +19,6 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   const [filterDateFrom, setFilterDateFrom] = useState('');
   const [filterDateTo, setFilterDateTo] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
-  const [showNewForm, setShowNewForm] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const typeLabels = {
@@ -62,14 +62,6 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
 
   const hasActiveFilters = searchTerm || filterNumber || filterDoctor || filterPatient || 
                           filterDateFrom || filterDateTo || filterType !== 'all';
-  if (showNewForm) {
-    return (
-      <PrescriptionForm
-        onSubmit={() => setShowNewForm(false)}
-        onCancel={() => setShowNewForm(false)}
-      />
-    );
-  }
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
@@ -81,7 +73,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           </h2>
         </div>
         <button
-          onClick={() => setShowNewForm(true)}
+          onClick={onNewPrescription}
           className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base"
         >
           <FileText className="h-4 w-4" />

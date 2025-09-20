@@ -116,6 +116,7 @@ export function AppContent() {
           <PrescriptionHistory 
             onViewPrescription={handleViewPrescription} 
             onEditPrescription={handleEditPrescription}
+            onNewPrescription={() => setCurrentView('new')}
           />
         )}
         {currentView === 'doctors' && <DoctorManager />}
