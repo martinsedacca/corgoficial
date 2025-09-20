@@ -338,7 +338,7 @@ export function Dashboard() {
               <option value="all">Todos los tipos</option>
               <option value="studies">Estudios</option>
               <option value="treatments">Tratamientos</option>
-              <option value="authorization">Autorizaciones</option>
+              <option value="authorization">Cirugías</option>
             </select>
           </div>
           <div>
