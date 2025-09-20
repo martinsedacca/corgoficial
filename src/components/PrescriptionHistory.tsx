@@ -7,6 +7,7 @@ import { Download } from 'lucide-react';
 import { printPrescriptionPDF } from '../utils/pdfGenerator';
 import { generateStatisticsReport } from '../utils/reportGenerator';
 import { AlertTriangle } from 'lucide-react';
+import { DateRangePicker } from './DateRangePicker';
 
 // Componente Skeleton para la lista de recetas
 const SkeletonPrescriptionCard = () => (
@@ -366,26 +367,14 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              Fecha Desde
-            </label>
-            <input
-              type="date"
-              value={filterDateFrom}
-              onChange={(e) => setFilterDateFrom(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              Fecha Hasta
-            </label>
-            <input
-              type="date"
-              value={filterDateTo}
-              onChange={(e) => setFilterDateTo(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          <div className="xl:col-span-2">
+            <DateRangePicker
+              startDate={filterDateFrom}
+              endDate={filterDateTo}
+              onDateChange={(start, end) => {
+                setFilterDateFrom(start);
+                setFilterDateTo(end);
+              }}
             />
           </div>
         </div>
