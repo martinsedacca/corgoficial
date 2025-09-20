@@ -116,7 +116,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       setSelectedPatient(editingPrescription.patient);
       setPrescriptionType(editingPrescription.type);
       setDoctorSearch(editingPrescription.doctor.name);
-      setPatientSearch(`${editingPrescription.patient.name} ${editingPrescription.patient.lastName} - ${editingPrescription.patient.socialWork}`);
+      setPatientSearch(`${editingPrescription.patient.name} ${editingPrescription.patient.lastName} - DNI: ${editingPrescription.patient.dni}`);
       setAdditionalNotes(editingPrescription.additionalNotes || '');
       
       // Configurar prácticas seleccionadas
@@ -136,7 +136,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
 
   const patientOptions = patients.map(patient => ({
     id: patient.id,
-    label: `${patient.name} ${patient.lastName} - ${patient.socialWork}`,
+    label: `${patient.name} ${patient.lastName} - DNI: ${patient.dni}`,
     value: patient
   })).sort((a, b) => {
     const fullNameA = `${a.value.name} ${a.value.lastName}`.trim();
@@ -197,7 +197,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       
       // Seleccionar el paciente creado directamente
       setSelectedPatient(createdPatient);
-      setPatientSearch(`${createdPatient.name} ${createdPatient.lastName} - ${createdPatient.socialWork}`);
+      setPatientSearch(`${createdPatient.name} ${createdPatient.lastName} - DNI: ${createdPatient.dni}`);
       
       // Limpiar formulario y cerrar después de un tiempo más corto
       setTimeout(() => {
