@@ -138,19 +138,19 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
           </div>
           
           {/* Botones de autorización */}
-          {prescription.authorized ? (
-            <button
-              onClick={() => setShowDeauthorizeModal(true)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-red-100 text-red-700 border border-red-200 hover:bg-red-200 transition-colors"
-            >
-              Desautorizar
-            </button>
-          ) : (
+          {!prescription.authorized ? (
             <button
               onClick={handleAuthorize}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200 transition-colors"
             >
               Autorizar
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowDeauthorizeModal(true)}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-red-100 text-red-700 border border-red-200 hover:bg-red-200 transition-colors"
+            >
+              Desautorizar
             </button>
           )}
         </div>
