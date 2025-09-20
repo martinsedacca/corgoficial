@@ -80,7 +80,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
 
   const patientOptions = patients.map(patient => ({
     id: patient.id,
-    label: `${patient.name} - ${patient.socialWork}`,
+    label: `${patient.name} ${patient.lastName} - ${patient.socialWork}`,
     value: patient
   }));
 
@@ -131,7 +131,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       
       // Seleccionar el paciente creado directamente
       setSelectedPatient(createdPatient);
-      setPatientSearch(`${createdPatient.name} - ${createdPatient.socialWork}`);
+      setPatientSearch(`${createdPatient.name} ${createdPatient.lastName} - ${createdPatient.socialWork}`);
       
       // Limpiar formulario y cerrar después de un tiempo más corto
       setTimeout(() => {
