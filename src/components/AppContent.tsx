@@ -54,7 +54,7 @@ export function AppContent() {
     ...(hasPermission('manage_doctors') ? [{ key: 'doctors', label: 'Médicos', icon: User, color: 'text-primary-600' }] : []),
     ...(hasPermission('manage_patients') ? [{ key: 'patients', label: 'Pacientes', icon: Users, color: 'text-green-600' }] : []),
     ...(hasPermission('manage_practices') ? [{ key: 'admin-practices', label: 'Administrar Prácticas', icon: Activity, color: 'text-purple-600' }] : []),
-    ...(hasPermission('manage_social_works') ? [{ key: 'social-works', label: 'Obras Sociales', icon: Building2, color: 'text-blue-600' }] : []),
+    ...(hasPermission('manage_social_works') ? [{ key: 'social-works', label: 'Obras Sociales', icon: Building2, color: 'text-primary-600' }] : []),
     ...(hasPermission('manage_users') ? [{ key: 'users', label: 'Usuarios', icon: Settings, color: 'text-red-600' }] : [])
   ].filter(Boolean);
 
@@ -107,7 +107,7 @@ export function AppContent() {
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <Icon className={`h-3 w-3 sm:h-4 sm:w-4 ${currentView === item.key ? 'text-primary-600' : item.color.replace('blue', 'primary')}`} />
+                    <Icon className={`h-3 w-3 sm:h-4 sm:w-4 ${currentView === item.key ? 'text-primary-600' : item.color}`} />
                     <span className="hidden sm:inline">{item.label}</span>
                     <span className="sm:hidden text-xs">{item.label.split(' ')[0]}</span>
                   </button>
