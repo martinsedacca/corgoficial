@@ -44,7 +44,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
             className="flex items-center gap-2 bg-green-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium hover:bg-green-700 transition-colors text-sm sm:text-base"
           >
             <Download className="h-5 w-5" />
-            Exportar a PDF
+            Descargar PDF
           </button>
           <button
             onClick={handlePrintPDF}
