@@ -86,7 +86,7 @@ export function PatientManager() {
       formData.socialWork.trim() !== ''
     );
   };
-  const handleSubmit = (e: React.FormEvent) => {
+
   // Filtrar pacientes
   const filteredPatients = patients.filter(patient => {
     const fullName = `${patient.name} ${patient.lastName}`.toLowerCase();
@@ -123,6 +123,7 @@ export function PatientManager() {
 
   const hasActiveFilters = searchTerm || filterName || filterDNI || filterSocialWork || filterAffiliateNumber;
 
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!isFormValid()) {
