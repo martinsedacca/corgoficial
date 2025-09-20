@@ -59,7 +59,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           return practiceCategories.includes('study');
         case 'treatments':
           return practiceCategories.includes('treatment');
-        case 'surgery':
+        case 'authorization':
           return practiceCategories.includes('surgery');
         default:
           return true;
@@ -259,14 +259,14 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
               Tratamientos
             </button>
             <button
-              onClick={() => setFilterType('surgery')}
+              onClick={() => setFilterType('authorization')}
               className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                filterType === 'surgery'
+                filterType === 'authorization'
                   ? 'bg-purple-600 text-white'
                   : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
               }`}
             >
-              Cirugías
+              Autorizaciones
             </button>
           </div>
         </div>

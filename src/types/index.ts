@@ -38,7 +38,7 @@ export interface PrescriptionItem {
 export interface Prescription {
   id: string;
   number: number;
-  type: 'studies' | 'treatments' | 'surgery';
+  type: 'studies' | 'treatments' | 'authorization';
   doctorId: string;
   doctor: Doctor;
   patientId: string;
