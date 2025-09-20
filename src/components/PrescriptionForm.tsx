@@ -12,7 +12,7 @@ interface PrescriptionFormProps {
 }
 
 export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: PrescriptionFormProps) {
-  const { doctors, patients, practices, getNextPrescriptionNumber, addPrescription, updatePrescription } = useData();
+  const { doctors, patients, practices, getNextPrescriptionNumber, addPrescription, updatePrescription, addPatient } = useData();
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [newPatientData, setNewPatientData] = useState({
     name: '',
