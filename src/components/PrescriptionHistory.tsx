@@ -259,9 +259,9 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
               Tratamientos
             </button>
             <button
-              onClick={() => setFilterType('authorization')}
+              onClick={() => setFilterType('surgery')}
               className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                filterType === 'authorization'
+                filterType === 'surgery'
                   ? 'bg-purple-600 text-white'
                   : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
               }`}
