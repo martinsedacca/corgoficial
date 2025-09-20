@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import { Doctor } from '../types';
-import { UserPlus, Edit3, Trash2, User, Phone, Mail } from 'lucide-react';
+import { UserPlus, Edit3, Trash2, User, Phone, Mail, AlertTriangle } from 'lucide-react';
 
 export function DoctorManager() {
   const { doctors, addDoctor, updateDoctor, deleteDoctor } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [doctorToDelete, setDoctorToDelete] = useState<Doctor | null>(null);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     specialty: '',
@@ -27,7 +31,8 @@ export function DoctorManager() {
         resetForm();
       } catch (error) {
         console.error('Error saving doctor:', error);
-        alert('Error al guardar el médico. Por favor, intente nuevamente.');
+        setErrorMessage('Error al guardar el médico. Por favor, intente nuevamente.');
+        setShowErrorModal(true);
       }
     };
     
@@ -46,14 +51,24 @@ export function DoctorManager() {
     setShowForm(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('¿Está seguro de eliminar este médico?')) {
-      try {
-        await deleteDoctor(id);
-      } catch (error) {
-        console.error('Error deleting doctor:', error);
-        alert('Error al eliminar el médico. Verifique que no tenga recetas asociadas.');
-      }
+  const handleDeleteClick = (doctor: Doctor) => {
+    setDoctorToDelete(doctor);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!doctorToDelete) return;
+    
+    try {
+      await deleteDoctor(doctorToDelete.id);
+      setShowDeleteModal(false);
+      setDoctorToDelete(null);
+    } catch (error) {
+      console.error('Error deleting doctor:', error);
+      setShowDeleteModal(false);
+      setDoctorToDelete(null);
+      setErrorMessage('Error al eliminar el médico. Verifique que no tenga recetas asociadas.');
+      setShowErrorModal(true);
     }
   };
 
@@ -217,7 +232,7 @@ export function DoctorManager() {
                     <Edit3 className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => handleDelete(doctor.id)}
+                    onClick={() => handleDeleteClick(doctor)}
                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -228,6 +243,76 @@ export function DoctorManager() {
           ))
         )}
       </div>
+
+      {/* Modal de confirmación de eliminación */}
+      {showDeleteModal && doctorToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Confirmar Eliminación
+                  </h3>
+                  <p className="text-sm text-gray-500">Esta acción no se puede deshacer</p>
+                </div>
+              </div>
+              <p className="text-gray-600 mb-6">
+                ¿Está seguro que desea eliminar al médico <strong>{doctorToDelete.name}</strong>?
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setDoctorToDelete(null);
+                  }}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de error */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Error
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-6">
+                {errorMessage}
+              </p>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Entendido
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

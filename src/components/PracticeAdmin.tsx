@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import { Practice } from '../types';
-import { Plus, Edit3, Trash2, Activity, Search, Save, X, AlertCircle } from 'lucide-react';
+import { Plus, Edit3, Trash2, Activity, Search, Save, X, AlertCircle, AlertTriangle } from 'lucide-react';
 
 export function PracticeAdmin() {
   const { practices, addPractice, updatePractice, deletePractice } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingPractice, setEditingPractice] = useState<Practice | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [practiceToDelete, setPracticeToDelete] = useState<Practice | null>(null);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [formData, setFormData] = useState({
@@ -49,7 +53,8 @@ export function PracticeAdmin() {
     );
     
     if (existingPractice) {
-      alert('Ya existe una práctica con ese código. Por favor, use un código diferente.');
+      setErrorMessage('Ya existe una práctica con ese código. Por favor, use un código diferente.');
+      setShowErrorModal(true);
       return;
     }
 
@@ -63,7 +68,8 @@ export function PracticeAdmin() {
         resetForm();
       } catch (error) {
         console.error('Error saving practice:', error);
-        alert('Error al guardar la práctica. Por favor, intente nuevamente.');
+        setErrorMessage('Error al guardar la práctica. Por favor, intente nuevamente.');
+        setShowErrorModal(true);
       }
     };
     
@@ -81,14 +87,24 @@ export function PracticeAdmin() {
     setShowForm(true);
   };
 
-  const handleDelete = async (practice: Practice) => {
-    if (window.confirm(`¿Está seguro de eliminar la práctica "${practice.name}"?\n\nEsta acción no se puede deshacer.`)) {
-      try {
-        await deletePractice(practice.id);
-      } catch (error) {
-        console.error('Error deleting practice:', error);
-        alert('Error al eliminar la práctica. Verifique que no esté siendo utilizada en recetas.');
-      }
+  const handleDeleteClick = (practice: Practice) => {
+    setPracticeToDelete(practice);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!practiceToDelete) return;
+    
+    try {
+      await deletePractice(practiceToDelete.id);
+      setShowDeleteModal(false);
+      setPracticeToDelete(null);
+    } catch (error) {
+      console.error('Error deleting practice:', error);
+      setShowDeleteModal(false);
+      setPracticeToDelete(null);
+      setErrorMessage('Error al eliminar la práctica. Verifique que no esté siendo utilizada en recetas.');
+      setShowErrorModal(true);
     }
   };
 
@@ -312,7 +328,7 @@ export function PracticeAdmin() {
                         <Edit3 className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(practice)}
+                        onClick={() => handleDeleteClick(practice)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Eliminar práctica"
                       >
@@ -352,6 +368,76 @@ export function PracticeAdmin() {
               Agregar Primera Práctica
             </button>
           )}
+        </div>
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {showDeleteModal && practiceToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Confirmar Eliminación
+                  </h3>
+                  <p className="text-sm text-gray-500">Esta acción no se puede deshacer</p>
+                </div>
+              </div>
+              <p className="text-gray-600 mb-6">
+                ¿Está seguro que desea eliminar la práctica <strong>"{practiceToDelete.name}"</strong>?
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setPracticeToDelete(null);
+                  }}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de error */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Error
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-6">
+                {errorMessage}
+              </p>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Entendido
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

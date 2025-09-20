@@ -3,12 +3,16 @@ import { useData } from '../contexts/DataContext';
 import { supabase } from '../lib/supabase';
 import { Patient } from '../types';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
-import { UserPlus, Edit3, Trash2, Users, Phone, Mail, MapPin, Search, Filter, X } from 'lucide-react';
+import { UserPlus, Edit3, Trash2, Users, Phone, Mail, MapPin, Search, Filter, X, AlertTriangle } from 'lucide-react';
 
 export function PatientManager() {
   const { patients, addPatient, updatePatient, deletePatient } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [patientToDelete, setPatientToDelete] = useState<Patient | null>(null);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterName, setFilterName] = useState('');
   const [filterDNI, setFilterDNI] = useState('');
@@ -127,7 +131,8 @@ export function PatientManager() {
     e.preventDefault();
     
     if (!isFormValid()) {
-      alert('Por favor complete todos los campos obligatorios correctamente');
+      setErrorMessage('Por favor complete todos los campos obligatorios correctamente');
+      setShowErrorModal(true);
       return;
     }
 
@@ -141,7 +146,8 @@ export function PatientManager() {
         resetForm();
       } catch (error) {
         console.error('Error saving patient:', error);
-        alert('Error al guardar el paciente. Por favor, intente nuevamente.');
+        setErrorMessage('Error al guardar el paciente. Por favor, intente nuevamente.');
+        setShowErrorModal(true);
       }
     };
     
@@ -164,14 +170,24 @@ export function PatientManager() {
     setShowForm(true);
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('¿Está seguro de eliminar este paciente?')) {
-      try {
-        await deletePatient(id);
-      } catch (error) {
-        console.error('Error deleting patient:', error);
-        alert('Error al eliminar el paciente. Verifique que no tenga recetas asociadas.');
-      }
+  const handleDeleteClick = (patient: Patient) => {
+    setPatientToDelete(patient);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!patientToDelete) return;
+    
+    try {
+      await deletePatient(patientToDelete.id);
+      setShowDeleteModal(false);
+      setPatientToDelete(null);
+    } catch (error) {
+      console.error('Error deleting patient:', error);
+      setShowDeleteModal(false);
+      setPatientToDelete(null);
+      setErrorMessage('Error al eliminar el paciente. Verifique que no tenga recetas asociadas.');
+      setShowErrorModal(true);
     }
   };
 
@@ -538,7 +554,7 @@ export function PatientManager() {
                     <Edit3 className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => handleDelete(patient.id)}
+                    onClick={() => handleDeleteClick(patient)}
                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -559,6 +575,76 @@ export function PatientManager() {
               (filtrados)
             </span>
           )}
+        </div>
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {showDeleteModal && patientToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Confirmar Eliminación
+                  </h3>
+                  <p className="text-sm text-gray-500">Esta acción no se puede deshacer</p>
+                </div>
+              </div>
+              <p className="text-gray-600 mb-6">
+                ¿Está seguro que desea eliminar al paciente <strong>{patientToDelete.name} {patientToDelete.lastName}</strong>?
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setPatientToDelete(null);
+                  }}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de error */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Error
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-6">
+                {errorMessage}
+              </p>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Entendido
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

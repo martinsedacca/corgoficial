@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { AutoComplete } from './AutoComplete';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
 import { PrescriptionItem, Doctor, Patient, Practice, Prescription } from '../types';
-import { Plus, Trash2, FileText, Save, X } from 'lucide-react';
+import { Plus, Trash2, FileText, Save, X, AlertTriangle } from 'lucide-react';
 
 interface PrescriptionFormProps {
   onSubmit: (prescription: any) => void;
@@ -39,6 +39,8 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [doctorSearch, setDoctorSearch] = useState('');
   const [patientSearch, setPatientSearch] = useState('');
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [patientCreationSuccess, setPatientCreationSuccess] = useState(false);
   const [creatingPatient, setCreatingPatient] = useState(false);
   
@@ -243,7 +245,8 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDoctor || !selectedPatient) {
-      alert('Por favor complete todos los campos obligatorios');
+      setErrorMessage('Por favor complete todos los campos obligatorios');
+      setShowErrorModal(true);
       return;
     }
 
@@ -260,7 +263,8 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       });
 
     if (selectedPracticesList.length === 0) {
-      alert('Debe seleccionar al menos una práctica');
+      setErrorMessage('Debe seleccionar al menos una práctica');
+      setShowErrorModal(true);
       return;
     }
 
@@ -285,7 +289,8 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
         onSubmit(prescriptionData);
       } catch (error) {
         console.error('Error saving prescription:', error);
-        alert('Error al guardar la receta. Por favor, intente nuevamente.');
+        setErrorMessage('Error al guardar la receta. Por favor, intente nuevamente.');
+        setShowErrorModal(true);
       }
     };
     
@@ -715,6 +720,35 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
           </button>
         </div>
       </form>
+
+      {/* Modal de error */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Error
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-6">
+                {errorMessage}
+              </p>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Entendido
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

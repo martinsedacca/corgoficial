@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import { SocialWork } from '../types';
 import { ChevronDown, Search, Plus } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 interface SocialWorkAutocompleteProps {
   value: string;
@@ -21,6 +22,8 @@ export function SocialWorkAutocomplete({
   disabled = false
 }: SocialWorkAutocompleteProps) {
   const { socialWorks, addSocialWork } = useData();
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -63,7 +66,8 @@ export function SocialWorkAutocomplete({
       setFilter('');
     } catch (error) {
       console.error('Error creating social work:', error);
-      alert('Error al crear la obra social. Por favor, intente nuevamente.');
+      setErrorMessage('Error al crear la obra social. Por favor, intente nuevamente.');
+      setShowErrorModal(true);
     }
   };
 
@@ -144,6 +148,35 @@ export function SocialWorkAutocomplete({
               )}
             </>
           )}
+        </div>
+      )}
+
+      {/* Modal de error */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Error
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-6">
+                {errorMessage}
+              </p>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Entendido
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
