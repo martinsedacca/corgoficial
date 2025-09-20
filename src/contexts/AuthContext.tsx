@@ -135,12 +135,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (newSession?.user) {
           try {
+            console.log('Cargando perfil en cambio de estado para:', newSession.user.id);
             const { data: profileData } = await supabase
               .from('user_profiles')
               .select('*')
               .eq('user_id', newSession.user.id)
               .single();
 
+            console.log('Perfil obtenido en cambio de estado:', profileData);
             if (mounted) {
               setProfile(profileData || null);
               setLoading(false);
