@@ -53,8 +53,8 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     
     if (shouldUseColumns) {
       // Layout de 2 columnas para más de 10 prácticas
-      const leftColumn = practiceItems.slice(0, Math.ceil(practiceItems.length / 2));
-      const rightColumn = practiceItems.slice(Math.ceil(practiceItems.length / 2));
+      const leftColumn = practiceItems.slice(0, 10);
+      const rightColumn = practiceItems.slice(10);
       
       practicesHtml += '<div style="display: flex; gap: 16px;">';
       
@@ -335,8 +335,8 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
     
     if (shouldUseColumns) {
       // Layout de 2 columnas para más de 10 prácticas
-      const leftColumn = practiceItems.slice(0, Math.ceil(practiceItems.length / 2));
-      const rightColumn = practiceItems.slice(Math.ceil(practiceItems.length / 2));
+      const leftColumn = practiceItems.slice(0, 10);
+      const rightColumn = practiceItems.slice(10);
       
       practicesHtml += '<div style="display: flex; gap: 16px;">';
       
