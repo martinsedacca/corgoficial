@@ -4,6 +4,7 @@ import { Prescription } from '../types';
 import { PrescriptionForm } from './PrescriptionForm';
 import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X, Printer, Clock, CheckCircle } from 'lucide-react';
 import { printPrescriptionPDF } from '../utils/pdfGenerator';
+import { AlertTriangle } from 'lucide-react';
 
 interface PrescriptionHistoryProps {
   onViewPrescription: (prescription: Prescription) => void;
@@ -13,6 +14,8 @@ interface PrescriptionHistoryProps {
 
 export default function PrescriptionHistory({ onViewPrescription, onEditPrescription, onNewPrescription }: PrescriptionHistoryProps) {
   const { prescriptions, updatePrescriptionAuthorization } = useData();
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterNumber, setFilterNumber] = useState('');
   const [filterDoctor, setFilterDoctor] = useState('');
@@ -90,7 +93,8 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
       await printPrescriptionPDF(prescription);
     } catch (error) {
       console.error('Error al imprimir receta:', error);
-      alert('Error al imprimir la receta. Por favor, intente nuevamente.');
+      setErrorMessage('Error al imprimir la receta. Por favor, intente nuevamente.');
+      setShowErrorModal(true);
     }
   };
 
@@ -99,7 +103,8 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
       await updatePrescriptionAuthorization(prescription.id, !prescription.authorized);
     } catch (error) {
       console.error('Error al cambiar autorización:', error);
-      alert('Error al cambiar el estado de autorización. Por favor, intente nuevamente.');
+      setErrorMessage('Error al cambiar el estado de autorización. Por favor, intente nuevamente.');
+      setShowErrorModal(true);
     }
   };
 
@@ -415,6 +420,35 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
               (filtradas)
             </span>
           )}
+        </div>
+      )}
+
+      {/* Modal de error */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Error
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-6">
+                {errorMessage}
+              </p>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Entendido
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

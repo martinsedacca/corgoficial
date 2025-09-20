@@ -5,6 +5,7 @@ import { companyInfo } from '../data/mockData';
 import { useData } from '../contexts/DataContext';
 import { Calendar, User, Stethoscope, FileText, Download, Printer, Clock, CheckCircle } from 'lucide-react';
 import { generatePrescriptionPDF, printPrescriptionPDF } from '../utils/pdfGenerator';
+import { AlertTriangle } from 'lucide-react';
 
 interface PrescriptionViewerProps {
   prescription: Prescription;
@@ -13,6 +14,8 @@ interface PrescriptionViewerProps {
 export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
   const { updatePrescriptionAuthorization, prescriptions } = useData();
   const [showDeauthorizeModal, setShowDeauthorizeModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   
   // Obtener la receta actualizada del contexto para reactividad
   const currentPrescription = useMemo(() => {
@@ -30,7 +33,8 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       await generatePrescriptionPDF(currentPrescription);
     } catch (error) {
       console.error('Error al exportar PDF:', error);
-      alert('Error al exportar el PDF. Por favor, intente nuevamente.');
+      setErrorMessage('Error al exportar el PDF. Por favor, intente nuevamente.');
+      setShowErrorModal(true);
     }
   };
 
@@ -39,7 +43,8 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       await printPrescriptionPDF(currentPrescription);
     } catch (error) {
       console.error('Error al imprimir PDF:', error);
-      alert('Error al imprimir el PDF. Por favor, intente nuevamente.');
+      setErrorMessage('Error al imprimir el PDF. Por favor, intente nuevamente.');
+      setShowErrorModal(true);
     }
   };
 
@@ -48,7 +53,8 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       await updatePrescriptionAuthorization(currentPrescription.id, true);
     } catch (error) {
       console.error('Error al cambiar autorización:', error);
-      alert('Error al cambiar el estado de autorización. Por favor, intente nuevamente.');
+      setErrorMessage('Error al cambiar el estado de autorización. Por favor, intente nuevamente.');
+      setShowErrorModal(true);
     }
   };
 
@@ -58,7 +64,9 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       setShowDeauthorizeModal(false);
     } catch (error) {
       console.error('Error al desautorizar:', error);
-      alert('Error al desautorizar la receta. Por favor, intente nuevamente.');
+      setShowDeauthorizeModal(false);
+      setErrorMessage('Error al desautorizar la receta. Por favor, intente nuevamente.');
+      setShowErrorModal(true);
     }
   };
 
@@ -305,6 +313,35 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                 >
                   Desautorizar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de error */}
+      {showErrorModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Error
+                </h3>
+              </div>
+              <p className="text-gray-600 mb-6">
+                {errorMessage}
+              </p>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowErrorModal(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Entendido
                 </button>
               </div>
             </div>

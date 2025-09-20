@@ -276,7 +276,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
 
   } catch (error) {
     console.error('Error generando PDF:', error);
-    alert('Error al generar el PDF. Por favor, intente nuevamente.');
+    throw new Error('Error al generar el PDF. Por favor, intente nuevamente.');
   } finally {
     // Remover el contenido temporal del DOM
     document.body.removeChild(pdfContent);
@@ -558,7 +558,7 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
 
   } catch (error) {
     console.error('Error generando PDF para imprimir:', error);
-    alert('Error al generar el PDF para imprimir. Por favor, intente nuevamente.');
+    throw new Error('Error al generar el PDF para imprimir. Por favor, intente nuevamente.');
   } finally {
     // Remover el contenido temporal del DOM
     document.body.removeChild(pdfContent);
