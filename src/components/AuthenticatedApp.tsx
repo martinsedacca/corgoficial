@@ -18,15 +18,6 @@ export function AuthenticatedApp() {
     profileActive: profile?.is_active
   });
 
-  if (loading) {
-    console.log('Mostrando spinner de carga...');
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <LoadingSpinner size="lg" text="Cargando aplicación..." />
-      </div>
-    );
-  }
-
   // Si no hay usuario y se solicita registro
   if (!user && showRegistration) {
     console.log('Mostrando formulario de registro...');
