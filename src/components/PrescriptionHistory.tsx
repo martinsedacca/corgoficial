@@ -64,7 +64,7 @@ interface PrescriptionHistoryProps {
 }
 
 export default function PrescriptionHistory({ onViewPrescription, onEditPrescription, onNewPrescription }: PrescriptionHistoryProps) {
-  const { prescriptions, updatePrescriptionAuthorization, loadingPrescriptions, loadPrescriptions } = useData();
+  const { prescriptions, updatePrescriptionAuthorization, loadingPrescriptions, loadPrescriptions, loadSocialWorks } = useData();
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -82,6 +82,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   // Cargar recetas cuando se monta el componente
   useEffect(() => {
     loadPrescriptions();
+    loadSocialWorks();
   }, []);
 
   const typeLabels = {
@@ -372,7 +373,10 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
-          <div>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div className="lg:col-span-1">
             <DateRangePicker
               startDate={filterDateFrom}
               endDate={filterDateTo}
@@ -382,9 +386,6 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
               }}
             />
           </div>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           <div>
             <SocialWorkAutocomplete
               value={filterSocialWork}
