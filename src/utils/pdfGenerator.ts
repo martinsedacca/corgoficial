@@ -133,7 +133,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     // Agregar observaciones generales si las hay
     if (prescription.additionalNotes) {
       practicesHtml += `
-        <div style="margin-top: 12px; padding: 4px; background-color: #f0f8ff; border-left: 3px solid #1E40AF; font-size: 9px; color: #333;">
+        <div style="margin-top: 12px; padding: 4px 4px 9px 4px; background-color: #f0f8ff; border-left: 3px solid #1E40AF; font-size: 9px; color: #333;">
           <strong>Observaciones:</strong> ${prescription.additionalNotes}
         </div>
       `;
@@ -414,7 +414,7 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
     // Agregar observaciones generales si las hay
     if (prescription.additionalNotes) {
       practicesHtml += `
-        <div style="margin-top: 12px; padding: 4px; background-color: #f0f8ff; border-left: 3px solid #1E40AF; font-size: 9px; color: #333;">
+        <div style="margin-top: 12px; padding: 4px 4px 9px 4px; background-color: #f0f8ff; border-left: 3px solid #1E40AF; font-size: 9px; color: #333;">
           <strong>Observaciones:</strong> ${prescription.additionalNotes}
         </div>
       `;
