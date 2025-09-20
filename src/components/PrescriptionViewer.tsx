@@ -2,7 +2,8 @@ import React from 'react';
 import { Prescription } from '../types';
 import { companyInfo } from '../data/mockData';
 import { Calendar, User, Stethoscope, FileText, Download } from 'lucide-react';
-import { generatePrescriptionPDF } from '../utils/pdfGenerator';
+import { generatePrescriptionPDF, printPrescriptionPDF } from '../utils/pdfGenerator';
+import { Printer } from 'lucide-react';
 
 interface PrescriptionViewerProps {
   prescription: Prescription;
@@ -24,17 +25,37 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
     }
   };
 
+  const handlePrintPDF = async () => {
+    try {
+      await printPrescriptionPDF(prescription);
+    } catch (error) {
+      console.error('Error al imprimir PDF:', error);
+      alert('Error al imprimir el PDF. Por favor, intente nuevamente.');
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 sm:p-8 max-w-4xl mx-auto">
       {/* Export Button - Moved to top */}
       <div className="mb-6 text-center">
-        <button
-          onClick={handleExportPDF}
-          className="flex items-center gap-2 bg-green-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium hover:bg-green-700 transition-colors mx-auto text-sm sm:text-base"
-        >
-          <Download className="h-5 w-5" />
-          Exportar a PDF
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <button
+            onClick={handleExportPDF}
+            className="flex items-center gap-2 bg-green-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium hover:bg-green-700 transition-colors text-sm sm:text-base"
+          >
+            <Download className="h-5 w-5" />
+            Exportar a PDF
+          </button>
+          <button
+            onClick={handlePrintPDF}
+          <button
+            onClick={handlePrintPDF}
+            className="flex items-center gap-2 bg-blue-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm sm:text-base"
+          >
+            <FileText className="h-5 w-5" />
+            Imprimir
+          </button>
+        </div>
       </div>
 
       {/* Header */}
