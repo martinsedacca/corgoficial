@@ -17,6 +17,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const [newPatientData, setNewPatientData] = useState({
     name: '',
     lastName: '',
+    dni: '',
     socialWork: '',
     affiliateNumber: '',
     plan: '',
@@ -141,6 +142,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
         setNewPatientData({
           name: '',
           lastName: '',
+          dni: '',
           socialWork: '',
           affiliateNumber: '',
           plan: '',
@@ -369,6 +371,22 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                       disabled={creatingPatient}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                       placeholder="Pérez"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      DNI *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newPatientData.dni}
+                      onChange={(e) => setNewPatientData({...newPatientData, dni: e.target.value.replace(/\D/g, '').slice(0, 8)})}
+                      disabled={creatingPatient}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      placeholder="12345678"
+                      maxLength={8}
+                      pattern="[0-9]{8}"
                     />
                   </div>
                   <div>
