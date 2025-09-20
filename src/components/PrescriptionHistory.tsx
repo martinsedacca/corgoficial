@@ -266,7 +266,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                   : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
               }`}
             >
-              Autorizaciones
+              Cirugías
             </button>
           </div>
         </div>

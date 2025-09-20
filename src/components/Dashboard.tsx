@@ -116,7 +116,7 @@ export function Dashboard() {
     const typeLabels = {
       studies: 'Estudios',
       treatments: 'Tratamientos',
-      authorization: 'Autorizaciones'
+      authorization: 'Cirugías'
     };
     
     return Object.entries(stats).map(([type, count]) => ({
