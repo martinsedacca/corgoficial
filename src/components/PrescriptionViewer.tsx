@@ -48,8 +48,6 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
           </button>
           <button
             onClick={handlePrintPDF}
-          <button
-            onClick={handlePrintPDF}
             className="flex items-center gap-2 bg-blue-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm sm:text-base"
           >
             <FileText className="h-5 w-5" />
