@@ -258,7 +258,8 @@ export const prescriptionService = {
       })),
       additionalNotes: prescription.additional_notes,
       date: prescription.date,
-      createdAt: prescription.created_at
+      createdAt: prescription.created_at,
+      authorized: prescription.authorized
     }));
   },
 
@@ -281,7 +282,8 @@ export const prescriptionService = {
         doctor_id: prescriptionData.doctorId,
         patient_id: prescriptionData.patientId,
         additional_notes: prescriptionData.additionalNotes || null,
-        date: prescriptionData.date
+        date: prescriptionData.date,
+        authorized: false
       })
       .select()
       .single();
