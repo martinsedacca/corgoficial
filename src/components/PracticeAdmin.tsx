@@ -3,8 +3,41 @@ import { useData } from '../contexts/DataContext';
 import { Practice } from '../types';
 import { Plus, Edit3, Trash2, Activity, Search, Save, X, AlertCircle, AlertTriangle } from 'lucide-react';
 
+// Componente Skeleton para la lista de prácticas
+const SkeletonPracticeCard = () => (
+  <div className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors animate-pulse">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex-1">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="h-5 w-48 bg-gray-200 rounded"></div>
+          <div className="h-6 w-12 bg-gray-200 rounded"></div>
+        </div>
+        <div className="h-4 w-64 bg-gray-200 rounded"></div>
+      </div>
+      <div className="flex gap-2 sm:ml-4">
+        <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+        <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+      </div>
+    </div>
+  </div>
+);
+
+// Componente Skeleton para secciones de categorías
+const SkeletonCategorySection = () => (
+  <div className="bg-white rounded-lg shadow-lg p-3 sm:p-6 animate-pulse">
+    <div className="flex items-center gap-3 mb-4">
+      <div className="h-6 w-32 bg-gray-200 rounded-full"></div>
+    </div>
+    <div className="grid gap-3">
+      {[...Array(3)].map((_, index) => (
+        <SkeletonPracticeCard key={index} />
+      ))}
+    </div>
+  </div>
+);
+
 export function PracticeAdmin() {
-  const { practices, addPractice, updatePractice, deletePractice } = useData();
+  const { practices, addPractice, updatePractice, deletePractice, loading } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingPractice, setEditingPractice] = useState<Practice | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -292,59 +325,66 @@ export function PracticeAdmin() {
       </div>
 
       {/* Lista de Prácticas por Categoría */}
-      {Object.entries(practicesByCategory).map(([category, categoryPractices]) => {
-        if (filterCategory !== 'all' && filterCategory !== category) return null;
-        if (categoryPractices.length === 0) return null;
+      {loading ? (
+        // Mostrar skeletons mientras carga
+        [...Array(3)].map((_, index) => (
+          <SkeletonCategorySection key={index} />
+        ))
+      ) : (
+        Object.entries(practicesByCategory).map(([category, categoryPractices]) => {
+          if (filterCategory !== 'all' && filterCategory !== category) return null;
+          if (categoryPractices.length === 0) return null;
 
-        return (
-          <div key={category} className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${categoryColors[category as keyof typeof categoryColors]}`}>
-                {categoryLabels[category as keyof typeof categoryLabels]} ({categoryPractices.length})
+          return (
+            <div key={category} className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`px-3 py-1 rounded-full text-sm font-medium ${categoryColors[category as keyof typeof categoryColors]}`}>
+                  {categoryLabels[category as keyof typeof categoryLabels]} ({categoryPractices.length})
+                </div>
               </div>
-            </div>
-            
-            <div className="grid gap-3">
-              {categoryPractices.map((practice) => (
-                <div key={practice.id} className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900">{practice.name}</h3>
-                        <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm font-mono">
-                          {practice.code}
-                        </span>
+              
+              <div className="grid gap-3">
+                {categoryPractices.map((practice) => (
+                  <div key={practice.id} className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900">{practice.name}</h3>
+                          <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm font-mono">
+                            {practice.code}
+                          </span>
+                        </div>
+                        {practice.description && (
+                          <p className="text-sm text-gray-600">{practice.description}</p>
+                        )}
                       </div>
-                      {practice.description && (
-                        <p className="text-sm text-gray-600">{practice.description}</p>
-                      )}
-                    </div>
-                    <div className="flex gap-2 sm:ml-4">
-                      <button
-                        onClick={() => handleEdit(practice)}
-                        className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                        title="Editar práctica"
-                      >
-                        <Edit3 className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(practice)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Eliminar práctica"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <div className="flex gap-2 sm:ml-4">
+                        <button
+                          onClick={() => handleEdit(practice)}
+                          className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                          title="Editar práctica"
+                        >
+                          <Edit3 className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(practice)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Eliminar práctica"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })
+      )}
 
       {/* Estado vacío */}
-      {filteredPractices.length === 0 && (
+      {!loading && filteredPractices.length === 0 && (
         <div className="bg-white rounded-lg shadow-lg p-12 text-center">
           <Activity className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">

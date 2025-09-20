@@ -3,8 +3,27 @@ import { useData } from '../contexts/DataContext';
 import { SocialWork } from '../types';
 import { Plus, Edit3, Trash2, Building2, Search, X, AlertTriangle } from 'lucide-react';
 
+// Componente Skeleton para la lista de obras sociales
+const SkeletonSocialWorkCard = () => (
+  <div className="border border-gray-200 rounded-lg p-3 sm:p-4 animate-pulse">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex-1">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="h-5 w-32 bg-gray-200 rounded"></div>
+          <div className="h-6 w-12 bg-gray-200 rounded-full"></div>
+        </div>
+        <div className="h-4 w-48 bg-gray-200 rounded"></div>
+      </div>
+      <div className="flex gap-2 sm:ml-4">
+        <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+        <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+      </div>
+    </div>
+  </div>
+);
+
 export function SocialWorkManager() {
-  const { socialWorks, addSocialWork, updateSocialWork, deleteSocialWork } = useData();
+  const { socialWorks, addSocialWork, updateSocialWork, deleteSocialWork, loading } = useData();
   const [showForm, setShowForm] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingSocialWork, setEditingSocialWork] = useState<SocialWork | null>(null);
@@ -208,7 +227,12 @@ export function SocialWorkManager() {
         </div>
 
         <div className="grid gap-4">
-          {filteredSocialWorks.length === 0 ? (
+          {loading ? (
+            // Mostrar skeletons mientras carga
+            [...Array(4)].map((_, index) => (
+              <SkeletonSocialWorkCard key={index} />
+            ))
+          ) : filteredSocialWorks.length === 0 ? (
             <div className="text-center py-12">
               <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500 text-lg">

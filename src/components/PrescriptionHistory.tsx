@@ -6,6 +6,53 @@ import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X, P
 import { printPrescriptionPDF } from '../utils/pdfGenerator';
 import { AlertTriangle } from 'lucide-react';
 
+// Componente Skeleton para la lista de recetas
+const SkeletonPrescriptionCard = () => (
+  <div className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors animate-pulse">
+    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="flex-1">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-2">
+          <div className="h-6 w-16 bg-gray-200 rounded"></div>
+          <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
+          <div className="h-6 w-24 bg-gray-200 rounded-full"></div>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm mb-3">
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 bg-gray-200 rounded"></div>
+            <div className="h-4 w-32 bg-gray-200 rounded"></div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 bg-gray-200 rounded"></div>
+            <div className="h-4 w-24 bg-gray-200 rounded"></div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 bg-gray-200 rounded"></div>
+            <div className="h-4 w-28 bg-gray-200 rounded"></div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 bg-gray-200 rounded"></div>
+            <div className="h-4 w-20 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+        
+        <div className="mt-3">
+          <div className="h-4 w-full bg-gray-200 rounded"></div>
+        </div>
+      </div>
+      
+      <div className="lg:ml-4">
+        <div className="flex items-center justify-center gap-1 sm:gap-2">
+          <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
+          <div className="h-8 w-12 bg-gray-200 rounded-lg"></div>
+          <div className="h-8 w-16 bg-gray-200 rounded-lg"></div>
+          <div className="h-8 w-20 bg-gray-200 rounded-lg"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 interface PrescriptionHistoryProps {
   onViewPrescription: (prescription: Prescription) => void;
   onEditPrescription: (prescription: Prescription) => void;
@@ -13,7 +60,7 @@ interface PrescriptionHistoryProps {
 }
 
 export default function PrescriptionHistory({ onViewPrescription, onEditPrescription, onNewPrescription }: PrescriptionHistoryProps) {
-  const { prescriptions, updatePrescriptionAuthorization } = useData();
+  const { prescriptions, updatePrescriptionAuthorization, loading } = useData();
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -325,7 +372,12 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
 
       {/* Lista de recetas */}
       <div className="space-y-4">
-        {filteredPrescriptions.length === 0 ? (
+        {loading ? (
+          // Mostrar skeletons mientras carga
+          [...Array(5)].map((_, index) => (
+            <SkeletonPrescriptionCard key={index} />
+          ))
+        ) : filteredPrescriptions.length === 0 ? (
           <div className="text-center py-12">
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg mb-2">
@@ -458,7 +510,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
         )}
       </div>
       
-      {filteredPrescriptions.length > 0 && (
+      {!loading && filteredPrescriptions.length > 0 && (
         <div className="mt-6 text-center text-sm text-gray-500">
           Mostrando {filteredPrescriptions.length} de {availablePrescriptions.length} recetas
           {hasActiveFilters && (

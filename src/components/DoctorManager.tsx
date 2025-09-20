@@ -3,8 +3,37 @@ import { useData } from '../contexts/DataContext';
 import { Doctor } from '../types';
 import { UserPlus, Edit3, Trash2, User, Phone, Mail, AlertTriangle } from 'lucide-react';
 
+// Componente Skeleton para la lista de médicos
+const SkeletonDoctorCard = () => (
+  <div className="border border-gray-200 rounded-lg p-3 sm:p-4 animate-pulse">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex-1">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="h-5 w-32 bg-gray-200 rounded"></div>
+          <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
+        </div>
+        <div className="text-sm space-y-1">
+          <div className="h-4 w-24 bg-gray-200 rounded"></div>
+          <div className="flex items-center gap-1">
+            <div className="h-3 w-3 bg-gray-200 rounded"></div>
+            <div className="h-4 w-28 bg-gray-200 rounded"></div>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="h-3 w-3 bg-gray-200 rounded"></div>
+            <div className="h-4 w-36 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+      <div className="flex gap-2 sm:ml-4">
+        <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+        <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
+      </div>
+    </div>
+  </div>
+);
+
 export function DoctorManager() {
-  const { doctors, addDoctor, updateDoctor, deleteDoctor } = useData();
+  const { doctors, addDoctor, updateDoctor, deleteDoctor, loading } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -192,7 +221,12 @@ export function DoctorManager() {
       )}
 
       <div className="grid gap-4">
-        {doctors.length === 0 ? (
+        {loading ? (
+          // Mostrar skeletons mientras carga
+          [...Array(3)].map((_, index) => (
+            <SkeletonDoctorCard key={index} />
+          ))
+        ) : doctors.length === 0 ? (
           <div className="text-center py-12">
             <User className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">No hay médicos registrados</p>
