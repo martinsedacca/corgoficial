@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import { Prescription } from '../types';
 import { PrescriptionForm } from './PrescriptionForm';
+import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
 import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X, Printer, Clock, CheckCircle } from 'lucide-react';
 import { Download } from 'lucide-react';
 import { printPrescriptionPDF } from '../utils/pdfGenerator';
@@ -71,6 +72,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   const [filterDoctor, setFilterDoctor] = useState('');
   const [filterPatient, setFilterPatient] = useState('');
   const [filterDNI, setFilterDNI] = useState('');
+  const [filterSocialWork, setFilterSocialWork] = useState('');
   const [filterDateFrom, setFilterDateFrom] = useState('');
   const [filterDateTo, setFilterDateTo] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
@@ -105,6 +107,8 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
       prescription.patient.name.toLowerCase().includes(filterPatient.toLowerCase()) ||
       prescription.patient.lastName.toLowerCase().includes(filterPatient.toLowerCase());
     const matchesDNI = !filterDNI || prescription.patient.dni.includes(filterDNI);
+    const matchesSocialWork = !filterSocialWork || 
+      prescription.patient.socialWork.toLowerCase().includes(filterSocialWork.toLowerCase());
     
     const prescriptionDate = new Date(prescription.date);
     const matchesDateFrom = !filterDateFrom || prescriptionDate >= new Date(filterDateFrom + 'T00:00:00');
@@ -130,7 +134,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     })();
     
     return matchesSearch && matchesNumber && matchesDoctor && matchesPatient && matchesDNI &&
-           matchesDateFrom && matchesDateTo && matchesType && matchesAuthorization;
+           matchesSocialWork && matchesDateFrom && matchesDateTo && matchesType && matchesAuthorization;
   }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const clearAllFilters = () => {
@@ -139,6 +143,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     setFilterDoctor('');
     setFilterPatient('');
     setFilterDNI('');
+    setFilterSocialWork('');
     setFilterDateFrom('');
     setFilterDateTo('');
     setFilterType('all');
@@ -146,7 +151,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   };
 
   const hasActiveFilters = searchTerm || filterNumber || filterDoctor || filterPatient || 
-                          filterDNI ||
+                          filterDNI || filterSocialWork ||
                           filterDateFrom || filterDateTo || filterType !== 'all' || filterAuthorization !== 'all';
 
   const handlePrintPrescription = async (prescription: Prescription) => {
@@ -318,7 +323,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
 
       {/* Filtros siempre visibles */}
       <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4 mb-4">
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
               Número de Receta
@@ -365,6 +370,14 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
               value={filterDNI}
               onChange={(e) => setFilterDNI(e.target.value)}
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
+          </div>
+          <div>
+            <SocialWorkAutocomplete
+              value={filterSocialWork}
+              onChange={(value) => setFilterSocialWork(value)}
+              placeholder="Ej: OSDE, IOMA"
+              label="Obra Social"
             />
           </div>
           <div className="xl:col-span-2">
