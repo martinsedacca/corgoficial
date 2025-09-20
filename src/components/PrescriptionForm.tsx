@@ -31,6 +31,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [doctorSearch, setDoctorSearch] = useState('');
   const [patientSearch, setPatientSearch] = useState('');
+  const [patientCreationSuccess, setPatientCreationSuccess] = useState(false);
   
   // Como eliminamos la autenticación, definimos isDoctor como false por defecto
   const isDoctor = false;
@@ -108,23 +109,33 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
 
   const handleSaveNewPatient = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevenir que se propague al formulario padre
     try {
       const newPatient = await addPatient(newPatientData);
       if (newPatient) {
         setSelectedPatient(newPatient);
         setPatientSearch(`${newPatient.name} - ${newPatient.socialWork}`);
+        setPatientCreationSuccess(true);
+        
+        // Ocultar el mensaje de éxito después de 3 segundos
+        setTimeout(() => {
+          setPatientCreationSuccess(false);
+        }, 3000);
+        
+        // Cerrar el formulario después de un breve delay para que se vea el mensaje
+        setTimeout(() => {
+          setShowPatientForm(false);
+          setNewPatientData({
+            name: '',
+            socialWork: '',
+            affiliateNumber: '',
+            plan: '',
+            phone: '',
+            email: '',
+            address: ''
+          });
+        }, 1500);
       }
-      setShowPatientForm(false);
-      setNewPatientData({
-        name: '',
-        socialWork: '',
-        affiliateNumber: '',
-        plan: '',
-        phone: '',
-        email: '',
-        address: ''
-      });
-      alert('Paciente creado exitosamente');
     } catch (error) {
       console.error('Error creating patient:', error);
       alert('Error al crear el paciente. Por favor, intente nuevamente.');
@@ -292,8 +303,20 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
           {/* Formulario para crear nuevo paciente */}
           {showPatientForm && (
             <div className="mt-4 p-3 sm:p-4 border border-primary-200 rounded-lg bg-primary-50">
+              {/* Mensaje de éxito */}
+              {patientCreationSuccess && (
+                <div className="mb-4 p-3 bg-green-100 border border-green-300 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm">✓</span>
+                    </div>
+                    <span className="text-green-800 font-medium">¡Paciente creado exitosamente!</span>
+                  </div>
+                </div>
+              )}
+              
               <h4 className="text-lg font-medium text-primary-800 mb-3">Crear Nuevo Paciente</h4>
-              <form onSubmit={handleSaveNewPatient} className="space-y-3">
+              <div className="space-y-3">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -374,20 +397,23 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                 </div>
                 <div className="flex gap-3">
                   <button
-                    type="submit"
+                    type="button"
+                    onClick={handleSaveNewPatient}
                     className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+                    disabled={patientCreationSuccess}
                   >
-                    Crear Paciente
+                    {patientCreationSuccess ? 'Creando...' : 'Crear Paciente'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowPatientForm(false)}
                     className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
+                    disabled={patientCreationSuccess}
                   >
                     Cancelar
                   </button>
                 </div>
-              </form>
+              </div>
             </div>
           )}
         </div>
