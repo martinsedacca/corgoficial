@@ -115,6 +115,7 @@ export const patientService = {
       .from('patients')
       .update({
         name: updates.name,
+        last_name: updates.lastName,
         social_work: updates.socialWork,
         affiliate_number: updates.affiliateNumber,
         plan: updates.plan || null,
@@ -130,6 +131,7 @@ export const patientService = {
     return {
       id: data.id,
       name: data.name,
+      lastName: data.last_name,
       socialWork: data.social_work,
       affiliateNumber: data.affiliate_number,
       plan: data.plan || null,
