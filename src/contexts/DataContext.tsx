@@ -149,6 +149,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     try {
       const newPatient = await patientService.create(patientData);
       setPatients(prev => [...prev, newPatient]);
+      return newPatient;
     } catch (err) {
       console.error('Error adding patient:', err);
       throw err;
