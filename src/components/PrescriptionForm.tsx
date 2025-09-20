@@ -109,14 +109,10 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const handleSaveNewPatient = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { addPatient } = useData();
-      await addPatient(newPatientData);
-      // Buscar el paciente recién creado
-      const { patients } = useData();
-      const newPatient = patients.find(p => p.name === newPatientData.name);
+      const newPatient = await addPatient(newPatientData);
       if (newPatient) {
         setSelectedPatient(newPatient);
-        setPatientSearch(newPatient.name);
+        setPatientSearch(`${newPatient.name} - ${newPatient.socialWork}`);
       }
       setShowPatientForm(false);
       setNewPatientData({
@@ -128,6 +124,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
         email: '',
         address: ''
       });
+      alert('Paciente creado exitosamente');
     } catch (error) {
       console.error('Error creating patient:', error);
       alert('Error al crear el paciente. Por favor, intente nuevamente.');
