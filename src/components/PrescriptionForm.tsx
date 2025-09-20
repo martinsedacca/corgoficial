@@ -116,7 +116,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       setSelectedPatient(editingPrescription.patient);
       setPrescriptionType(editingPrescription.type);
       setDoctorSearch(editingPrescription.doctor.name);
-      setPatientSearch(editingPrescription.patient.name);
+      setPatientSearch(`${editingPrescription.patient.name} ${editingPrescription.patient.lastName} - ${editingPrescription.patient.socialWork}`);
       setAdditionalNotes(editingPrescription.additionalNotes || '');
       
       // Configurar prácticas seleccionadas
