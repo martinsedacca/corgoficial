@@ -3,12 +3,18 @@ import { useData } from '../contexts/DataContext';
 import { supabase } from '../lib/supabase';
 import { Patient } from '../types';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
-import { UserPlus, Edit3, Trash2, Users, Phone, Mail, MapPin } from 'lucide-react';
+import { UserPlus, Edit3, Trash2, Users, Phone, Mail, MapPin, Search, Filter, X } from 'lucide-react';
 
 export function PatientManager() {
   const { patients, addPatient, updatePatient, deletePatient } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterName, setFilterName] = useState('');
+  const [filterDNI, setFilterDNI] = useState('');
+  const [filterSocialWork, setFilterSocialWork] = useState('');
+  const [filterAffiliateNumber, setFilterAffiliateNumber] = useState('');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [dniValidation, setDniValidation] = useState<{
     isChecking: boolean;
     exists: boolean;
@@ -81,6 +87,42 @@ export function PatientManager() {
     );
   };
   const handleSubmit = (e: React.FormEvent) => {
+  // Filtrar pacientes
+  const filteredPatients = patients.filter(patient => {
+    const fullName = `${patient.name} ${patient.lastName}`.toLowerCase();
+    
+    // Búsqueda general
+    const matchesSearch = !searchTerm || 
+      fullName.includes(searchTerm.toLowerCase()) ||
+      patient.dni.includes(searchTerm) ||
+      patient.socialWork.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (patient.affiliateNumber && patient.affiliateNumber.includes(searchTerm));
+    
+    // Filtros específicos
+    const matchesName = !filterName || fullName.includes(filterName.toLowerCase());
+    const matchesDNI = !filterDNI || patient.dni.includes(filterDNI);
+    const matchesSocialWork = !filterSocialWork || 
+      patient.socialWork.toLowerCase().includes(filterSocialWork.toLowerCase());
+    const matchesAffiliateNumber = !filterAffiliateNumber || 
+      (patient.affiliateNumber && patient.affiliateNumber.includes(filterAffiliateNumber));
+    
+    return matchesSearch && matchesName && matchesDNI && matchesSocialWork && matchesAffiliateNumber;
+  }).sort((a, b) => {
+    const fullNameA = `${a.name} ${a.lastName}`.trim();
+    const fullNameB = `${b.name} ${b.lastName}`.trim();
+    return fullNameA.localeCompare(fullNameB, 'es', { sensitivity: 'base' });
+  });
+
+  const clearAllFilters = () => {
+    setSearchTerm('');
+    setFilterName('');
+    setFilterDNI('');
+    setFilterSocialWork('');
+    setFilterAffiliateNumber('');
+  };
+
+  const hasActiveFilters = searchTerm || filterName || filterDNI || filterSocialWork || filterAffiliateNumber;
+
     e.preventDefault();
     
     if (!isFormValid()) {
@@ -328,14 +370,123 @@ export function PatientManager() {
         </div>
       )}
 
+      {/* Filtros de búsqueda */}
+      <div className="mb-6">
+        {/* Búsqueda principal */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Búsqueda general (nombre, DNI, obra social, afiliado)..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                showAdvancedFilters || hasActiveFilters
+                  ? 'bg-green-100 text-green-700 border border-green-300'
+                  : 'bg-gray-100 text-gray-600 border border-gray-300 hover:bg-gray-200'
+              }`}
+            >
+              <Filter className="h-4 w-4" />
+              <span className="hidden sm:inline">Filtros</span>
+            </button>
+            {hasActiveFilters && (
+              <button
+                onClick={clearAllFilters}
+                className="flex items-center gap-2 px-3 py-2 bg-red-100 text-red-600 border border-red-300 rounded-lg hover:bg-red-200 transition-colors"
+                title="Limpiar todos los filtros"
+              >
+                <X className="h-4 w-4" />
+                <span className="hidden sm:inline">Limpiar</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Filtros avanzados */}
+        {showAdvancedFilters && (
+          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <h4 className="text-sm font-medium text-gray-700 mb-3">Filtros Específicos</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Nombre y Apellido
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej: Juan Pérez"
+                  value={filterName}
+                  onChange={(e) => setFilterName(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  DNI
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej: 12345678"
+                  value={filterDNI}
+                  onChange={(e) => setFilterDNI(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  maxLength={8}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  Obra Social
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej: OSDE, IOMA"
+                  value={filterSocialWork}
+                  onChange={(e) => setFilterSocialWork(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">
+                  N° Afiliado
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej: 123456789"
+                  value={filterAffiliateNumber}
+                  onChange={(e) => setFilterAffiliateNumber(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
       <div className="grid gap-4">
-        {patients.length === 0 ? (
+        {filteredPatients.length === 0 ? (
           <div className="text-center py-12">
             <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">No hay pacientes registrados</p>
+            <p className="text-gray-500 text-lg">
+              {patients.length === 0 
+                ? 'No hay pacientes registrados'
+                : 'No se encontraron pacientes con los filtros aplicados'
+              }
+            </p>
+            {hasActiveFilters && patients.length > 0 && (
+              <p className="text-gray-400 mt-2">
+                Intente ajustar los filtros de búsqueda
+              </p>
+            )}
           </div>
         ) : (
-          patients.map((patient) => (
+          filteredPatients.map((patient) => (
             <div key={patient.id} className="border border-gray-200 rounded-lg p-3 sm:p-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex-1">
@@ -392,6 +543,18 @@ export function PatientManager() {
           ))
         )}
       </div>
+
+      {/* Contador de resultados */}
+      {filteredPatients.length > 0 && (
+        <div className="mt-6 text-center text-sm text-gray-500">
+          Mostrando {filteredPatients.length} de {patients.length} pacientes
+          {hasActiveFilters && (
+            <span className="ml-2 text-green-600">
+              (filtrados)
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
