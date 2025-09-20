@@ -113,24 +113,14 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
     e.stopPropagation(); // Prevenir que se propague al formulario padre
     setCreatingPatient(true);
     try {
-      await addPatient(newPatientData);
+      const createdPatient = await addPatient(newPatientData);
       
       // Mostrar mensaje de éxito
       setPatientCreationSuccess(true);
       
-      // Recargar los datos para obtener el paciente recién creado
-      await new Promise(resolve => setTimeout(resolve, 500)); // Pequeña pausa para asegurar que se guardó
-      
-      // Buscar el paciente recién creado por nombre y obra social
-      const createdPatient = patients.find(p => 
-        p.name.toLowerCase() === newPatientData.name.toLowerCase() &&
-        p.socialWork.toLowerCase() === newPatientData.socialWork.toLowerCase()
-      );
-      
-      if (createdPatient) {
-        setSelectedPatient(createdPatient);
-        setPatientSearch(`${createdPatient.name} - ${createdPatient.socialWork}`);
-      }
+      // Seleccionar el paciente creado directamente
+      setSelectedPatient(createdPatient);
+      setPatientSearch(`${createdPatient.name} - ${createdPatient.socialWork}`);
       
       // Limpiar formulario y cerrar después de un tiempo más corto
       setTimeout(() => {
