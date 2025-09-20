@@ -361,24 +361,22 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                 
                 <div className="lg:ml-4">
                   <div className="flex items-center justify-center gap-1 sm:gap-2">
-                    {/* Tag de estado de autorización */}
-                    <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
-                      prescription.authorized
-                        ? 'bg-green-50 text-green-700 border border-green-200'
-                        : 'bg-gray-50 text-gray-600 border border-gray-200'
-                    }`}>
-                      {prescription.authorized ? (
-                        <>
-                          <CheckCircle className="h-3 w-3" />
-                          <span>Autorizado</span>
-                        </>
-                      ) : (
-                        <>
-                          <Clock className="h-3 w-3" />
-                          <span>Autorización Pendiente</span>
-                        </>
-                      )}
-                    </div>
+                    {/* Estado de autorización */}
+                    {prescription.authorized ? (
+                      <div className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                        <CheckCircle className="h-3 w-3" />
+                        <span>Autorizado</span>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleToggleAuthorization(prescription)}
+                        className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200 transition-colors"
+                        title="Autorizar receta"
+                      >
+                        <Clock className="h-3 w-3" />
+                        <span>Autorizar</span>
+                      </button>
+                    )}
                     <button
                       onClick={() => onViewPrescription(prescription)}
                       className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
