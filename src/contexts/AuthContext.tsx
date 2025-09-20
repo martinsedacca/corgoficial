@@ -33,164 +33,101 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [initialized, setInitialized] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
-    let isInitializing = false;
-
-    const initAuth = async () => {
-      if (isInitializing) return;
-      isInitializing = true;
+    // Obtener sesión inicial
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
       
-      try {
-        console.log('Inicializando autenticación...');
-        
-        // Obtener sesión actual
-        const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error('Error obteniendo sesión:', sessionError);
-          if (mounted) {
-            setSession(null);
-            setUser(null);
-            setProfile(null);
-            setLoading(false);
-            setInitialized(true);
-          }
-          return;
-        }
-
-        console.log('Sesión actual:', currentSession?.user?.email || 'No hay sesión');
-
-        if (!mounted) return;
-
-        if (currentSession?.user) {
-          setSession(currentSession);
-          setUser(currentSession.user);
-
-          // Intentar obtener perfil del usuario
-          try {
-            console.log('Cargando perfil para usuario:', currentSession.user.id);
-            const { data: profileData, error: profileError } = await supabase
-              .from('user_profiles')
-              .select('*')
-              .eq('user_id', currentSession.user.id)
-              .maybeSingle();
-
-            if (profileError && profileError.code !== 'PGRST116') {
-              console.error('Error cargando perfil:', profileError);
-            } else {
-              console.log('Perfil cargado exitosamente:', profileData);
-            }
-
-            if (mounted) {
-              setProfile(profileData || null);
-            }
-          } catch (profileError) {
-            console.error('Error en catch cargando perfil:', profileError);
-            if (mounted) {
-              setProfile(null);
-            }
-          }
-        } else {
-          console.log('No hay usuario autenticado');
-          if (mounted) {
-            setSession(null);
-            setUser(null);
-            setProfile(null);
-          }
-        }
-      } catch (error) {
-        console.error('Error en inicialización de auth:', error);
-        if (mounted) {
-          setSession(null);
-          setUser(null);
-          setProfile(null);
-        }
-      } finally {
-        if (mounted) {
-          console.log('Finalizando carga de autenticación');
-          setLoading(false);
-          setInitialized(true);
-        }
-        isInitializing = false;
+      if (session?.user) {
+        loadUserProfile(session.user.id);
       }
-    };
+    });
 
-    // Ejecutar inicialización solo si no se ha inicializado
-    if (!initialized) {
-      initAuth();
-    }
-
-    // Configurar listener de cambios de autenticación
+    // Escuchar cambios de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, newSession) => {
-        console.log('Cambio de estado de auth:', event, newSession?.user?.email);
-        if (!mounted) return;
-
-        setSession(newSession);
-        setUser(newSession?.user || null);
-
-        if (newSession?.user) {
-          try {
-            console.log('Cargando perfil en cambio de estado para:', newSession.user.id);
-            const { data: profileData } = await supabase
-              .from('user_profiles')
-              .select('*')
-              .eq('user_id', newSession.user.id)
-              .single();
-
-            console.log('Perfil obtenido en cambio de estado:', profileData);
-            if (mounted) {
-              setProfile(profileData || null);
-              setLoading(false);
-            }
-          } catch (error) {
-            console.log('Error cargando perfil en cambio de estado:', error);
-            if (mounted) {
-              setProfile(null);
-              setLoading(false);
-            }
-          }
+      async (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          loadUserProfile(session.user.id);
         } else {
-          if (mounted) {
-            setProfile(null);
-            setLoading(false);
-          }
+          setProfile(null);
         }
       }
     );
 
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
-  }, [initialized]);
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const loadUserProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error loading profile:', error);
+        // Si es m.sedacca@gmail.com, crear perfil de admin automáticamente
+        if (user?.email === 'm.sedacca@gmail.com') {
+          const adminProfile: UserProfile = {
+            id: 'admin-' + userId,
+            user_id: userId,
+            email: 'm.sedacca@gmail.com',
+            full_name: 'Administrador',
+            role: 'admin',
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          setProfile(adminProfile);
+        }
+      } else {
+        setProfile(data);
+      }
+    } catch (error) {
+      console.error('Error in loadUserProfile:', error);
+      // Si es m.sedacca@gmail.com, crear perfil de admin automáticamente
+      if (user?.email === 'm.sedacca@gmail.com') {
+        const adminProfile: UserProfile = {
+          id: 'admin-' + userId,
+          user_id: userId,
+          email: 'm.sedacca@gmail.com',
+          full_name: 'Administrador',
+          role: 'admin',
+          is_active: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        setProfile(adminProfile);
+      }
+    }
+  };
 
   const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      return { error };
-    } catch (error) {
-      console.error('Error en signIn:', error);
-      return { error };
-    }
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    return { error };
   };
 
   const signOut = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error('Error en signOut:', error);
-    }
+    await supabase.auth.signOut();
+    setProfile(null);
   };
 
+  // Para m.sedacca@gmail.com siempre dar acceso completo
   const hasPermission = (permission: string): boolean => {
+    if (user?.email === 'm.sedacca@gmail.com') {
+      return true; // Acceso completo sin restricciones
+    }
+    
     if (!profile) return false;
 
     const permissions = {
@@ -222,7 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return permissions[profile.role]?.includes(permission) || false;
   };
 
-  const isAdmin = profile?.role === 'admin';
+  const isAdmin = user?.email === 'm.sedacca@gmail.com' || profile?.role === 'admin';
   const isSecretary = profile?.role === 'secretary';
   const isDoctor = profile?.role === 'doctor';
 

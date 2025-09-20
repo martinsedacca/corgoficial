@@ -16,7 +16,7 @@ import { FileText, History, User, Users, Activity, Building2, BarChart3, Setting
 type View = 'dashboard' | 'new' | 'history' | 'doctors' | 'patients' | 'practices' | 'admin-practices' | 'social-works' | 'users';
 
 export function AppContent() {
-  const { profile, signOut, hasPermission } = useAuth();
+  const { user, profile, signOut, hasPermission } = useAuth();
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [viewingPrescription, setViewingPrescription] = useState<Prescription | null>(null);
   const [editingPrescription, setEditingPrescription] = useState<Prescription | null>(null);
@@ -89,8 +89,8 @@ export function AppContent() {
                 className="h-8 sm:h-10 w-auto"
               />
               <div className="hidden sm:block">
-                <div className="text-sm font-medium text-gray-900">{profile?.full_name}</div>
-                <div className="text-xs text-gray-500 capitalize">{profile?.role}</div>
+                <div className="text-sm font-medium text-gray-900">{profile?.full_name || user?.email}</div>
+                <div className="text-xs text-gray-500 capitalize">{profile?.role || 'admin'}</div>
               </div>
             </div>
             
