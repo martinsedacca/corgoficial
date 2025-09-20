@@ -108,7 +108,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
         <span style="margin-right: 8px;">Nombre y Apellido:</span>
         <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
-          ${prescription.patient.name} ${prescription.patient.lastName}
+          ${prescription.patient.name}
           <div style="position: absolute; bottom: -6px; left: 0; right: 0; border-bottom: 1px dotted #666;"></div>
         </div>
       </div>
@@ -217,7 +217,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     pdf.line(pdfWidth / 2, 0, pdfWidth / 2, pdfHeight);
 
     // Descargar el PDF
-    pdf.save(`Receta_${prescription.number}_${prescription.patient.name}_${prescription.patient.lastName}.pdf`.replace(/\s+/g, '_'));
+    pdf.save(`Receta_${prescription.number}_${prescription.patient.name}_${prescription.patient.lastName}`.replace(/\s+/g, '_') + '.pdf');
 
   } catch (error) {
     console.error('Error generando PDF:', error);
@@ -334,7 +334,7 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
       <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
         <span style="margin-right: 8px;">Nombre y Apellido:</span>
         <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
-          ${prescription.patient.name} ${prescription.patient.lastName}
+          ${prescription.patient.name}
           <div style="position: absolute; bottom: -6px; left: 0; right: 0; border-bottom: 1px dotted #666;"></div>
         </div>
       </div>
