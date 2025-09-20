@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Prescription } from '../types';
 import { companyInfo } from '../data/mockData';
 import { useData } from '../contexts/DataContext';
@@ -11,8 +11,13 @@ interface PrescriptionViewerProps {
 }
 
 export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
-  const { updatePrescriptionAuthorization } = useData();
+  const { updatePrescriptionAuthorization, prescriptions } = useData();
   const [showDeauthorizeModal, setShowDeauthorizeModal] = useState(false);
+  
+  // Obtener la receta actualizada del contexto para reactividad
+  const currentPrescription = useMemo(() => {
+    return prescriptions.find(p => p.id === prescription.id) || prescription;
+  }, [prescriptions, prescription.id, prescription]);
   
   const typeLabels = {
     studies: 'Autorización de Estudios',
@@ -22,7 +27,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
   const handleExportPDF = async () => {
     try {
-      await generatePrescriptionPDF(prescription);
+      await generatePrescriptionPDF(currentPrescription);
     } catch (error) {
       console.error('Error al exportar PDF:', error);
       alert('Error al exportar el PDF. Por favor, intente nuevamente.');
@@ -31,7 +36,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
   const handlePrintPDF = async () => {
     try {
-      await printPrescriptionPDF(prescription);
+      await printPrescriptionPDF(currentPrescription);
     } catch (error) {
       console.error('Error al imprimir PDF:', error);
       alert('Error al imprimir el PDF. Por favor, intente nuevamente.');
@@ -40,7 +45,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
   const handleAuthorize = async () => {
     try {
-      await updatePrescriptionAuthorization(prescription.id, true);
+      await updatePrescriptionAuthorization(currentPrescription.id, true);
     } catch (error) {
       console.error('Error al cambiar autorización:', error);
       alert('Error al cambiar el estado de autorización. Por favor, intente nuevamente.');
@@ -49,7 +54,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
   const handleDeauthorize = async () => {
     try {
-      await updatePrescriptionAuthorization(prescription.id, false);
+      await updatePrescriptionAuthorization(currentPrescription.id, false);
       setShowDeauthorizeModal(false);
     } catch (error) {
       console.error('Error al desautorizar:', error);
@@ -108,11 +113,11 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6">
         <div className="space-y-1">
           <div className="text-sm text-gray-600">Receta N°:</div>
-          <div className="text-base sm:text-lg font-bold text-primary-900">#{prescription.number}</div>
+          <div className="text-base sm:text-lg font-bold text-primary-900">#{currentPrescription.number}</div>
         </div>
         <div className="space-y-1 sm:text-right">
           <div className="text-sm text-gray-600">Fecha:</div>
-          <div className="text-base sm:text-lg font-semibold">{new Date(prescription.date).toLocaleDateString('es-AR')}</div>
+          <div className="text-base sm:text-lg font-semibold">{new Date(currentPrescription.date).toLocaleDateString('es-AR')}</div>
         </div>
       </div>
 
@@ -120,11 +125,11 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       <div className="mb-6">
         <div className="flex items-center gap-3">
           <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${
-            prescription.authorized 
+            currentPrescription.authorized 
               ? 'bg-green-100 text-green-800 border border-green-200' 
               : 'bg-gray-100 text-gray-600 border border-gray-200'
           }`}>
-            {prescription.authorized ? (
+            {currentPrescription.authorized ? (
               <>
                 <CheckCircle className="h-4 w-4" />
                 Estado: Autorizado
@@ -138,7 +143,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
           </div>
           
           {/* Botones de autorización */}
-          {!prescription.authorized ? (
+          {!currentPrescription.authorized ? (
             <button
               onClick={handleAuthorize}
               className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200 transition-colors"
@@ -160,7 +165,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       <div className="mb-6">
         <div className="bg-primary-50 border-l-4 border-primary-500 p-3 sm:p-4 rounded-lg">
           <div className="text-base sm:text-lg font-semibold text-primary-800">
-            {typeLabels[prescription.type]}
+            {typeLabels[currentPrescription.type]}
           </div>
         </div>
       </div>
@@ -172,18 +177,18 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
             <div>
               <span className="text-sm text-gray-600">Nombre y Apellido: </span>
-              <span className="font-medium">{prescription.patient.name} {prescription.patient.lastName}</span>
+              <span className="font-medium">{currentPrescription.patient.name} {currentPrescription.patient.lastName}</span>
             </div>
             <div>
               <span className="text-sm text-gray-600">Obra Social: </span>
-              <span className="font-medium">{prescription.patient.socialWork}{prescription.patient.plan ? ` - ${prescription.patient.plan}` : ''}</span>
+              <span className="font-medium">{currentPrescription.patient.socialWork}{currentPrescription.patient.plan ? ` - ${currentPrescription.patient.plan}` : ''}</span>
             </div>
           </div>
           <div className="mt-2">
             <span className="text-sm text-gray-600">N° Afiliado: </span>
-            <span className="font-medium">{prescription.patient.affiliateNumber}</span>
+            <span className="font-medium">{currentPrescription.patient.affiliateNumber}</span>
             <span className="text-sm text-gray-600 ml-4">Plan: </span>
-            <span className="font-medium">{prescription.patient.plan || 'Sin plan'}</span>
+            <span className="font-medium">{currentPrescription.patient.plan || 'Sin plan'}</span>
           </div>
         </div>
       </div>
@@ -192,7 +197,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       <div className="mb-6">
         <div className="text-sm font-medium text-gray-600 mb-3">Solicito:</div>
         <div className="space-y-3">
-          {prescription.items.map((item, index) => (
+          {currentPrescription.items.map((item, index) => (
             <div key={index} className="border border-gray-200 rounded-lg p-3 sm:p-4">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
                 <div className="flex-1">
@@ -215,11 +220,11 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       </div>
 
       {/* Additional Notes */}
-      {prescription.additionalNotes && (
+      {currentPrescription.additionalNotes && (
         <div className="mb-6">
           <div className="text-sm font-medium text-gray-600 mb-2">Observaciones:</div>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-xs sm:text-sm">
-            {prescription.additionalNotes}
+            {currentPrescription.additionalNotes}
           </div>
         </div>
       )}
@@ -227,8 +232,8 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       {/* Doctor Info */}
       <div className="mb-8">
         <div className="text-sm font-medium text-gray-600 mb-2">Médico:</div>
-        <div className="text-base sm:text-lg font-semibold">{prescription.doctor.name}</div>
-        <div className="text-sm text-gray-600">{prescription.doctor.specialty} - {prescription.doctor.license}</div>
+        <div className="text-base sm:text-lg font-semibold">{currentPrescription.doctor.name}</div>
+        <div className="text-sm text-gray-600">{currentPrescription.doctor.specialty} - {currentPrescription.doctor.license}</div>
       </div>
 
       {/* Signature Area */}
