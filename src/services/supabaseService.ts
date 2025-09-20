@@ -95,6 +95,7 @@ export const patientService = {
       .single();
     
     if (error) throw error;
+    if (!data) throw new Error('Failed to create patient - no data returned');
     return {
       id: data.id,
       name: data.name,
