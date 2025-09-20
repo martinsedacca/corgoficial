@@ -14,7 +14,7 @@ interface DataContextType {
   addDoctor: (doctor: Omit<Doctor, 'id'>) => Promise<void>;
   updateDoctor: (id: string, doctor: Partial<Doctor>) => Promise<void>;
   deleteDoctor: (id: string) => Promise<void>;
-  addPatient: (patient: Omit<Patient, 'id'>) => Promise<void>;
+  addPatient: (patient: Omit<Patient, 'id'>) => Promise<Patient>;
   updatePatient: (id: string, patient: Partial<Patient>) => Promise<void>;
   deletePatient: (id: string) => Promise<void>;
   addPractice: (practice: Omit<Practice, 'id'>) => Promise<void>;
