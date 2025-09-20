@@ -45,7 +45,20 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     const matchesDateFrom = !filterDateFrom || prescriptionDate >= new Date(filterDateFrom + 'T00:00:00');
     const matchesDateTo = !filterDateTo || prescriptionDate <= new Date(filterDateTo + 'T23:59:59');
     
-    const matchesType = filterType === 'all' || prescription.type === filterType;
+    // Filtrar por tipo basado en las categorías de prácticas que contiene la receta
+    const matchesType = filterType === 'all' || (() => {
+      const practiceCategories = [...new Set(prescription.items.map(item => item.practice.category))];
+      switch (filterType) {
+        case 'studies':
+          return practiceCategories.includes('study');
+        case 'treatments':
+          return practiceCategories.includes('treatment');
+        case 'authorization':
+          return practiceCategories.includes('surgery');
+        default:
+          return true;
+      }
+    })();
     
     return matchesSearch && matchesNumber && matchesDoctor && matchesPatient && 
            matchesDateFrom && matchesDateTo && matchesType;
@@ -92,8 +105,8 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
         </button>
       </div>
 
-      {/* Filtros */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      {/* Búsqueda principal */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-4">
         <div className="flex-1">
           <div className="relative">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
@@ -106,164 +119,129 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
             />
           </div>
         </div>
-        <div className="flex gap-2">
+        {hasActiveFilters && (
           <button
-            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
-              showAdvancedFilters || hasActiveFilters
-                ? 'bg-primary-50 border-primary-200 text-primary-700'
-                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-            }`}
+            onClick={clearAllFilters}
+            className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+            title="Limpiar todos los filtros"
           >
-            <Filter className="h-4 w-4" />
-            <span className="hidden sm:inline">Filtros</span>
-            {hasActiveFilters && (
-              <span className="bg-primary-600 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">
-                {[searchTerm, filterNumber, filterDoctor, filterPatient, filterDateFrom, filterDateTo, filterType !== 'all' ? '1' : ''].filter(Boolean).length}
-              </span>
-            )}
+            <X className="h-4 w-4" />
+            <span className="hidden sm:inline">Limpiar</span>
           </button>
-          {hasActiveFilters && (
-            <button
-              onClick={clearAllFilters}
-              className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
-              title="Limpiar todos los filtros"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* Filtros Avanzados */}
-      {showAdvancedFilters && (
-        <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">Filtros Avanzados</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
-                Número de Receta
-              </label>
-              <input
-                type="text"
-                placeholder="Ej: 1234"
-                value={filterNumber}
-                onChange={(e) => setFilterNumber(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
-                Médico
-              </label>
-              <input
-                type="text"
-                placeholder="Nombre del médico"
-                value={filterDoctor}
-                onChange={(e) => setFilterDoctor(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
-                Paciente
-              </label>
-              <input
-                type="text"
-                placeholder="Nombre del paciente"
-                value={filterPatient}
-                onChange={(e) => setFilterPatient(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
-                Fecha Desde
-              </label>
-              <input
-                type="date"
-                value={filterDateFrom}
-                onChange={(e) => setFilterDateFrom(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
-                Fecha Hasta
-              </label>
-              <input
-                type="date"
-                value={filterDateTo}
-                onChange={(e) => setFilterDateTo(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              />
-            </div>
-          </div>
-          <div className="mt-4">
+      {/* Filtros siempre visibles */}
+      <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-4">
+          <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
-              Tipo de Receta
+              Número de Receta
             </label>
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setFilterType('all')}
-                className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  filterType === 'all'
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                Todos
-              </button>
-              <button
-                onClick={() => setFilterType('studies')}
-                className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  filterType === 'studies'
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                Estudios
-              </button>
-              <button
-                onClick={() => setFilterType('treatments')}
-                className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  filterType === 'treatments'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                Tratamientos
-              </button>
-              <button
-                onClick={() => setFilterType('authorization')}
-                className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                  filterType === 'authorization'
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                Autorización
-              </button>
-            </div>
+            <input
+              type="text"
+              placeholder="Ej: 1234"
+              value={filterNumber}
+              onChange={(e) => setFilterNumber(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Médico
+            </label>
+            <input
+              type="text"
+              placeholder="Nombre del médico"
+              value={filterDoctor}
+              onChange={(e) => setFilterDoctor(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Paciente
+            </label>
+            <input
+              type="text"
+              placeholder="Nombre del paciente"
+              value={filterPatient}
+              onChange={(e) => setFilterPatient(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Fecha Desde
+            </label>
+            <input
+              type="date"
+              value={filterDateFrom}
+              onChange={(e) => setFilterDateFrom(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Fecha Hasta
+            </label>
+            <input
+              type="date"
+              value={filterDateTo}
+              onChange={(e) => setFilterDateTo(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
           </div>
         </div>
-      )}
 
-      {/* Selector de tipo (versión compacta cuando filtros avanzados están ocultos) */}
-      {!showAdvancedFilters && (
-        <div className="mb-6">
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          >
-            <option value="all">Todos los tipos</option>
-            <option value="studies">Estudios</option>
-            <option value="treatments">Tratamientos</option>
-            <option value="authorization">Autorización</option>
-          </select>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">
+            Tipo de Prácticas
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setFilterType('all')}
+              className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                filterType === 'all'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              Todos
+            </button>
+            <button
+              onClick={() => setFilterType('studies')}
+              className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                filterType === 'studies'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              Estudios
+            </button>
+            <button
+              onClick={() => setFilterType('treatments')}
+              className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                filterType === 'treatments'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              Tratamientos
+            </button>
+            <button
+              onClick={() => setFilterType('authorization')}
+              className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                filterType === 'authorization'
+                  ? 'bg-purple-600 text-white'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              Cirugías
+            </button>
+          </div>
         </div>
-      )}
+      </div>
 
       {/* Lista de recetas */}
       <div className="space-y-4">
