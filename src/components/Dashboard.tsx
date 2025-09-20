@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useData } from '../contexts/DataContext';
 import { generateStatisticsReport } from '../utils/reportGenerator';
-import { BarChart3, Calendar, User, Activity, TrendingUp, FileText, Filter, Download } from 'lucide-react';
+import { BarChart3, Calendar, User, Activity, TrendingUp, FileText, Filter, Download, CheckCircle } from 'lucide-react';
 
 export function Dashboard() {
   const { prescriptions, doctors, practices } = useData();
