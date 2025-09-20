@@ -154,7 +154,6 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
           <img src="${logoBase64}" alt="CORG Logo" style="height: 40px; width: auto;" />
         </div>
       ` : ''}
-      <div style="font-size: 11px; margin-bottom: 2px; color: #666; letter-spacing: 1px;">${companyInfo.subtitle}</div>
       <div style="font-size: 9px; margin-bottom: 1px; color: #666; font-weight: bold;">DIRECTOR MÉDICO</div>
       <div style="font-size: 9px; margin-bottom: 1px; color: #333;">${companyInfo.director}</div>
       <div style="font-size: 9px; color: #666;">y Equipo</div>
@@ -436,7 +435,6 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
           <img src="${logoBase64}" alt="CORG Logo" style="height: 40px; width: auto;" />
         </div>
       ` : ''}
-      <div style="font-size: 11px; margin-bottom: 2px; color: #666; letter-spacing: 1px;">${companyInfo.subtitle}</div>
       <div style="font-size: 9px; margin-bottom: 1px; color: #666; font-weight: bold;">DIRECTOR MÉDICO</div>
       <div style="font-size: 9px; margin-bottom: 1px; color: #333;">${companyInfo.director}</div>
       <div style="font-size: 9px; color: #666;">y Equipo</div>
