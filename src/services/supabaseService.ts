@@ -242,6 +242,7 @@ export const prescriptionService = {
         id: prescription.patient.id,
         name: prescription.patient.name,
         lastName: prescription.patient.last_name || '',
+        dni: prescription.patient.dni,
         socialWork: prescription.patient.social_work,
         affiliateNumber: prescription.patient.affiliate_number,
         plan: prescription.patient.plan,
