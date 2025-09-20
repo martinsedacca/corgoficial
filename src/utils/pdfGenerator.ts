@@ -41,7 +41,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
   const typeLabels = {
     studies: 'AUTORIZACIÓN DE ESTUDIOS',
     treatments: 'AUTORIZACIÓN DE TRATAMIENTOS',
-    authorization: 'AUTORIZACIÓN DE CIRUGÍA'
+    surgery: 'AUTORIZACIÓN DE CIRUGÍA'
   };
 
   // Generar las prácticas en formato de dos columnas como el original
@@ -322,7 +322,7 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
   const typeLabels = {
     studies: 'AUTORIZACIÓN DE ESTUDIOS',
     treatments: 'AUTORIZACIÓN DE TRATAMIENTOS',
-    authorization: 'AUTORIZACIÓN DE CIRUGÍA'
+    surgery: 'AUTORIZACIÓN DE CIRUGÍA'
   };
 
   // Generar las prácticas en formato de dos columnas como el original
