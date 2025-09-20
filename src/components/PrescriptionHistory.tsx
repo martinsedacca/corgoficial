@@ -535,6 +535,38 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                         </div>
                       ));
                     })()}
+                    {/* Indicador de tiempo para recetas no autorizadas */}
+                    {!prescription.authorized && (() => {
+                      const createdDate = new Date(prescription.createdAt);
+                      const now = new Date();
+                      const diffMs = now.getTime() - createdDate.getTime();
+                      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                      const diffMonths = Math.floor(diffDays / 30);
+                      
+                      let timeText = '';
+                      let colorClass = '';
+                      
+                      if (diffMonths >= 1) {
+                        timeText = `${diffMonths} ${diffMonths === 1 ? 'mes' : 'meses'} desde emisión`;
+                        colorClass = 'text-red-600'; // Más de 5 días = rojo
+                      } else if (diffDays >= 5) {
+                        timeText = `${diffDays} días desde emisión`;
+                        colorClass = 'text-red-600'; // Más de 5 días = rojo
+                      } else if (diffDays >= 1) {
+                        timeText = `${diffDays} ${diffDays === 1 ? 'día' : 'días'} desde emisión`;
+                        colorClass = 'text-yellow-600'; // Menos de 5 días = amarillo
+                      } else {
+                        timeText = `${diffHours} hs desde emisión`;
+                        colorClass = 'text-gray-600'; // Horas = gris
+                      }
+                      
+                      return (
+                        <div className={`text-xs font-bold ${colorClass}`}>
+                          {timeText}
+                        </div>
+                      );
+                    })()}
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
