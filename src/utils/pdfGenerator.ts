@@ -108,7 +108,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
         <span style="margin-right: 8px;">Nombre y Apellido:</span>
         <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
-          ${prescription.patient.name}
+          ${prescription.patient.name} ${prescription.patient.lastName}
           <div style="position: absolute; bottom: -6px; left: 0; right: 0; border-bottom: 1px dotted #666;"></div>
         </div>
       </div>
@@ -334,7 +334,7 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
       <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
         <span style="margin-right: 8px;">Nombre y Apellido:</span>
         <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
-          ${prescription.patient.name}
+          ${prescription.patient.name} ${prescription.patient.lastName}
           <div style="position: absolute; bottom: -6px; left: 0; right: 0; border-bottom: 1px dotted #666;"></div>
         </div>
       </div>
