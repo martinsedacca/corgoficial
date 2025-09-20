@@ -16,6 +16,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [newPatientData, setNewPatientData] = useState({
     name: '',
+    lastName: '',
     socialWork: '',
     affiliateNumber: '',
     plan: '',
@@ -129,6 +130,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
         setShowPatientForm(false);
         setNewPatientData({
           name: '',
+          lastName: '',
           socialWork: '',
           affiliateNumber: '',
           plan: '',
@@ -352,7 +354,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                     <input
                       type="text"
                       required
-                      value={newPatientData.lastName}
+                      value={newPatientData.lastName || ''}
                       onChange={(e) => setNewPatientData({...newPatientData, lastName: e.target.value})}
                       disabled={creatingPatient}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
