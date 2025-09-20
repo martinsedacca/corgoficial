@@ -17,6 +17,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   const [filterNumber, setFilterNumber] = useState('');
   const [filterDoctor, setFilterDoctor] = useState('');
   const [filterPatient, setFilterPatient] = useState('');
+  const [filterDNI, setFilterDNI] = useState('');
   const [filterDateFrom, setFilterDateFrom] = useState('');
   const [filterDateTo, setFilterDateTo] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
@@ -34,12 +35,17 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   const filteredPrescriptions = availablePrescriptions.filter(prescription => {
     const matchesSearch = 
       prescription.patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prescription.patient.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prescription.patient.dni.includes(searchTerm) ||
       prescription.doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       prescription.number.toString().includes(searchTerm);
     
     const matchesNumber = !filterNumber || prescription.number.toString().includes(filterNumber);
     const matchesDoctor = !filterDoctor || prescription.doctor.name.toLowerCase().includes(filterDoctor.toLowerCase());
-    const matchesPatient = !filterPatient || prescription.patient.name.toLowerCase().includes(filterPatient.toLowerCase());
+    const matchesPatient = !filterPatient || 
+      prescription.patient.name.toLowerCase().includes(filterPatient.toLowerCase()) ||
+      prescription.patient.lastName.toLowerCase().includes(filterPatient.toLowerCase());
+    const matchesDNI = !filterDNI || prescription.patient.dni.includes(filterDNI);
     
     const prescriptionDate = new Date(prescription.date);
     const matchesDateFrom = !filterDateFrom || prescriptionDate >= new Date(filterDateFrom + 'T00:00:00');
@@ -60,7 +66,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
       }
     })();
     
-    return matchesSearch && matchesNumber && matchesDoctor && matchesPatient && 
+    return matchesSearch && matchesNumber && matchesDoctor && matchesPatient && matchesDNI &&
            matchesDateFrom && matchesDateTo && matchesType;
   }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
@@ -69,12 +75,14 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     setFilterNumber('');
     setFilterDoctor('');
     setFilterPatient('');
+    setFilterDNI('');
     setFilterDateFrom('');
     setFilterDateTo('');
     setFilterType('all');
   };
 
   const hasActiveFilters = searchTerm || filterNumber || filterDoctor || filterPatient || 
+                          filterDNI ||
                           filterDateFrom || filterDateTo || filterType !== 'all';
 
   const handlePrintPrescription = async (prescription: Prescription) => {
@@ -133,7 +141,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
 
       {/* Filtros siempre visibles */}
       <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-4">
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
               Número de Receta
@@ -167,6 +175,18 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
               placeholder="Nombre del paciente"
               value={filterPatient}
               onChange={(e) => setFilterPatient(e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              DNI
+            </label>
+            <input
+              type="text"
+              placeholder="DNI del paciente"
+              value={filterDNI}
+              onChange={(e) => setFilterDNI(e.target.value)}
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
@@ -296,7 +316,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4" />
                       <span>
-                        <strong>Paciente:</strong> {prescription.patient.name} {prescription.patient.lastName}
+                        <strong>Paciente:</strong> {prescription.patient.name} {prescription.patient.lastName} - DNI: {prescription.patient.dni}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
