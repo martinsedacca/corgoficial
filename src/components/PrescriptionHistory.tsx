@@ -26,7 +26,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   const typeLabels = {
     studies: 'Estudios',
     treatments: 'Tratamientos',
-    authorization: 'Autorización'
+    surgery: 'Cirugías'
   };
 
   // Usar todas las prescripciones (modo público)

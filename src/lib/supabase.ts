@@ -116,7 +116,7 @@ export interface Database {
         Row: {
           id: string;
           number: number;
-          type: 'studies' | 'treatments' | 'authorization';
+          type: 'studies' | 'treatments' | 'surgery';
           doctor_id: string;
           patient_id: string;
           additional_notes: string | null;
@@ -127,7 +127,7 @@ export interface Database {
         Insert: {
           id?: string;
           number: number;
-          type: 'studies' | 'treatments' | 'authorization';
+          type: 'studies' | 'treatments' | 'surgery';
           doctor_id: string;
           patient_id: string;
           additional_notes?: string | null;
@@ -138,7 +138,7 @@ export interface Database {
         Update: {
           id?: string;
           number?: number;
-          type?: 'studies' | 'treatments' | 'authorization';
+          type?: 'studies' | 'treatments' | 'surgery';
           doctor_id?: string;
           patient_id?: string;
           additional_notes?: string | null;

@@ -22,7 +22,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
   const typeLabels = {
     studies: 'Autorización de Estudios',
     treatments: 'Autorización de Tratamientos',
-    authorization: 'Autorización de Cirugía'
+    surgery: 'Autorización de Cirugía'
   };
 
   const handleExportPDF = async () => {

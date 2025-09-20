@@ -34,7 +34,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const [nextNumber, setNextNumber] = useState<number | null>(null);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  const [prescriptionType, setPrescriptionType] = useState<'studies' | 'treatments' | 'authorization'>('studies');
+  const [prescriptionType, setPrescriptionType] = useState<'studies' | 'treatments' | 'surgery'>('studies');
   const [selectedPractices, setSelectedPractices] = useState<{[key: string]: 'AO' | 'OI' | 'OD' | null}>({});
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [doctorSearch, setDoctorSearch] = useState('');
@@ -338,14 +338,14 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
             </button>
             <button
               type="button"
-              onClick={() => setPrescriptionType('authorization')}
+              onClick={() => setPrescriptionType('surgery')}
               className={`p-2 sm:p-3 rounded-lg border-2 transition-colors ${
-                prescriptionType === 'authorization'
+                prescriptionType === 'surgery'
                   ? 'border-primary-500 bg-primary-50 text-primary-700'
                   : 'border-gray-300 hover:border-gray-400'
               }`}
             >
-              <div className="text-sm sm:text-base font-medium">Autorización</div>
+              <div className="text-sm sm:text-base font-medium">Cirugías</div>
               <div className="text-xs text-gray-500 hidden sm:block">Cirugías</div>
             </button>
           </div>
