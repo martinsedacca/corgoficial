@@ -496,32 +496,38 @@ export function PatientManager() {
                       {patient.socialWork}
                     </span>
                   </div>
-                  <div className="text-sm text-gray-600 space-y-1">
-                    <p><strong>DNI:</strong> {patient.dni}</p>
-                    {patient.affiliateNumber && (
-                      <p><strong>N° Afiliado:</strong> {patient.affiliateNumber}</p>
-                    )}
-                    {patient.plan && (
-                      <p><strong>Plan:</strong> {patient.plan}</p>
-                    )}
-                    {patient.phone && (
-                      <p className="flex items-center gap-1">
-                        <Phone className="h-3 w-3" />
-                        {patient.phone}
-                      </p>
-                    )}
-                    {patient.email && (
-                      <p className="flex items-center gap-1">
-                        <Mail className="h-3 w-3" />
-                        {patient.email}
-                      </p>
-                    )}
-                    {patient.address && (
-                      <p className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {patient.address}
-                      </p>
-                    )}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-1 text-sm text-gray-600">
+                    <div>
+                      <p><strong>DNI:</strong> {patient.dni}</p>
+                      {patient.affiliateNumber && (
+                        <p><strong>N° Afiliado:</strong> {patient.affiliateNumber}</p>
+                      )}
+                      {patient.plan && (
+                        <p><strong>Plan:</strong> {patient.plan}</p>
+                      )}
+                    </div>
+                    <div>
+                      {patient.phone && (
+                        <p className="flex items-center gap-1">
+                          <Phone className="h-3 w-3" />
+                          {patient.phone}
+                        </p>
+                      )}
+                      {patient.email && (
+                        <p className="flex items-center gap-1">
+                          <Mail className="h-3 w-3" />
+                          {patient.email}
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      {patient.address && (
+                        <p className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {patient.address}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-2 sm:ml-4">
