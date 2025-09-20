@@ -323,7 +323,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
 
       {/* Filtros siempre visibles */}
       <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
               Número de Receta
@@ -373,14 +373,6 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
             />
           </div>
           <div>
-            <SocialWorkAutocomplete
-              value={filterSocialWork}
-              onChange={(value) => setFilterSocialWork(value)}
-              placeholder="Ej: OSDE, IOMA"
-              label="Obra Social"
-            />
-          </div>
-          <div className="xl:col-span-2">
             <DateRangePicker
               startDate={filterDateFrom}
               endDate={filterDateTo}
@@ -388,6 +380,17 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                 setFilterDateFrom(start);
                 setFilterDateTo(end);
               }}
+            />
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+          <div>
+            <SocialWorkAutocomplete
+              value={filterSocialWork}
+              onChange={(value) => setFilterSocialWork(value)}
+              placeholder="Ej: OSDE, IOMA"
+              label="Obra Social"
             />
           </div>
         </div>
