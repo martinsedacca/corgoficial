@@ -35,13 +35,6 @@ export function AuthenticatedApp() {
   if (!user) {
     console.log('No hay usuario, mostrando login');
     return <LoginForm onShowRegistration={() => setShowRegistration(true)} />;
-      return <UserRegistration />;
-    }
-    return (
-      <LoginForm 
-        onShowRegistration={() => setShowRegistration(true)}
-      />
-    );
   }
 
   // Si hay usuario pero no tiene perfil, mostrar error
