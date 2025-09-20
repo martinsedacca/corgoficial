@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from 'react';
 import { Prescription } from '../types';
 import { companyInfo } from '../data/mockData';
 import { useData } from '../contexts/DataContext';
@@ -11,6 +12,7 @@ interface PrescriptionViewerProps {
 
 export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
   const { updatePrescriptionAuthorization } = useData();
+  const [showDeauthorizeModal, setShowDeauthorizeModal] = useState(false);
   
   const typeLabels = {
     studies: 'Autorización de Estudios',
@@ -36,23 +38,27 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
     }
   };
 
-  const handleToggleAuthorization = async () => {
-    if (prescription.authorized) {
-      // Confirmar desautorización
-      const confirmed = window.confirm('¿Está seguro que desea desautorizar esta receta?');
-      if (!confirmed) return;
-    }
-    
+  const handleAuthorize = async () => {
     try {
-      await updatePrescriptionAuthorization(prescription.id, !prescription.authorized);
+      await updatePrescriptionAuthorization(prescription.id, true);
     } catch (error) {
       console.error('Error al cambiar autorización:', error);
       alert('Error al cambiar el estado de autorización. Por favor, intente nuevamente.');
     }
   };
 
+  const handleDeauthorize = async () => {
+    try {
+      await updatePrescriptionAuthorization(prescription.id, false);
+      setShowDeauthorizeModal(false);
+    } catch (error) {
+      console.error('Error al desautorizar:', error);
+      alert('Error al desautorizar la receta. Por favor, intente nuevamente.');
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-8 max-w-4xl mx-auto">
+    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-8 max-w-4xl mx-auto relative">
       {/* Export Button - Moved to top */}
       <div className="mb-6 text-center">
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -131,17 +137,22 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
             )}
           </div>
           
-          {/* Botón de autorizar/desautorizar */}
-          <button
-            onClick={handleToggleAuthorization}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              prescription.authorized
-                ? 'bg-red-100 text-red-700 border border-red-200 hover:bg-red-200'
-                : 'bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200'
-            }`}
-          >
-            {prescription.authorized ? 'Desautorizar' : 'Autorizar'}
-          </button>
+          {/* Botones de autorización */}
+          {prescription.authorized ? (
+            <button
+              onClick={() => setShowDeauthorizeModal(true)}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-red-100 text-red-700 border border-red-200 hover:bg-red-200 transition-colors"
+            >
+              Desautorizar
+            </button>
+          ) : (
+            <button
+              onClick={handleAuthorize}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200 transition-colors"
+            >
+              Autorizar
+            </button>
+          )}
         </div>
       </div>
 
@@ -276,6 +287,36 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
           </div>
         </div>
       </div>
+
+      {/* Modal de confirmación de desautorización */}
+      {showDeauthorizeModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Confirmar Desautorización
+              </h3>
+              <p className="text-gray-600 mb-6">
+                ¿Está seguro que desea desautorizar esta receta?
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setShowDeauthorizeModal(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeauthorize}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Desautorizar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
