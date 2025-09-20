@@ -72,9 +72,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (error) {
+        // If JWT is expired, sign out the user
+        if (error.message?.includes('JWT expired')) {
+          console.log('JWT expired, signing out user');
+          await supabase.auth.signOut();
+          return;
+        }
+        
         console.error('Error loading profile:', error);
         // Si es m.sedacca@gmail.com, crear perfil de admin automáticamente
-        if (user?.email === 'm.sedacca@gmail.com') {
+        if (session?.user?.email === 'm.sedacca@gmail.com') {
           const adminProfile: UserProfile = {
             id: 'admin-' + userId,
             user_id: userId,
@@ -91,9 +98,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(data);
       }
     } catch (error) {
+      // If JWT is expired, sign out the user
+      if (error instanceof Error && error.message?.includes('JWT expired')) {
+        console.log('JWT expired, signing out user');
+        await supabase.auth.signOut();
+        return;
+      }
+      
       console.error('Error in loadUserProfile:', error);
       // Si es m.sedacca@gmail.com, crear perfil de admin automáticamente
-      if (user?.email === 'm.sedacca@gmail.com') {
+      if (session?.user?.email === 'm.sedacca@gmail.com') {
         const adminProfile: UserProfile = {
           id: 'admin-' + userId,
           user_id: userId,
@@ -124,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Para m.sedacca@gmail.com siempre dar acceso completo
   const hasPermission = (permission: string): boolean => {
-    if (user?.email === 'm.sedacca@gmail.com') {
+    if (session?.user?.email === 'm.sedacca@gmail.com') {
       return true; // Acceso completo sin restricciones
     }
     
@@ -159,7 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return permissions[profile.role]?.includes(permission) || false;
   };
 
-  const isAdmin = user?.email === 'm.sedacca@gmail.com' || profile?.role === 'admin';
+  const isAdmin = session?.user?.email === 'm.sedacca@gmail.com' || profile?.role === 'admin';
   const isSecretary = profile?.role === 'secretary';
   const isDoctor = profile?.role === 'doctor';
 
