@@ -56,7 +56,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   // Funciones de carga individuales
   const loadDoctors = async () => {
-    if (loadingDoctors || doctors.length > 0 || !user) return; // Evitar cargas duplicadas
+    if (loadingDoctors || !user) return; // Evitar cargas duplicadas
     
     setLoadingDoctors(true);
     try {
@@ -70,7 +70,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const loadPatients = async () => {
-    if (loadingPatients || patients.length > 0 || !user) return;
+    if (loadingPatients || !user) return;
     
     setLoadingPatients(true);
     try {
@@ -84,7 +84,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const loadPractices = async () => {
-    if (loadingPractices || practices.length > 0 || !user) return;
+    if (loadingPractices || !user) return;
     
     setLoadingPractices(true);
     try {
@@ -98,7 +98,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const loadPrescriptions = async () => {
-    if (loadingPrescriptions || prescriptions.length > 0 || !user) return;
+    if (loadingPrescriptions || !user) return;
     
     setLoadingPrescriptions(true);
     try {
@@ -112,7 +112,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const loadSocialWorks = async () => {
-    if (loadingSocialWorks || socialWorks.length > 0 || !user) return;
+    if (loadingSocialWorks || !user) return;
     
     setLoadingSocialWorks(true);
     try {

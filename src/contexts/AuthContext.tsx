@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               setProfile(profileData || null);
             }
           } catch (profileError) {
-            console.log('No profile found or error loading profile');
+            console.log('No profile found or error loading profile:', profileError);
             if (mounted) {
               setProfile(null);
             }
@@ -75,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         }
       } catch (error) {
-        console.log('Auth initialization error:', error);
+        console.error('Auth initialization error:', error);
         if (mounted) {
           setSession(null);
           setUser(null);
@@ -94,6 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Configurar listener de cambios de autenticación
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
+        console.log('Auth state change:', event, newSession?.user?.email);
         if (!mounted) return;
 
         setSession(newSession);
@@ -112,6 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               setProfile(profileData || null);
             }
           } catch (error) {
+            console.log('Profile loading error:', error);
             if (mounted) {
               setProfile(null);
             }
