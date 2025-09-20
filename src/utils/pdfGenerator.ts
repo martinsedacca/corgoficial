@@ -47,14 +47,14 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
   // Generar las prácticas en formato de dos columnas como el original
   const generatePracticesGrid = () => {
     const practiceItems = prescription.items;
-    const shouldUseColumns = practiceItems.length > 10;
+    const shouldUseColumns = practiceItems.length > 14;
     
     let practicesHtml = '<div style="margin: 8px 0;">';
     
     if (shouldUseColumns) {
-      // Layout de 2 columnas para más de 10 prácticas
-      const leftColumn = practiceItems.slice(0, 10);
-      const rightColumn = practiceItems.slice(10);
+      // Layout de 2 columnas para más de 14 prácticas
+      const leftColumn = practiceItems.slice(0, 14);
+      const rightColumn = practiceItems.slice(14);
       
       practicesHtml += '<div style="display: flex; gap: 16px;">';
       
@@ -106,7 +106,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       
       practicesHtml += '</div>';
     } else {
-      // Layout de una columna para 10 o menos prácticas
+      // Layout de una columna para 14 o menos prácticas
       practiceItems.forEach((item) => {
         const practiceName = item.practice.name.toUpperCase();
         const selectedAO = item.ao || 'AO';
@@ -329,14 +329,14 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
   // Generar las prácticas en formato de dos columnas como el original
   const generatePracticesGrid = () => {
     const practiceItems = prescription.items;
-    const shouldUseColumns = practiceItems.length > 10;
+    const shouldUseColumns = practiceItems.length > 14;
     
     let practicesHtml = '<div style="margin: 8px 0;">';
     
     if (shouldUseColumns) {
-      // Layout de 2 columnas para más de 10 prácticas
-      const leftColumn = practiceItems.slice(0, 10);
-      const rightColumn = practiceItems.slice(10);
+      // Layout de 2 columnas para más de 14 prácticas
+      const leftColumn = practiceItems.slice(0, 14);
+      const rightColumn = practiceItems.slice(14);
       
       practicesHtml += '<div style="display: flex; gap: 16px;">';
       
@@ -388,7 +388,7 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
       
       practicesHtml += '</div>';
     } else {
-      // Layout de una columna para 10 o menos prácticas
+      // Layout de una columna para 14 o menos prácticas
       practiceItems.forEach((item) => {
         const practiceName = item.practice.name.toUpperCase();
         const selectedAO = item.ao || 'AO';
