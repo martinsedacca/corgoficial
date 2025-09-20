@@ -442,8 +442,18 @@ export const prescriptionService = {
       })),
       additionalNotes: fullPrescription.additional_notes,
       date: fullPrescription.date,
-      createdAt: fullPrescription.created_at
+      createdAt: fullPrescription.created_at,
+      authorized: fullPrescription.authorized
     };
+  },
+
+  async updateAuthorization(id: string, authorized: boolean): Promise<void> {
+    const { error } = await supabase
+      .from('prescriptions')
+      .update({ authorized })
+      .eq('id', id);
+    
+    if (error) throw error;
   },
 
   async delete(id: string): Promise<void> {

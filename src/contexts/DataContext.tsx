@@ -297,6 +297,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     deletePractice,
     addPrescription,
     updatePrescription,
+    updatePrescriptionAuthorization,
     deletePrescription,
     addSocialWork,
     updateSocialWork,

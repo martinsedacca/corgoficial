@@ -353,6 +353,27 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                 <div className="lg:ml-4">
                   <div className="flex items-center justify-center gap-1 sm:gap-2">
                     <button
+                      onClick={() => handleToggleAuthorization(prescription)}
+                      className={`flex items-center gap-1 px-2 sm:px-3 py-2 rounded-lg transition-colors text-sm ${
+                        prescription.authorized
+                          ? 'bg-gray-500 text-white hover:bg-gray-600'
+                          : 'bg-green-600 text-white hover:bg-green-700'
+                      }`}
+                      title={prescription.authorized ? 'Marcar como pendiente' : 'Autorizar receta'}
+                    >
+                      {prescription.authorized ? (
+                        <>
+                          <Clock className="h-4 w-4" />
+                          <span className="hidden sm:inline">Pendiente</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="h-4 w-4" />
+                          <span className="hidden sm:inline">Autorizar</span>
+                        </>
+                      )}
+                    </button>
+                    <button
                       onClick={() => onViewPrescription(prescription)}
                       className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
                     >

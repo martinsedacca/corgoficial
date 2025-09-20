@@ -92,6 +92,27 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
         </div>
       </div>
 
+      {/* Authorization Status */}
+      <div className="mb-6">
+        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${
+          prescription.authorized 
+            ? 'bg-green-100 text-green-800 border border-green-200' 
+            : 'bg-gray-100 text-gray-600 border border-gray-200'
+        }`}>
+          {prescription.authorized ? (
+            <>
+              <CheckCircle className="h-4 w-4" />
+              Estado: Autorizado
+            </>
+          ) : (
+            <>
+              <Clock className="h-4 w-4" />
+              Estado: Pendiente de Autorización
+            </>
+          )}
+        </div>
+      </div>
+
       {/* Type */}
       <div className="mb-6">
         <div className="bg-primary-50 border-l-4 border-primary-500 p-3 sm:p-4 rounded-lg">
