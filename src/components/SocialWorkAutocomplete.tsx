@@ -9,6 +9,7 @@ interface SocialWorkAutocompleteProps {
   placeholder?: string;
   label?: string;
   required?: boolean;
+  disabled?: boolean;
 }
 
 export function SocialWorkAutocomplete({ 
@@ -16,7 +17,8 @@ export function SocialWorkAutocomplete({
   onChange, 
   placeholder = "Buscar obra social...", 
   label = "Obra Social",
-  required = false 
+  required = false,
+  disabled = false
 }: SocialWorkAutocompleteProps) {
   const { socialWorks, addSocialWork } = useData();
   const [isOpen, setIsOpen] = useState(false);
@@ -79,7 +81,8 @@ export function SocialWorkAutocomplete({
           onFocus={() => setIsOpen(true)}
           placeholder={placeholder}
           required={required}
-          className="w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          disabled={disabled}
+          className="w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
         />
         <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
         <button

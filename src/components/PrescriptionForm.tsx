@@ -32,6 +32,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const [doctorSearch, setDoctorSearch] = useState('');
   const [patientSearch, setPatientSearch] = useState('');
   const [patientCreationSuccess, setPatientCreationSuccess] = useState(false);
+  const [creatingPatient, setCreatingPatient] = useState(false);
   
   // Como eliminamos la autenticación, definimos isDoctor como false por defecto
   const isDoctor = false;
@@ -110,6 +111,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const handleSaveNewPatient = async (e: React.FormEvent) => {
     e.preventDefault();
     e.stopPropagation(); // Prevenir que se propague al formulario padre
+    setCreatingPatient(true);
     try {
       await addPatient(newPatientData);
       
@@ -130,9 +132,10 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
         setPatientSearch(`${createdPatient.name} - ${createdPatient.socialWork}`);
       }
       
-      // Limpiar formulario y cerrar después de mostrar el mensaje
+      // Limpiar formulario y cerrar después de un tiempo más corto
       setTimeout(() => {
         setPatientCreationSuccess(false);
+        setCreatingPatient(false);
         setShowPatientForm(false);
         setNewPatientData({
           name: '',
@@ -143,11 +146,12 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
           email: '',
           address: ''
         });
-      }, 2000);
+      }, 1500);
       
     } catch (error) {
       console.error('Error creating patient:', error);
       alert('Error al crear el paciente. Por favor, intente nuevamente.');
+      setCreatingPatient(false);
     }
   };
 
@@ -311,7 +315,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
           
           {/* Formulario para crear nuevo paciente */}
           {showPatientForm && (
-            <div className="mt-4 p-3 sm:p-4 border border-primary-200 rounded-lg bg-primary-50">
+            <div className={`mt-4 p-3 sm:p-4 border border-primary-200 rounded-lg bg-primary-50 ${creatingPatient ? 'opacity-75' : ''}`}>
               {/* Mensaje de éxito */}
               {patientCreationSuccess && (
                 <div className="mb-4 p-3 bg-green-100 border border-green-300 rounded-lg">
@@ -320,6 +324,16 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                       <span className="text-white text-sm">✓</span>
                     </div>
                     <span className="text-green-800 font-medium">¡Paciente creado exitosamente!</span>
+                  </div>
+                </div>
+              )}
+              
+              {/* Mensaje de carga */}
+              {creatingPatient && !patientCreationSuccess && (
+                <div className="mb-4 p-3 bg-blue-100 border border-blue-300 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                    <span className="text-blue-800 font-medium">Creando paciente...</span>
                   </div>
                 </div>
               )}
@@ -336,6 +350,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                       required
                       value={newPatientData.name}
                       onChange={(e) => setNewPatientData({...newPatientData, name: e.target.value})}
+                      disabled={creatingPatient}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     />
                   </div>
@@ -343,6 +358,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                     <SocialWorkAutocomplete
                       value={newPatientData.socialWork}
                       onChange={(value) => setNewPatientData({...newPatientData, socialWork: value})}
+                      disabled={creatingPatient}
                       required
                     />
                   </div>
@@ -355,6 +371,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                       required
                       value={newPatientData.affiliateNumber}
                       onChange={(e) => setNewPatientData({...newPatientData, affiliateNumber: e.target.value})}
+                      disabled={creatingPatient}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     />
                   </div>
@@ -366,6 +383,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                       type="text"
                       value={newPatientData.plan}
                       onChange={(e) => setNewPatientData({...newPatientData, plan: e.target.value})}
+                      disabled={creatingPatient}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                       placeholder="Plan 210, Plan Premium, etc."
                     />
@@ -378,6 +396,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                       type="tel"
                       value={newPatientData.phone}
                       onChange={(e) => setNewPatientData({...newPatientData, phone: e.target.value})}
+                      disabled={creatingPatient}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     />
                   </div>
@@ -389,6 +408,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                       type="email"
                       value={newPatientData.email}
                       onChange={(e) => setNewPatientData({...newPatientData, email: e.target.value})}
+                      disabled={creatingPatient}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     />
                   </div>
@@ -400,6 +420,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                       type="text"
                       value={newPatientData.address}
                       onChange={(e) => setNewPatientData({...newPatientData, address: e.target.value})}
+                      disabled={creatingPatient}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     />
                   </div>
@@ -408,16 +429,16 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                   <button
                     type="button"
                     onClick={handleSaveNewPatient}
-                    className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
-                    disabled={patientCreationSuccess}
+                    className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={creatingPatient || patientCreationSuccess}
                   >
-                    {patientCreationSuccess ? 'Creando...' : 'Crear Paciente'}
+                    {creatingPatient ? 'Creando...' : patientCreationSuccess ? '¡Creado!' : 'Crear Paciente'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowPatientForm(false)}
-                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
-                    disabled={patientCreationSuccess}
+                    className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={creatingPatient}
                   >
                     Cancelar
                   </button>
