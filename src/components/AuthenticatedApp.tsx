@@ -9,6 +9,13 @@ export function AuthenticatedApp() {
   const { user, profile, loading } = useAuth();
   const [showRegistration, setShowRegistration] = useState(false);
 
+  console.log('AuthenticatedApp - Estado:', { 
+    loading, 
+    hasUser: !!user, 
+    hasProfile: !!profile,
+    userEmail: user?.email 
+  });
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -19,6 +26,7 @@ export function AuthenticatedApp() {
 
   // Si no hay usuario autenticado, mostrar login
   if (!user) {
+    console.log('No hay usuario, mostrando login');
     if (showRegistration) {
       return <UserRegistration />;
     }
@@ -31,6 +39,7 @@ export function AuthenticatedApp() {
 
   // Si hay usuario pero no tiene perfil, mostrar error
   if (!profile) {
+    console.log('Usuario sin perfil válido');
     return (
       <div className="min-h-screen bg-red-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
@@ -58,6 +67,7 @@ export function AuthenticatedApp() {
 
   // Si el usuario no está activo, mostrar mensaje
   if (!profile.is_active) {
+    console.log('Usuario inactivo');
     return (
       <div className="min-h-screen bg-yellow-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
@@ -78,5 +88,6 @@ export function AuthenticatedApp() {
   }
 
   // Usuario autenticado y con perfil válido
+  console.log('Usuario autenticado correctamente, mostrando app');
   return <AppContent />;
 }

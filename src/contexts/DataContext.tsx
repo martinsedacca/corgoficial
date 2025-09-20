@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import React, { createContext, useContext, ReactNode, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { Doctor, Patient, Practice, Prescription, SocialWork } from '../types';
 import { doctorService, patientService, practiceService, prescriptionService, socialWorkService } from '../services/supabaseService';
@@ -56,7 +56,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   // Funciones de carga individuales
   const loadDoctors = async () => {
-    if (loadingDoctors || !user) return; // Evitar cargas duplicadas
+    if (loadingDoctors || !user) return;
     
     setLoadingDoctors(true);
     try {
@@ -128,31 +128,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const refreshData = async () => {
     if (!user) return;
     
-    // Recargar solo los datos que ya están cargados
-    const promises = [];
-    
-    if (doctors.length > 0) {
-      setDoctors([]);
-      promises.push(loadDoctors());
-    }
-    if (patients.length > 0) {
-      setPatients([]);
-      promises.push(loadPatients());
-    }
-    if (practices.length > 0) {
-      setPractices([]);
-      promises.push(loadPractices());
-    }
-    if (prescriptions.length > 0) {
-      setPrescriptions([]);
-      promises.push(loadPrescriptions());
-    }
-    if (socialWorks.length > 0) {
-      setSocialWorks([]);
-      promises.push(loadSocialWorks());
-    }
-    
-    await Promise.all(promises);
+    // Recargar todos los datos
+    await Promise.all([
+      loadDoctors(),
+      loadPatients(),
+      loadPractices(),
+      loadPrescriptions(),
+      loadSocialWorks()
+    ]);
   };
 
   // Funciones para médicos
