@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import { Prescription } from '../types';
 import { PrescriptionForm } from './PrescriptionForm';
-import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X } from 'lucide-react';
+import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X, Printer } from 'lucide-react';
+import { printPrescriptionPDF } from '../utils/pdfGenerator';
 
 interface PrescriptionHistoryProps {
   onViewPrescription: (prescription: Prescription) => void;
@@ -62,6 +63,15 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
 
   const hasActiveFilters = searchTerm || filterNumber || filterDoctor || filterPatient || 
                           filterDateFrom || filterDateTo || filterType !== 'all';
+
+  const handlePrintPrescription = async (prescription: Prescription) => {
+    try {
+      await printPrescriptionPDF(prescription);
+    } catch (error) {
+      console.error('Error al imprimir receta:', error);
+      alert('Error al imprimir la receta. Por favor, intente nuevamente.');
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
@@ -326,20 +336,28 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                 </div>
                 
                 <div className="lg:ml-4">
-                  <div className="flex items-center justify-center gap-2 sm:gap-3">
+                  <div className="flex items-center justify-center gap-1 sm:gap-2">
                     <button
                       onClick={() => onViewPrescription(prescription)}
-                      className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
+                      className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
                     >
                       <Eye className="h-4 w-4" />
                       <span className="hidden sm:inline">Ver</span>
                     </button>
                     <button
                       onClick={() => onEditPrescription(prescription)}
-                      className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                      className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
                     >
                       <Edit3 className="h-4 w-4" />
                       <span className="hidden sm:inline">Editar</span>
+                    </button>
+                    <button
+                      onClick={() => handlePrintPrescription(prescription)}
+                      className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                      title="Imprimir receta"
+                    >
+                      <Printer className="h-4 w-4" />
+                      <span className="hidden sm:inline">Imprimir</span>
                     </button>
                   </div>
                 </div>
