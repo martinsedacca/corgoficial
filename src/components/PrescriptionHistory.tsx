@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useData } from '../contexts/DataContext';
 import { Prescription } from '../types';
 import { PrescriptionForm } from './PrescriptionForm';
-import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X, Printer } from 'lucide-react';
+import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X, Printer, Clock, CheckCircle } from 'lucide-react';
 import { printPrescriptionPDF } from '../utils/pdfGenerator';
 
 interface PrescriptionHistoryProps {
@@ -12,7 +12,7 @@ interface PrescriptionHistoryProps {
 }
 
 export default function PrescriptionHistory({ onViewPrescription, onEditPrescription, onNewPrescription }: PrescriptionHistoryProps) {
-  const { prescriptions } = useData();
+  const { prescriptions, updatePrescriptionAuthorization } = useData();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterNumber, setFilterNumber] = useState('');
   const [filterDoctor, setFilterDoctor] = useState('');
@@ -91,6 +91,15 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     } catch (error) {
       console.error('Error al imprimir receta:', error);
       alert('Error al imprimir la receta. Por favor, intente nuevamente.');
+    }
+  };
+
+  const handleToggleAuthorization = async (prescription: Prescription) => {
+    try {
+      await updatePrescriptionAuthorization(prescription.id, !prescription.authorized);
+    } catch (error) {
+      console.error('Error al cambiar autorización:', error);
+      alert('Error al cambiar el estado de autorización. Por favor, intente nuevamente.');
     }
   };
 

@@ -27,6 +27,7 @@ interface DataContextType {
   updateSocialWork: (id: string, socialWork: Partial<SocialWork>) => Promise<void>;
   deleteSocialWork: (id: string) => Promise<void>;
   getNextPrescriptionNumber: () => Promise<number>;
+  updatePrescriptionAuthorization: (id: string, authorized: boolean) => Promise<void>;
   refreshData: () => Promise<void>;
 }
 
@@ -243,6 +244,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setPrescriptions(prev => prev.filter(p => p.id !== id));
     } catch (err) {
       console.error('Error deleting prescription:', err);
+      throw err;
+    }
+  };
+
+  const updatePrescriptionAuthorization = async (id: string, authorized: boolean) => {
+    try {
+      await prescriptionService.updateAuthorization(id, authorized);
+      setPrescriptions(prev => prev.map(p => p.id === id ? { ...p, authorized } : p));
+    } catch (err) {
+      console.error('Error updating prescription authorization:', err);
       throw err;
     }
   };
