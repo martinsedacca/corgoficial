@@ -2,13 +2,11 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { LoginForm } from './LoginForm';
 import { UserRegistration } from './UserRegistration';
-import { UserRegistration } from './UserRegistration';
 import { LoadingSpinner } from './LoadingSpinner';
 import { AppContent } from './AppContent';
 
 export function AuthenticatedApp() {
   const { user, profile, loading } = useAuth();
-  const [showRegistration, setShowRegistration] = useState(false);
   const [showRegistration, setShowRegistration] = useState(false);
 
   console.log('AuthenticatedApp - Estado:', { 
