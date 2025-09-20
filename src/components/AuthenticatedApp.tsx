@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { LoginForm } from './LoginForm';
 import { UserRegistration } from './UserRegistration';
 import { LoadingSpinner } from './LoadingSpinner';
@@ -8,6 +9,7 @@ import { AppContent } from './AppContent';
 export function AuthenticatedApp() {
   const { user, profile, loading } = useAuth();
   const [showRegistration, setShowRegistration] = useState(false);
+  const [creatingProfile, setCreatingProfile] = useState(false);
 
   console.log('AuthenticatedApp - Estado:', { 
     loading, 
@@ -18,6 +20,38 @@ export function AuthenticatedApp() {
     profileActive: profile?.is_active
   });
 
+  const createAdminProfile = async () => {
+    if (!user) return;
+    
+    setCreatingProfile(true);
+    try {
+      console.log('Creando perfil de administrador para:', user.email);
+      
+      const { error } = await supabase
+        .from('user_profiles')
+        .insert({
+          user_id: user.id,
+          email: user.email,
+          full_name: 'Administrador',
+          role: 'admin',
+          is_active: true
+        });
+
+      if (error) {
+        console.error('Error creando perfil:', error);
+        alert('Error al crear el perfil de administrador');
+      } else {
+        console.log('Perfil de administrador creado exitosamente');
+        // Recargar la página para que se actualice el contexto
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al crear el perfil de administrador');
+    } finally {
+      setCreatingProfile(false);
+    }
+  };
   // Si no hay usuario y se solicita registro
   if (!user && showRegistration) {
     console.log('Mostrando formulario de registro...');
@@ -42,20 +76,29 @@ export function AuthenticatedApp() {
             </svg>
           </div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Error de Perfil
+            Perfil de Usuario Faltante
           </h2>
           <p className="text-gray-600 mb-6">
-            Su cuenta no tiene un perfil válido. Contacte al administrador del sistema.
+            Su cuenta no tiene un perfil en el sistema. Como administrador, puede crear su perfil automáticamente.
           </p>
           <div className="text-sm text-gray-500 mb-4">
             Usuario: {user.email}
           </div>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Reintentar
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={createAdminProfile}
+              disabled={creatingProfile}
+              className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {creatingProfile ? 'Creando...' : 'Crear Perfil de Admin'}
+            </button>
+            <button
+              onClick={() => window.location.reload()}
+              className="flex-1 bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Reintentar
+            </button>
+          </div>
         </div>
       </div>
     );
