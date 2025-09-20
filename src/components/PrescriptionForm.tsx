@@ -105,7 +105,17 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   };
 
   const handleCreatePatient = (name: string) => {
-    setNewPatientData({ ...newPatientData, name });
+    // Separar automáticamente nombre y apellido
+    const nameParts = name.trim().split(' ');
+    if (nameParts.length > 1) {
+      // La última palabra es el apellido, el resto es el nombre
+      const lastName = nameParts.pop() || '';
+      const firstName = nameParts.join(' ');
+      setNewPatientData({ ...newPatientData, name: firstName, lastName });
+    } else {
+      // Solo una palabra, va al nombre
+      setNewPatientData({ ...newPatientData, name: name.trim(), lastName: '' });
+    }
     setShowPatientForm(true);
   };
 
