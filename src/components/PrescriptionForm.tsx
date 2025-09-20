@@ -132,13 +132,17 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
     id: doctor.id,
     label: `${doctor.name} - ${doctor.specialty}`,
     value: doctor
-  }));
+  })).sort((a, b) => a.value.name.localeCompare(b.value.name, 'es', { sensitivity: 'base' }));
 
   const patientOptions = patients.map(patient => ({
     id: patient.id,
     label: `${patient.name} ${patient.lastName} - ${patient.socialWork}`,
     value: patient
-  }));
+  })).sort((a, b) => {
+    const fullNameA = `${a.value.name} ${a.value.lastName}`.trim();
+    const fullNameB = `${b.value.name} ${b.value.lastName}`.trim();
+    return fullNameA.localeCompare(fullNameB, 'es', { sensitivity: 'base' });
+  });
 
   const filteredPractices = practices.filter(practice => {
     if (prescriptionType === 'studies') return practice.category === 'study';

@@ -29,7 +29,7 @@ export function SocialWorkAutocomplete({
   const filteredOptions = socialWorks.filter(socialWork =>
     socialWork.name.toLowerCase().includes(filter.toLowerCase()) ||
     (socialWork.code && socialWork.code.toLowerCase().includes(filter.toLowerCase()))
-  );
+  ).sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

@@ -7,7 +7,7 @@ export const doctorService = {
     const { data, error } = await supabase
       .from('doctors')
       .select('*')
-      .order('name');
+      .order('name', { ascending: true });
     
     if (error) throw error;
     return data || [];
@@ -64,7 +64,7 @@ export const patientService = {
     const { data, error } = await supabase
       .from('patients')
       .select('*')
-      .order('name');
+      .order('name', { ascending: true });
     
     if (error) throw error;
     return data.map(patient => ({
@@ -457,7 +457,7 @@ export const socialWorkService = {
     const { data, error } = await supabase
       .from('social_works')
       .select('*')
-      .order('name');
+      .order('name', { ascending: true });
     
     if (error) throw error;
     return data || [];
