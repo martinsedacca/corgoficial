@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
+import { AuthProvider } from './contexts/AuthContext';
 import { DataProvider } from './contexts/DataContext';
-import { AppContent } from './components/AppContent';
+import { AuthenticatedApp } from './components/AuthenticatedApp';
 
 function App() {
   return (
-    <DataProvider>
-      <AppContent />
-    </DataProvider>
+    <AuthProvider>
+      <DataProvider>
+        <AuthenticatedApp />
+      </DataProvider>
+    </AuthProvider>
   );
 }
 

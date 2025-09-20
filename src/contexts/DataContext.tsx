@@ -1,4 +1,5 @@
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 import { Doctor, Patient, Practice, Prescription, SocialWork } from '../types';
 import { doctorService, patientService, practiceService, prescriptionService, socialWorkService } from '../services/supabaseService';
 
@@ -41,6 +42,7 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export function DataProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [practices, setPractices] = useState<Practice[]>([]);
@@ -54,7 +56,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   // Funciones de carga individuales
   const loadDoctors = async () => {
-    if (loadingDoctors || doctors.length > 0) return; // Evitar cargas duplicadas
+    if (loadingDoctors || doctors.length > 0 || !user) return; // Evitar cargas duplicadas
     
     setLoadingDoctors(true);
     try {
@@ -68,7 +70,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const loadPatients = async () => {
-    if (loadingPatients || patients.length > 0) return;
+    if (loadingPatients || patients.length > 0 || !user) return;
     
     setLoadingPatients(true);
     try {
@@ -82,7 +84,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const loadPractices = async () => {
-    if (loadingPractices || practices.length > 0) return;
+    if (loadingPractices || practices.length > 0 || !user) return;
     
     setLoadingPractices(true);
     try {
@@ -96,7 +98,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const loadPrescriptions = async () => {
-    if (loadingPrescriptions || prescriptions.length > 0) return;
+    if (loadingPrescriptions || prescriptions.length > 0 || !user) return;
     
     setLoadingPrescriptions(true);
     try {
@@ -110,7 +112,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const loadSocialWorks = async () => {
-    if (loadingSocialWorks || socialWorks.length > 0) return;
+    if (loadingSocialWorks || socialWorks.length > 0 || !user) return;
     
     setLoadingSocialWorks(true);
     try {
@@ -124,6 +126,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshData = async () => {
+    if (!user) return;
+    
     // Recargar solo los datos que ya están cargados
     const promises = [];
     
