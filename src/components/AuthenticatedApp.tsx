@@ -12,11 +12,6 @@ export function AuthenticatedApp() {
     return <LoginForm />;
   }
 
-  // Si está cargando, mostrar spinner
-  if (loading) {
-    return <LoadingSpinner text="Cargando..." />;
-  }
-
   // Usuario autenticado, mostrar la aplicación
   return <AppContent />;
 }
