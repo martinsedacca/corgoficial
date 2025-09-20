@@ -1,142 +1,22 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
 import { LoginForm } from './LoginForm';
-import { UserRegistration } from './UserRegistration';
 import { LoadingSpinner } from './LoadingSpinner';
 import { AppContent } from './AppContent';
 
 export function AuthenticatedApp() {
   const { user, profile, loading } = useAuth();
-  const [showRegistration, setShowRegistration] = useState(false);
-  const [creatingProfile, setCreatingProfile] = useState(false);
-
-  console.log('AuthenticatedApp - Estado:', { 
-    loading, 
-    hasUser: !!user, 
-    hasProfile: !!profile,
-    userEmail: user?.email,
-    profileRole: profile?.role,
-    profileActive: profile?.is_active
-  });
-
-  const createAdminProfile = async () => {
-    if (!user) return;
-    
-    setCreatingProfile(true);
-    try {
-      console.log('Creando perfil de administrador para:', user.email);
-      
-      const { error } = await supabase
-        .from('user_profiles')
-        .insert({
-          user_id: user.id,
-          email: user.email,
-          full_name: 'Administrador',
-          role: 'admin',
-          is_active: true
-        });
-
-      if (error) {
-        console.error('Error creando perfil:', error);
-        alert('Error al crear el perfil de administrador');
-      } else {
-        console.log('Perfil de administrador creado exitosamente');
-        // Recargar la página para que se actualice el contexto
-        window.location.reload();
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error al crear el perfil de administrador');
-    } finally {
-      setCreatingProfile(false);
-    }
-  };
-  // Si no hay usuario y se solicita registro
-  if (!user && showRegistration) {
-    console.log('Mostrando formulario de registro...');
-    return <UserRegistration onBack={() => setShowRegistration(false)} />;
-  }
 
   // Si no hay usuario autenticado, mostrar login
   if (!user) {
-    console.log('No hay usuario, mostrando login');
-    return <LoginForm onShowRegistration={() => setShowRegistration(true)} />;
+    return <LoginForm />;
   }
 
-  // Si hay usuario pero no tiene perfil, mostrar error
-  if (!profile) {
-    console.log('Usuario sin perfil válido');
-    console.log('Datos del usuario:', { id: user.id, email: user.email });
-    console.log('Profile state:', profile);
-    return (
-      <div className="min-h-screen bg-red-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="text-red-600 mb-4">
-            <svg className="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Error Cargando Perfil
-          </h2>
-          <p className="text-gray-600 mb-6">
-            No se pudo cargar el perfil de usuario. Revise la consola para más detalles.
-          </p>
-          <div className="text-sm text-gray-500 mb-4">
-            Usuario: {user.email}
-            <br />
-            ID: {user.id}
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={() => window.location.reload()}
-              className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Reintentar Carga
-            </button>
-            <button
-              onClick={async () => {
-                console.log('Verificando perfil manualmente...');
-                const { data, error } = await supabase
-                  .from('user_profiles')
-                  .select('*')
-                  .eq('user_id', user.id);
-                console.log('Resultado consulta manual:', { data, error });
-              }}
-              className="flex-1 bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-            >
-              Debug Perfil
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+  // Si está cargando, mostrar spinner
+  if (loading) {
+    return <LoadingSpinner text="Cargando..." />;
   }
 
-  // Si el usuario no está activo, mostrar mensaje
-  if (!profile.is_active) {
-    console.log('Usuario inactivo');
-    return (
-      <div className="min-h-screen bg-yellow-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="text-yellow-600 mb-4">
-            <svg className="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Cuenta Inactiva
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Su cuenta ha sido desactivada. Contacte al administrador del sistema.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Usuario autenticado y con perfil válido
-  console.log('Usuario autenticado correctamente, mostrando app');
+  // Usuario autenticado, mostrar la aplicación
   return <AppContent />;
 }

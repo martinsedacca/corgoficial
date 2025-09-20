@@ -2,11 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Eye, EyeOff, LogIn, AlertCircle, UserPlus } from 'lucide-react';
 
-interface LoginFormProps {
-  onShowRegistration?: () => void;
-}
-
-export function LoginForm({ onShowRegistration }: LoginFormProps) {
+export function LoginForm() {
   const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,11 +21,7 @@ export function LoginForm({ onShowRegistration }: LoginFormProps) {
       if (error) {
         console.error('Login error:', error);
         if (error.message.includes('Invalid login credentials') || error.message.includes('invalid_credentials')) {
-          if (onShowRegistration) {
-            setError('Email o contraseña incorrectos. Si es la primera vez que usa el sistema, debe crear el usuario administrador primero.');
-          } else {
-            setError('Email o contraseña incorrectos');
-          }
+          setError('Email o contraseña incorrectos');
         } else if (error.message.includes('Email not confirmed')) {
           setError('Por favor confirme su email antes de iniciar sesión');
         } else if (error.message.includes('signup_disabled')) {
@@ -147,15 +139,6 @@ export function LoginForm({ onShowRegistration }: LoginFormProps) {
             <p className="text-sm text-gray-500">
               Contacte al administrador del sistema
             </p>
-            {onShowRegistration && (
-              <button
-                onClick={onShowRegistration}
-                className="mt-4 flex items-center gap-2 text-sm text-primary-600 hover:text-primary-800 font-medium mx-auto"
-              >
-                <UserPlus className="h-4 w-4" />
-                Crear primer usuario administrador
-              </button>
-            )}
           </div>
         </div>
 
