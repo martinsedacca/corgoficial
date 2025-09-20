@@ -125,6 +125,21 @@ export function Dashboard() {
     }));
   }, [filteredPrescriptions]);
 
+  // Estadísticas de autorización
+  const authorizationStats = useMemo(() => {
+    const authorized = filteredPrescriptions.filter(p => p.authorized).length;
+    const pending = filteredPrescriptions.filter(p => !p.authorized).length;
+    const total = filteredPrescriptions.length;
+    
+    return {
+      authorized,
+      pending,
+      total,
+      authorizedPercentage: total > 0 ? Math.round((authorized / total) * 100) : 0,
+      pendingPercentage: total > 0 ? Math.round((pending / total) * 100) : 0
+    };
+  }, [filteredPrescriptions]);
+
   const resetFilters = () => {
     setDateRange({
       startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -306,6 +321,90 @@ export function Dashboard() {
               </div>
               <div className="text-sm text-gray-600">Promedio/Día</div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Estado de Autorización */}
+      <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <CheckCircle className="h-5 w-5 text-green-600" />
+          Estado de Autorización de Recetas
+        </h3>
+        
+        {filteredPrescriptions.length === 0 ? (
+          <p className="text-gray-500 text-center py-8">No hay datos para mostrar</p>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Estadísticas numéricas */}
+            <div className="lg:col-span-2 grid grid-cols-2 gap-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                  <span className="text-sm font-medium text-green-800">Autorizadas</span>
+                </div>
+                <div className="text-3xl font-bold text-green-700">{authorizationStats.authorized}</div>
+                <div className="text-sm text-green-600">{authorizationStats.authorizedPercentage}% del total</div>
+              </div>
+              
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-4 h-4 bg-gray-400 rounded-full"></div>
+                  <span className="text-sm font-medium text-gray-700">Pendientes</span>
+                </div>
+                <div className="text-3xl font-bold text-gray-700">{authorizationStats.pending}</div>
+                <div className="text-sm text-gray-600">{authorizationStats.pendingPercentage}% del total</div>
+              </div>
+            </div>
+            
+            {/* Gráfico circular */}
+            <div className="flex items-center justify-center">
+              <div className="relative w-32 h-32">
+                <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 36 36">
+                  {/* Círculo de fondo */}
+                  <path
+                    className="text-gray-200"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    fill="transparent"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  {/* Círculo de progreso */}
+                  <path
+                    className="text-green-500"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    fill="transparent"
+                    strokeDasharray={`${authorizationStats.authorizedPercentage}, 100`}
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-green-600">{authorizationStats.authorizedPercentage}%</div>
+                    <div className="text-xs text-gray-500">Autorizadas</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Resumen */}
+        <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+          <div className="text-sm text-blue-800">
+            {authorizationStats.pending === 0 && authorizationStats.authorized > 0 ? (
+              <span className="font-medium">¡Excelente! Todas las recetas están autorizadas.</span>
+            ) : authorizationStats.pending > 0 ? (
+              <span>
+                <span className="font-medium">{authorizationStats.pending} recetas</span> pendientes de autorización
+                {authorizationStats.authorized > 0 && (
+                  <span> y <span className="font-medium">{authorizationStats.authorized} recetas</span> ya autorizadas</span>
+                )}
+              </span>
+            ) : (
+              <span>No hay recetas en el período seleccionado.</span>
+            )}
           </div>
         </div>
       </div>
