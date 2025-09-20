@@ -331,7 +331,8 @@ export const prescriptionService = {
       patient: {
         id: fullPrescription.patient.id,
         name: fullPrescription.patient.name,
-        lastName: fullPrescription.patient.last_name,
+        lastName: fullPrescription.patient.last_name || '',
+        dni: fullPrescription.patient.dni,
         socialWork: fullPrescription.patient.social_work,
         affiliateNumber: fullPrescription.patient.affiliate_number,
         plan: fullPrescription.patient.plan,
@@ -422,7 +423,8 @@ export const prescriptionService = {
       patient: {
         id: fullPrescription.patient.id,
         name: fullPrescription.patient.name,
-        lastName: fullPrescription.patient.last_name,
+        lastName: fullPrescription.patient.last_name || '',
+        dni: fullPrescription.patient.dni,
         socialWork: fullPrescription.patient.social_work,
         affiliateNumber: fullPrescription.patient.affiliate_number,
         plan: fullPrescription.patient.plan,
