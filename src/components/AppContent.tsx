@@ -11,13 +11,14 @@ import { SocialWorkManager } from './SocialWorkManager';
 import { Dashboard } from './Dashboard';
 import { UserManager } from './UserManager';
 import { Prescription } from '../types';
-import { FileText, History, User, Users, Activity, Building2, BarChart3, Settings, LogOut } from 'lucide-react';
+import { FileText, History, User, Users, Activity, Building2, BarChart3, Settings, LogOut, ChevronDown } from 'lucide-react';
 
 type View = 'dashboard' | 'new' | 'history' | 'doctors' | 'patients' | 'practices' | 'admin-practices' | 'social-works' | 'users';
 
 export function AppContent() {
   const { user, profile, signOut, hasPermission } = useAuth();
   const [currentView, setCurrentView] = useState<View>('dashboard');
+  const [showAdminDropdown, setShowAdminDropdown] = useState(false);
   const [viewingPrescription, setViewingPrescription] = useState<Prescription | null>(null);
   const [editingPrescription, setEditingPrescription] = useState<Prescription | null>(null);
 
@@ -48,15 +49,20 @@ export function AppContent() {
     }
   };
 
-  const menuItems = [
+  const mainMenuItems = [
     { key: 'dashboard', label: 'Dashboard', icon: BarChart3, color: 'text-blue-600' },
-    { key: 'history', label: 'Recetas', icon: History, color: 'text-gray-600' },
+    { key: 'history', label: 'Recetas', icon: History, color: 'text-gray-600' }
+  ];
+
+  const adminMenuItems = [
     ...(hasPermission('manage_doctors') ? [{ key: 'doctors', label: 'Médicos', icon: User, color: 'text-primary-600' }] : []),
     ...(hasPermission('manage_patients') ? [{ key: 'patients', label: 'Pacientes', icon: Users, color: 'text-green-600' }] : []),
-    ...(hasPermission('manage_practices') ? [{ key: 'admin-practices', label: 'Administrar Prácticas', icon: Activity, color: 'text-purple-600' }] : []),
-    ...(hasPermission('manage_social_works') ? [{ key: 'social-works', label: 'Obras Sociales', icon: Building2, color: 'text-primary-600' }] : []),
+    ...(hasPermission('manage_practices') ? [{ key: 'admin-practices', label: 'Prácticas', icon: Activity, color: 'text-purple-600' }] : []),
+    ...(hasPermission('manage_social_works') ? [{ key: 'social-works', label: 'Obras Sociales', icon: Building2, color: 'text-blue-600' }] : []),
     ...(hasPermission('manage_users') ? [{ key: 'users', label: 'Usuarios', icon: Settings, color: 'text-red-600' }] : [])
   ].filter(Boolean);
+
+  const hasAdminAccess = adminMenuItems.length > 0;
 
   if (viewingPrescription) {
     return (
@@ -95,7 +101,7 @@ export function AppContent() {
             </div>
             
             <div className="flex flex-wrap items-center justify-center gap-1 mt-2 sm:mt-0 sm:space-x-1 flex-1">
-              {menuItems.map((item) => {
+              {mainMenuItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <button
@@ -113,6 +119,55 @@ export function AppContent() {
                   </button>
                 );
               })}
+              
+              {/* Dropdown Admin */}
+              {hasAdminAccess && (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowAdminDropdown(!showAdminDropdown)}
+                    className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                      adminMenuItems.some(item => currentView === item.key)
+                        ? 'bg-primary-100 text-primary-700 border border-primary-200'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
+                  >
+                    <Settings className={`h-3 w-3 sm:h-4 sm:w-4 ${
+                      adminMenuItems.some(item => currentView === item.key) ? 'text-primary-600' : 'text-gray-600'
+                    }`} />
+                    <span className="hidden sm:inline">Admin</span>
+                    <span className="sm:hidden text-xs">Admin</span>
+                    <ChevronDown className={`h-3 w-3 sm:h-4 sm:w-4 transition-transform ${
+                      showAdminDropdown ? 'rotate-180' : ''
+                    }`} />
+                  </button>
+                  
+                  {/* Dropdown Menu */}
+                  {showAdminDropdown && (
+                    <div className="absolute top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                      {adminMenuItems.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <button
+                            key={item.key}
+                            onClick={() => {
+                              setCurrentView(item.key as View);
+                              setShowAdminDropdown(false);
+                            }}
+                            className={`w-full flex items-center space-x-2 px-4 py-2 text-sm transition-colors ${
+                              currentView === item.key
+                                ? 'bg-primary-50 text-primary-700'
+                                : 'text-gray-700 hover:bg-gray-50'
+                            }`}
+                          >
+                            <Icon className={`h-4 w-4 ${currentView === item.key ? 'text-primary-600' : item.color}`} />
+                            <span>{item.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             
             <div className="flex items-center gap-2">
