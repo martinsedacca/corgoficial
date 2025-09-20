@@ -236,7 +236,7 @@ export const prescriptionService = {
       patient: {
         id: prescription.patient.id,
         name: prescription.patient.name,
-        lastName: prescription.patient.last_name,
+        lastName: prescription.patient.last_name || '',
         socialWork: prescription.patient.social_work,
         affiliateNumber: prescription.patient.affiliate_number,
         plan: prescription.patient.plan,
