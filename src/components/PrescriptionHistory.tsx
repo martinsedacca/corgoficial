@@ -305,7 +305,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4" />
                       <span>
-                        <strong>Paciente:</strong> {prescription.patient.name}
+                        <strong>Paciente:</strong> {prescription.patient.name} {prescription.patient.lastName}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">

@@ -70,6 +70,7 @@ export const patientService = {
     return data.map(patient => ({
       id: patient.id,
       name: patient.name,
+      lastName: patient.last_name,
       socialWork: patient.social_work,
       affiliateNumber: patient.affiliate_number,
       plan: patient.plan || null,
@@ -84,6 +85,7 @@ export const patientService = {
       .from('patients')
       .insert({
         name: patient.name,
+        last_name: patient.lastName,
         social_work: patient.socialWork,
         affiliate_number: patient.affiliateNumber,
         plan: patient.plan || null,
@@ -231,6 +233,7 @@ export const prescriptionService = {
       patient: {
         id: prescription.patient.id,
         name: prescription.patient.name,
+        lastName: prescription.patient.last_name,
         socialWork: prescription.patient.social_work,
         affiliateNumber: prescription.patient.affiliate_number,
         plan: prescription.patient.plan,
@@ -319,6 +322,7 @@ export const prescriptionService = {
       patient: {
         id: fullPrescription.patient.id,
         name: fullPrescription.patient.name,
+        lastName: fullPrescription.patient.last_name,
         socialWork: fullPrescription.patient.social_work,
         affiliateNumber: fullPrescription.patient.affiliate_number,
         plan: fullPrescription.patient.plan,
@@ -409,6 +413,7 @@ export const prescriptionService = {
       patient: {
         id: fullPrescription.patient.id,
         name: fullPrescription.patient.name,
+        lastName: fullPrescription.patient.last_name,
         socialWork: fullPrescription.patient.social_work,
         affiliateNumber: fullPrescription.patient.affiliate_number,
         plan: fullPrescription.patient.plan,

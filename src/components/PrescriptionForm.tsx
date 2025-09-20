@@ -333,7 +333,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Nombre Completo *
+                      Nombre *
                     </label>
                     <input
                       type="text"
@@ -342,6 +342,21 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                       onChange={(e) => setNewPatientData({...newPatientData, name: e.target.value})}
                       disabled={creatingPatient}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      placeholder="Juan"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Apellido *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newPatientData.lastName}
+                      onChange={(e) => setNewPatientData({...newPatientData, lastName: e.target.value})}
+                      disabled={creatingPatient}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      placeholder="Pérez"
                     />
                   </div>
                   <div>

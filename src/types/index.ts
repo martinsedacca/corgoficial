@@ -10,6 +10,7 @@ export interface Doctor {
 export interface Patient {
   id: string;
   name: string;
+  lastName: string;
   socialWork: string;
   affiliateNumber: string;
   plan?: string;

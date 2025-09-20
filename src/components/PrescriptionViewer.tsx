@@ -108,7 +108,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
             <div>
               <span className="text-sm text-gray-600">Nombre y Apellido: </span>
-              <span className="font-medium">{prescription.patient.name}</span>
+              <span className="font-medium">{prescription.patient.name} {prescription.patient.lastName}</span>
             </div>
             <div>
               <span className="text-sm text-gray-600">Obra Social: </span>
