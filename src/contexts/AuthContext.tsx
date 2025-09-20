@@ -48,6 +48,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (sessionError) {
           console.error('Error obteniendo sesión:', sessionError);
           if (mounted) {
+            setSession(null);
+            setUser(null);
+            setProfile(null);
             setLoading(false);
           }
           return;
