@@ -76,7 +76,17 @@ const SkeletonAuthorization = () => (
   </div>
 );
 export function Dashboard() {
-  const { prescriptions, doctors, practices, loading } = useData();
+  const { 
+    prescriptions, 
+    doctors, 
+    practices, 
+    loadingPrescriptions, 
+    loadingDoctors, 
+    loadingPractices,
+    loadPrescriptions,
+    loadDoctors,
+    loadPractices
+  } = useData();
   const [dateRange, setDateRange] = useState({
     startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 días atrás
     endDate: new Date().toISOString().split('T')[0]
@@ -86,6 +96,14 @@ export function Dashboard() {
   const [selectedType, setSelectedType] = useState<string>('all');
 
   // Usar todas las prescripciones (modo público)
+  useEffect(() => {
+    // Cargar datos necesarios para el dashboard
+    loadPrescriptions();
+    loadDoctors();
+    loadPractices();
+  }, []);
+
+  const loading = loadingPrescriptions || loadingDoctors || loadingPractices;
   const basePrescriptions = prescriptions;
 
   // Filtrar prescripciones según los filtros aplicados

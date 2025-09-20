@@ -47,7 +47,7 @@ const SkeletonPatientCard = () => (
 );
 
 export function PatientManager() {
-  const { patients, addPatient, updatePatient, deletePatient, loading } = useData();
+  const { patients, addPatient, updatePatient, deletePatient, loadingPatients, loadPatients } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -76,6 +76,11 @@ export function PatientManager() {
     email: '',
     address: ''
   });
+
+  // Cargar pacientes cuando se monta el componente
+  useEffect(() => {
+    loadPatients();
+  }, []);
 
   // Validar DNI en tiempo real
   const validateDNI = async (dni: string) => {
@@ -527,7 +532,7 @@ export function PatientManager() {
         )}
       </div>
       <div className="grid gap-4">
-        {loading ? (
+        {loadingPatients ? (
           // Mostrar skeletons mientras carga
           [...Array(5)].map((_, index) => (
             <SkeletonPatientCard key={index} />

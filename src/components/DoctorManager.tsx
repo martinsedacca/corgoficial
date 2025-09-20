@@ -33,7 +33,7 @@ const SkeletonDoctorCard = () => (
 );
 
 export function DoctorManager() {
-  const { doctors, addDoctor, updateDoctor, deleteDoctor, loading } = useData();
+  const { doctors, addDoctor, updateDoctor, deleteDoctor, loadingDoctors, loadDoctors } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingDoctor, setEditingDoctor] = useState<Doctor | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -47,6 +47,11 @@ export function DoctorManager() {
     phone: '',
     email: ''
   });
+
+  // Cargar médicos cuando se monta el componente
+  useEffect(() => {
+    loadDoctors();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -221,7 +226,7 @@ export function DoctorManager() {
       )}
 
       <div className="grid gap-4">
-        {loading ? (
+        {loadingDoctors ? (
           // Mostrar skeletons mientras carga
           [...Array(3)].map((_, index) => (
             <SkeletonDoctorCard key={index} />

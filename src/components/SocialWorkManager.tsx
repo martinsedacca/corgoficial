@@ -23,7 +23,7 @@ const SkeletonSocialWorkCard = () => (
 );
 
 export function SocialWorkManager() {
-  const { socialWorks, addSocialWork, updateSocialWork, deleteSocialWork, loading } = useData();
+  const { socialWorks, addSocialWork, updateSocialWork, deleteSocialWork, loadingSocialWorks, loadSocialWorks } = useData();
   const [showForm, setShowForm] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingSocialWork, setEditingSocialWork] = useState<SocialWork | null>(null);
@@ -42,6 +42,11 @@ export function SocialWorkManager() {
     code: '',
     description: ''
   });
+
+  // Cargar obras sociales cuando se monta el componente
+  useEffect(() => {
+    loadSocialWorks();
+  }, []);
 
   const filteredSocialWorks = socialWorks.filter(socialWork =>
     socialWork.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -227,7 +232,7 @@ export function SocialWorkManager() {
         </div>
 
         <div className="grid gap-4">
-          {loading ? (
+          {loadingSocialWorks ? (
             // Mostrar skeletons mientras carga
             [...Array(4)].map((_, index) => (
               <SkeletonSocialWorkCard key={index} />

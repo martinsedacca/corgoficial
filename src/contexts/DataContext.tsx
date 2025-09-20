@@ -1,7 +1,6 @@
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { Doctor, Patient, Practice, Prescription, SocialWork } from '../types';
 import { doctorService, patientService, practiceService, prescriptionService, socialWorkService } from '../services/supabaseService';
-import { applyMigrations } from '../lib/migrations';
 
 interface DataContextType {
   doctors: Doctor[];
@@ -9,8 +8,16 @@ interface DataContextType {
   practices: Practice[];
   prescriptions: Prescription[];
   socialWorks: SocialWork[];
-  loading: boolean;
-  error: string | null;
+  loadingDoctors: boolean;
+  loadingPatients: boolean;
+  loadingPractices: boolean;
+  loadingPrescriptions: boolean;
+  loadingSocialWorks: boolean;
+  loadDoctors: () => Promise<void>;
+  loadPatients: () => Promise<void>;
+  loadPractices: () => Promise<void>;
+  loadPrescriptions: () => Promise<void>;
+  loadSocialWorks: () => Promise<void>;
   addDoctor: (doctor: Omit<Doctor, 'id'>) => Promise<void>;
   updateDoctor: (id: string, doctor: Partial<Doctor>) => Promise<void>;
   deleteDoctor: (id: string) => Promise<void>;
@@ -39,79 +46,109 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [practices, setPractices] = useState<Practice[]>([]);
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [socialWorks, setSocialWorks] = useState<SocialWork[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loadingDoctors, setLoadingDoctors] = useState(false);
+  const [loadingPatients, setLoadingPatients] = useState(false);
+  const [loadingPractices, setLoadingPractices] = useState(false);
+  const [loadingPrescriptions, setLoadingPrescriptions] = useState(false);
+  const [loadingSocialWorks, setLoadingSocialWorks] = useState(false);
 
-  // Cargar datos iniciales
-  const loadData = async () => {
+  // Funciones de carga individuales
+  const loadDoctors = async () => {
+    if (loadingDoctors || doctors.length > 0) return; // Evitar cargas duplicadas
+    
+    setLoadingDoctors(true);
     try {
-      setLoading(true);
-      setError(null);
-      
-      // Solo aplicar migraciones si no hay datos
-      try {
-        await applyMigrations();
-      } catch (migrationError) {
-        console.warn('Migration warning - continuing without sample data:', migrationError);
-        // Continuar aunque las migraciones fallen
-      }
-      
-      // Load data with individual error handling
-      let doctorsData = [];
-      let patientsData = [];
-      let practicesData = [];
-      let prescriptionsData = [];
-      let socialWorksData = [];
-      
-      try {
-        doctorsData = await doctorService.getAll();
-      } catch (error) {
-        console.warn('Error loading doctors:', error);
-      }
-      
-      try {
-        patientsData = await patientService.getAll();
-      } catch (error) {
-        console.warn('Error loading patients:', error);
-      }
-      
-      try {
-        practicesData = await practiceService.getAll();
-      } catch (error) {
-        console.warn('Error loading practices:', error);
-      }
-      
-      try {
-        prescriptionsData = await prescriptionService.getAll();
-      } catch (error) {
-        console.warn('Error loading prescriptions:', error);
-      }
-      
-      try {
-        socialWorksData = await socialWorkService.getAll();
-      } catch (error) {
-        console.warn('Error loading social works:', error);
-      }
-      
+      const doctorsData = await doctorService.getAll();
       setDoctors(doctorsData);
-      setPatients(patientsData);
-      setPractices(practicesData);
-      setPrescriptions(prescriptionsData);
-      setSocialWorks(socialWorksData);
     } catch (err) {
-      console.error('Error loading data:', err);
-      setError(err instanceof Error ? err.message : 'Error desconocido');
+      console.error('Error loading doctors:', err);
     } finally {
-      setLoading(false);
+      setLoadingDoctors(false);
     }
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  const loadPatients = async () => {
+    if (loadingPatients || patients.length > 0) return;
+    
+    setLoadingPatients(true);
+    try {
+      const patientsData = await patientService.getAll();
+      setPatients(patientsData);
+    } catch (err) {
+      console.error('Error loading patients:', err);
+    } finally {
+      setLoadingPatients(false);
+    }
+  };
+
+  const loadPractices = async () => {
+    if (loadingPractices || practices.length > 0) return;
+    
+    setLoadingPractices(true);
+    try {
+      const practicesData = await practiceService.getAll();
+      setPractices(practicesData);
+    } catch (err) {
+      console.error('Error loading practices:', err);
+    } finally {
+      setLoadingPractices(false);
+    }
+  };
+
+  const loadPrescriptions = async () => {
+    if (loadingPrescriptions || prescriptions.length > 0) return;
+    
+    setLoadingPrescriptions(true);
+    try {
+      const prescriptionsData = await prescriptionService.getAll();
+      setPrescriptions(prescriptionsData);
+    } catch (err) {
+      console.error('Error loading prescriptions:', err);
+    } finally {
+      setLoadingPrescriptions(false);
+    }
+  };
+
+  const loadSocialWorks = async () => {
+    if (loadingSocialWorks || socialWorks.length > 0) return;
+    
+    setLoadingSocialWorks(true);
+    try {
+      const socialWorksData = await socialWorkService.getAll();
+      setSocialWorks(socialWorksData);
+    } catch (err) {
+      console.error('Error loading social works:', err);
+    } finally {
+      setLoadingSocialWorks(false);
+    }
+  };
 
   const refreshData = async () => {
-    await loadData();
+    // Recargar solo los datos que ya están cargados
+    const promises = [];
+    
+    if (doctors.length > 0) {
+      setDoctors([]);
+      promises.push(loadDoctors());
+    }
+    if (patients.length > 0) {
+      setPatients([]);
+      promises.push(loadPatients());
+    }
+    if (practices.length > 0) {
+      setPractices([]);
+      promises.push(loadPractices());
+    }
+    if (prescriptions.length > 0) {
+      setPrescriptions([]);
+      promises.push(loadPrescriptions());
+    }
+    if (socialWorks.length > 0) {
+      setSocialWorks([]);
+      promises.push(loadSocialWorks());
+    }
+    
+    await Promise.all(promises);
   };
 
   // Funciones para médicos
@@ -295,8 +332,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
     practices,
     prescriptions,
     socialWorks,
-    loading,
-    error,
+    loadingDoctors,
+    loadingPatients,
+    loadingPractices,
+    loadingPrescriptions,
+    loadingSocialWorks,
+    loadDoctors,
+    loadPatients,
+    loadPractices,
+    loadPrescriptions,
+    loadSocialWorks,
     addDoctor,
     updateDoctor,
     deleteDoctor,

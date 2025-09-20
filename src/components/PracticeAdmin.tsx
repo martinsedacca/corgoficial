@@ -37,7 +37,7 @@ const SkeletonCategorySection = () => (
 );
 
 export function PracticeAdmin() {
-  const { practices, addPractice, updatePractice, deletePractice, loading } = useData();
+  const { practices, addPractice, updatePractice, deletePractice, loadingPractices, loadPractices } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingPractice, setEditingPractice] = useState<Practice | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -52,6 +52,11 @@ export function PracticeAdmin() {
     category: 'study' as Practice['category'],
     description: ''
   });
+
+  // Cargar prácticas cuando se monta el componente
+  useEffect(() => {
+    loadPractices();
+  }, []);
 
   const categoryLabels = {
     study: 'Estudio',
@@ -325,7 +330,7 @@ export function PracticeAdmin() {
       </div>
 
       {/* Lista de Prácticas por Categoría */}
-      {loading ? (
+      {loadingPractices ? (
         // Mostrar skeletons mientras carga
         [...Array(3)].map((_, index) => (
           <SkeletonCategorySection key={index} />
@@ -384,7 +389,7 @@ export function PracticeAdmin() {
       )}
 
       {/* Estado vacío */}
-      {!loading && filteredPractices.length === 0 && (
+      {!loadingPractices && filteredPractices.length === 0 && (
         <div className="bg-white rounded-lg shadow-lg p-12 text-center">
           <Activity className="h-16 w-16 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">

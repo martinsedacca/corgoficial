@@ -13,7 +13,21 @@ interface PrescriptionFormProps {
 }
 
 export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: PrescriptionFormProps) {
-  const { doctors, patients, practices, getNextPrescriptionNumber, addPrescription, updatePrescription, addPatient } = useData();
+  const { 
+    doctors, 
+    patients, 
+    practices, 
+    loadingDoctors,
+    loadingPatients,
+    loadingPractices,
+    loadDoctors,
+    loadPatients,
+    loadPractices,
+    getNextPrescriptionNumber, 
+    addPrescription, 
+    updatePrescription, 
+    addPatient 
+  } = useData();
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [dniValidation, setDniValidation] = useState<{
     isChecking: boolean;
@@ -46,6 +60,13 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   
   // Como eliminamos la autenticación, definimos isDoctor como false por defecto
   const isDoctor = false;
+
+  // Cargar datos necesarios para el formulario
+  useEffect(() => {
+    loadDoctors();
+    loadPatients();
+    loadPractices();
+  }, []);
 
   // Validar DNI en tiempo real para nuevo paciente
   const validateDNI = async (dni: string) => {

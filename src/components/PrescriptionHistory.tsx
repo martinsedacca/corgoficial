@@ -60,7 +60,7 @@ interface PrescriptionHistoryProps {
 }
 
 export default function PrescriptionHistory({ onViewPrescription, onEditPrescription, onNewPrescription }: PrescriptionHistoryProps) {
-  const { prescriptions, updatePrescriptionAuthorization, loading } = useData();
+  const { prescriptions, updatePrescriptionAuthorization, loadingPrescriptions, loadPrescriptions } = useData();
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -73,6 +73,11 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   const [filterType, setFilterType] = useState<string>('all');
   const [filterAuthorization, setFilterAuthorization] = useState<string>('all');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
+  // Cargar recetas cuando se monta el componente
+  useEffect(() => {
+    loadPrescriptions();
+  }, []);
 
   const typeLabels = {
     studies: 'Estudios',
@@ -372,7 +377,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
 
       {/* Lista de recetas */}
       <div className="space-y-4">
-        {loading ? (
+        {loadingPrescriptions ? (
           // Mostrar skeletons mientras carga
           [...Array(5)].map((_, index) => (
             <SkeletonPrescriptionCard key={index} />
@@ -510,7 +515,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
         )}
       </div>
       
-      {!loading && filteredPrescriptions.length > 0 && (
+      {!loadingPrescriptions && filteredPrescriptions.length > 0 && (
         <div className="mt-6 text-center text-sm text-gray-500">
           Mostrando {filteredPrescriptions.length} de {availablePrescriptions.length} recetas
           {hasActiveFilters && (
