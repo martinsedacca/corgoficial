@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import { Prescription } from '../types';
 import { PrescriptionForm } from './PrescriptionForm';
