@@ -503,11 +503,25 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           filteredPrescriptions.map((prescription) => (
             <div
               key={prescription.id}
-              className={`border rounded-lg p-3 sm:p-4 transition-colors ${
-                prescription.authorized 
-                  ? 'border-gray-200 hover:bg-gray-50' 
-                  : 'border-red-200 bg-red-50 hover:bg-red-100'
-              }`}
+              className={`border rounded-lg p-3 sm:p-4 transition-colors ${(() => {
+                if (prescription.authorized) {
+                  return 'border-gray-200 hover:bg-gray-50';
+                }
+                
+                // Calcular tiempo transcurrido para recetas no autorizadas
+                const createdDate = new Date(prescription.createdAt);
+                const now = new Date();
+                const diffMs = now.getTime() - createdDate.getTime();
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                
+                if (diffDays >= 5) {
+                  return 'border-red-200 bg-red-50 hover:bg-red-100';
+                } else if (diffDays >= 1) {
+                  return 'border-yellow-200 bg-yellow-50 hover:bg-yellow-100';
+                } else {
+                  return 'border-gray-200 hover:bg-gray-50';
+                }
+              })()}`}
             >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="flex-1">
