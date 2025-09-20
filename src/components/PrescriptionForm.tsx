@@ -345,8 +345,8 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                   : 'border-gray-300 hover:border-gray-400'
               }`}
             >
-              <div className="text-sm sm:text-base font-medium">Autorizaciones</div>
-              <div className="text-xs text-gray-500 hidden sm:block">Autorizaciones</div>
+              <div className="text-sm sm:text-base font-medium">Cirugías</div>
+              <div className="text-xs text-gray-500 hidden sm:block">Cirugías</div>
             </button>
           </div>
         </div>
