@@ -77,19 +77,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               .from('user_profiles')
               .select('*')
               .eq('user_id', currentSession.user.id)
+             .maybeSingle();
               .single();
 
-            if (profileError) {
-              console.log('Error o no se encontró perfil:', profileError.message);
+            if (profileError && profileError.code !== 'PGRST116') {
+              console.error('Error cargando perfil:', profileError);
             } else {
-              console.log('Perfil cargado:', profileData);
+              console.log('Perfil cargado exitosamente:', profileData);
             }
 
             if (mounted) {
               setProfile(profileData || null);
             }
           } catch (profileError) {
-            console.log('Error cargando perfil:', profileError);
+            console.error('Error en catch cargando perfil:', profileError);
             if (mounted) {
               setProfile(null);
             }

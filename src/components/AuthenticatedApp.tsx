@@ -67,6 +67,8 @@ export function AuthenticatedApp() {
   // Si hay usuario pero no tiene perfil, mostrar error
   if (!profile) {
     console.log('Usuario sin perfil válido');
+    console.log('Datos del usuario:', { id: user.id, email: user.email });
+    console.log('Profile state:', profile);
     return (
       <div className="min-h-screen bg-red-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
@@ -76,27 +78,35 @@ export function AuthenticatedApp() {
             </svg>
           </div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Perfil de Usuario Faltante
+            Error Cargando Perfil
           </h2>
           <p className="text-gray-600 mb-6">
-            Su cuenta no tiene un perfil en el sistema. Como administrador, puede crear su perfil automáticamente.
+            No se pudo cargar el perfil de usuario. Revise la consola para más detalles.
           </p>
           <div className="text-sm text-gray-500 mb-4">
             Usuario: {user.email}
+            <br />
+            ID: {user.id}
           </div>
           <div className="flex gap-3">
             <button
-              onClick={createAdminProfile}
-              disabled={creatingProfile}
-              className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => window.location.reload()}
+              className="flex-1 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              {creatingProfile ? 'Creando...' : 'Crear Perfil de Admin'}
+              Reintentar Carga
             </button>
             <button
-              onClick={() => window.location.reload()}
+              onClick={async () => {
+                console.log('Verificando perfil manualmente...');
+                const { data, error } = await supabase
+                  .from('user_profiles')
+                  .select('*')
+                  .eq('user_id', user.id);
+                console.log('Resultado consulta manual:', { data, error });
+              }}
               className="flex-1 bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
             >
-              Reintentar
+              Debug Perfil
             </button>
           </div>
         </div>
