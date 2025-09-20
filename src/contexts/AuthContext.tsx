@@ -77,8 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               .from('user_profiles')
               .select('*')
               .eq('user_id', currentSession.user.id)
-             .maybeSingle();
-              .single();
+              .maybeSingle();
 
             if (profileError && profileError.code !== 'PGRST116') {
               console.error('Error cargando perfil:', profileError);
