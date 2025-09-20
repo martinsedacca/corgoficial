@@ -1,7 +1,7 @@
 import React from 'react';
 import { Prescription } from '../types';
 import { companyInfo } from '../data/mockData';
-import { Calendar, User, Stethoscope, FileText, Download, Printer } from 'lucide-react';
+import { Calendar, User, Stethoscope, FileText, Download, Printer, Clock, CheckCircle } from 'lucide-react';
 import { generatePrescriptionPDF, printPrescriptionPDF } from '../utils/pdfGenerator';
 
 interface PrescriptionViewerProps {
