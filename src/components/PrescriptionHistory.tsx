@@ -292,15 +292,26 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                     <div className="text-base sm:text-lg font-semibold text-primary-700">
                       #{prescription.number}
                     </div>
-                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      prescription.type === 'studies' 
-                        ? 'bg-primary-100 text-primary-800'
-                        : prescription.type === 'treatments'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-purple-100 text-purple-800'
-                    }`}>
-                      {typeLabels[prescription.type]}
-                    </div>
+                    {(() => {
+                      // Obtener todas las categorías únicas de las prácticas en esta receta
+                      const categories = [...new Set(prescription.items.map(item => item.practice.category))];
+                      const categoryLabels = {
+                        study: 'Estudios',
+                        treatment: 'Tratamientos', 
+                        surgery: 'Cirugías'
+                      };
+                      const categoryColors = {
+                        study: 'bg-blue-100 text-blue-800',
+                        treatment: 'bg-green-100 text-green-800',
+                        surgery: 'bg-purple-100 text-purple-800'
+                      };
+                      
+                      return categories.map(category => (
+                        <div key={category} className={`px-3 py-1 rounded-full text-xs font-medium ${categoryColors[category as keyof typeof categoryColors]}`}>
+                          {categoryLabels[category as keyof typeof categoryLabels]}
+                        </div>
+                      ));
+                    })()}
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
