@@ -70,10 +70,10 @@ export const patientService = {
     return data.map(patient => ({
       id: patient.id,
       name: patient.name,
-      lastName: patient.last_name,
+      lastName: patient.last_name || '',
       socialWork: patient.social_work,
       affiliateNumber: patient.affiliate_number,
-      plan: patient.plan || null,
+      plan: patient.plan || '',
       phone: patient.phone,
       email: patient.email,
       address: patient.address
@@ -101,9 +101,10 @@ export const patientService = {
     return {
       id: data.id,
       name: data.name,
+      lastName: data.last_name || '',
       socialWork: data.social_work,
       affiliateNumber: data.affiliate_number,
-      plan: data.plan || null,
+      plan: data.plan || '',
       phone: data.phone,
       email: data.email,
       address: data.address
