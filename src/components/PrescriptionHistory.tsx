@@ -503,7 +503,11 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           filteredPrescriptions.map((prescription) => (
             <div
               key={prescription.id}
-              className="border border-gray-200 rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors"
+              className={`border rounded-lg p-3 sm:p-4 transition-colors ${
+                prescription.authorized 
+                  ? 'border-gray-200 hover:bg-gray-50' 
+                  : 'border-red-200 bg-red-50 hover:bg-red-100'
+              }`}
             >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="flex-1">
