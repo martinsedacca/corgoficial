@@ -1,9 +1,8 @@
 import React from 'react';
 import { Prescription } from '../types';
 import { companyInfo } from '../data/mockData';
-import { Calendar, User, Stethoscope, FileText, Download } from 'lucide-react';
+import { Calendar, User, Stethoscope, FileText, Download, Printer } from 'lucide-react';
 import { generatePrescriptionPDF, printPrescriptionPDF } from '../utils/pdfGenerator';
-import { Printer } from 'lucide-react';
 
 interface PrescriptionViewerProps {
   prescription: Prescription;
@@ -41,16 +40,16 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={handleExportPDF}
-            className="flex items-center gap-2 bg-green-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium hover:bg-green-700 transition-colors text-sm sm:text-base"
+            className="flex items-center gap-2 bg-primary-50 text-primary-700 border-2 border-primary-300 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium hover:bg-primary-100 hover:border-primary-400 transition-colors text-sm sm:text-base"
           >
             <Download className="h-5 w-5" />
             Descargar PDF
           </button>
           <button
             onClick={handlePrintPDF}
-            className="flex items-center gap-2 bg-blue-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm sm:text-base"
+            className="flex items-center gap-2 bg-primary-50 text-primary-700 border-2 border-primary-300 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium hover:bg-primary-100 hover:border-primary-400 transition-colors text-sm sm:text-base"
           >
-            <FileText className="h-5 w-5" />
+            <Printer className="h-5 w-5" />
             Imprimir
           </button>
         </div>
