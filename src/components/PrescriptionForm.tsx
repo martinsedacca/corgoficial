@@ -111,31 +111,40 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
     e.preventDefault();
     e.stopPropagation(); // Prevenir que se propague al formulario padre
     try {
-      const newPatient = await addPatient(newPatientData);
-      if (newPatient) {
-        setSelectedPatient(newPatient);
-        setPatientSearch(`${newPatient.name} - ${newPatient.socialWork}`);
-        setPatientCreationSuccess(true);
-        
-        // Ocultar el mensaje de éxito después de 3 segundos
-        setTimeout(() => {
-          setPatientCreationSuccess(false);
-        }, 3000);
-        
-        // Cerrar el formulario después de un breve delay para que se vea el mensaje
-        setTimeout(() => {
-          setShowPatientForm(false);
-          setNewPatientData({
-            name: '',
-            socialWork: '',
-            affiliateNumber: '',
-            plan: '',
-            phone: '',
-            email: '',
-            address: ''
-          });
-        }, 1500);
+      await addPatient(newPatientData);
+      
+      // Mostrar mensaje de éxito
+      setPatientCreationSuccess(true);
+      
+      // Recargar los datos para obtener el paciente recién creado
+      await new Promise(resolve => setTimeout(resolve, 500)); // Pequeña pausa para asegurar que se guardó
+      
+      // Buscar el paciente recién creado por nombre y obra social
+      const createdPatient = patients.find(p => 
+        p.name.toLowerCase() === newPatientData.name.toLowerCase() &&
+        p.socialWork.toLowerCase() === newPatientData.socialWork.toLowerCase()
+      );
+      
+      if (createdPatient) {
+        setSelectedPatient(createdPatient);
+        setPatientSearch(`${createdPatient.name} - ${createdPatient.socialWork}`);
       }
+      
+      // Limpiar formulario y cerrar después de mostrar el mensaje
+      setTimeout(() => {
+        setPatientCreationSuccess(false);
+        setShowPatientForm(false);
+        setNewPatientData({
+          name: '',
+          socialWork: '',
+          affiliateNumber: '',
+          plan: '',
+          phone: '',
+          email: '',
+          address: ''
+        });
+      }, 2000);
+      
     } catch (error) {
       console.error('Error creating patient:', error);
       alert('Error al crear el paciente. Por favor, intente nuevamente.');
