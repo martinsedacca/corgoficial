@@ -1,6 +1,7 @@
 import React from 'react';
 import { Prescription } from '../types';
 import { companyInfo } from '../data/mockData';
+import { useData } from '../contexts/DataContext';
 import { Calendar, User, Stethoscope, FileText, Download, Printer, Clock, CheckCircle } from 'lucide-react';
 import { generatePrescriptionPDF, printPrescriptionPDF } from '../utils/pdfGenerator';
 
@@ -9,6 +10,8 @@ interface PrescriptionViewerProps {
 }
 
 export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
+  const { updatePrescriptionAuthorization } = useData();
+  
   const typeLabels = {
     studies: 'Autorización de Estudios',
     treatments: 'Autorización de Tratamientos',
@@ -30,6 +33,21 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
     } catch (error) {
       console.error('Error al imprimir PDF:', error);
       alert('Error al imprimir el PDF. Por favor, intente nuevamente.');
+    }
+  };
+
+  const handleToggleAuthorization = async () => {
+    if (prescription.authorized) {
+      // Confirmar desautorización
+      const confirmed = window.confirm('¿Está seguro que desea desautorizar esta receta?');
+      if (!confirmed) return;
+    }
+    
+    try {
+      await updatePrescriptionAuthorization(prescription.id, !prescription.authorized);
+    } catch (error) {
+      console.error('Error al cambiar autorización:', error);
+      alert('Error al cambiar el estado de autorización. Por favor, intente nuevamente.');
     }
   };
 
@@ -94,22 +112,36 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
       {/* Authorization Status */}
       <div className="mb-6">
-        <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${
-          prescription.authorized 
-            ? 'bg-green-100 text-green-800 border border-green-200' 
-            : 'bg-gray-100 text-gray-600 border border-gray-200'
-        }`}>
-          {prescription.authorized ? (
-            <>
-              <CheckCircle className="h-4 w-4" />
-              Estado: Autorizado
-            </>
-          ) : (
-            <>
-              <Clock className="h-4 w-4" />
-              Estado: Pendiente de Autorización
-            </>
-          )}
+        <div className="flex items-center gap-3">
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${
+            prescription.authorized 
+              ? 'bg-green-100 text-green-800 border border-green-200' 
+              : 'bg-gray-100 text-gray-600 border border-gray-200'
+          }`}>
+            {prescription.authorized ? (
+              <>
+                <CheckCircle className="h-4 w-4" />
+                Estado: Autorizado
+              </>
+            ) : (
+              <>
+                <Clock className="h-4 w-4" />
+                Estado: Pendiente de Autorización
+              </>
+            )}
+          </div>
+          
+          {/* Botón de autorizar/desautorizar */}
+          <button
+            onClick={handleToggleAuthorization}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              prescription.authorized
+                ? 'bg-red-100 text-red-700 border border-red-200 hover:bg-red-200'
+                : 'bg-blue-100 text-blue-700 border border-blue-200 hover:bg-blue-200'
+            }`}
+          >
+            {prescription.authorized ? 'Desautorizar' : 'Autorizar'}
+          </button>
         </div>
       </div>
 
