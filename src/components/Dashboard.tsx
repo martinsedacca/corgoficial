@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import { generateStatisticsReport } from '../utils/reportGenerator';
 import { BarChart3, Calendar, User, Activity, TrendingUp, FileText, Filter, Download, CheckCircle } from 'lucide-react';
