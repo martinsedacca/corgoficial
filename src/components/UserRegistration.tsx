@@ -1,43 +1,30 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Eye, EyeOff, UserPlus, Shield, AlertCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, UserPlus, AlertCircle, CheckCircle } from 'lucide-react';
 
-const SECRET_PASSWORD = 'amadeus222';
+interface UserRegistrationProps {
+  onBack: () => void;
+}
 
-export function UserRegistration() {
-  const [secretPassword, setSecretPassword] = useState('');
-  const [showSecretPassword, setShowSecretPassword] = useState(false);
-  const [secretVerified, setSecretVerified] = useState(false);
+export function UserRegistration({ onBack }: UserRegistrationProps) {
+  const [formData, setFormData] = useState({
+    email: 'm.sedacca@gmail.com',
+    password: 'admin1234',
+    fullName: 'Administrador'
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    full_name: '',
-    role: 'admin' as 'admin' | 'secretary' | 'doctor'
-  });
+  const [success, setSuccess] = useState(false);
 
-  const handleSecretSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (secretPassword === SECRET_PASSWORD) {
-      setSecretVerified(true);
-      setError(null);
-    } else {
-      setError('Contraseña secreta incorrecta');
-    }
-  };
-
-  const handleUserSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setSuccess(null);
 
     try {
-      // Crear usuario en Supabase Auth
+      console.log('Creando usuario administrador...');
+      
+      // 1. Crear usuario en Supabase Auth
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -46,130 +33,77 @@ export function UserRegistration() {
         }
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error('Error creando usuario:', authError);
+        throw authError;
+      }
 
       if (!authData.user) {
         throw new Error('No se pudo crear el usuario');
       }
 
-      // Crear perfil de usuario
+      console.log('Usuario creado en Auth:', authData.user.id);
+
+      // 2. Crear perfil de usuario
       const { error: profileError } = await supabase
         .from('user_profiles')
         .insert({
           user_id: authData.user.id,
           email: formData.email,
-          full_name: formData.full_name,
-          role: formData.role,
+          full_name: formData.fullName,
+          role: 'admin',
           is_active: true
         });
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Error creando perfil:', profileError);
+        throw profileError;
+      }
 
-      setSuccess(`Usuario ${formData.full_name} creado exitosamente como ${formData.role}`);
-      
-      // Limpiar formulario
-      setFormData({
-        email: '',
-        password: '',
-        full_name: '',
-        role: 'admin'
-      });
-      
-    } catch (error: any) {
-      console.error('Error creating user:', error);
-      setError(`Error al crear usuario: ${error.message}`);
+      console.log('Perfil creado exitosamente');
+      setSuccess(true);
+
+      // Redirigir al login después de 2 segundos
+      setTimeout(() => {
+        onBack();
+      }, 2000);
+
+    } catch (err: any) {
+      console.error('Error en registro:', err);
+      if (err.message.includes('User already registered')) {
+        setError('Este email ya está registrado. Intente iniciar sesión.');
+      } else if (err.message.includes('Password should be at least')) {
+        setError('La contraseña debe tener al menos 6 caracteres.');
+      } else {
+        setError(`Error al crear usuario: ${err.message}`);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const resetForm = () => {
-    setSecretVerified(false);
-    setSecretPassword('');
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
-      email: '',
-      password: '',
-      full_name: '',
-      role: 'admin'
+      ...formData,
+      [e.target.name]: e.target.value
     });
-    setError(null);
-    setSuccess(null);
   };
 
-  if (!secretVerified) {
+  if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
         <div className="max-w-md w-full">
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-6">
-              <img 
-                src="/Logo-corg.png" 
-                alt="CORG Logo" 
-                className="h-20 w-auto"
-              />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Registro de Usuario Administrador
-            </h1>
-            <p className="text-gray-600">
-              Ingrese la contraseña secreta para continuar
+          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              ¡Usuario Creado Exitosamente!
+            </h2>
+            <p className="text-gray-600 mb-4">
+              El usuario administrador ha sido creado correctamente.
             </p>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <form onSubmit={handleSecretSubmit} className="space-y-6">
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
-                  <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-                  <p className="text-red-700 text-sm">{error}</p>
-                </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Contraseña Secreta
-                </label>
-                <div className="relative">
-                  <input
-                    type={showSecretPassword ? 'text' : 'password'}
-                    required
-                    value={secretPassword}
-                    onChange={(e) => setSecretPassword(e.target.value)}
-                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-                    placeholder="Ingrese contraseña secreta"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowSecretPassword(!showSecretPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    {showSecretPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full flex items-center justify-center gap-2 bg-red-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
-              >
-                <Shield className="h-5 w-5" />
-                Verificar Acceso
-              </button>
-            </form>
-          </div>
-          
-          {/* Enlace para volver al login */}
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => window.location.reload()}
-              className="text-sm text-red-600 hover:text-red-800 font-medium underline"
-            >
-              ← Volver al Login
-            </button>
+            <p className="text-sm text-gray-500">
+              Redirigiendo al login...
+            </p>
           </div>
         </div>
       </div>
@@ -177,8 +111,9 @@ export function UserRegistration() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
+        {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <img 
@@ -188,15 +123,16 @@ export function UserRegistration() {
             />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Crear Nuevo Usuario
+            Crear Usuario Administrador
           </h1>
           <p className="text-gray-600">
-            Complete los datos del nuevo usuario
+            Configure el primer usuario del sistema
           </p>
         </div>
 
+        {/* Formulario */}
         <div className="bg-white rounded-lg shadow-lg p-8">
-          <form onSubmit={handleUserSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
                 <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
@@ -204,95 +140,73 @@ export function UserRegistration() {
               </div>
             )}
 
-            {success && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
-                <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                <p className="text-green-700 text-sm">{success}</p>
-              </div>
-            )}
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nombre Completo *
+                Nombre Completo
               </label>
               <input
                 type="text"
+                name="fullName"
                 required
-                value={formData.full_name}
-                onChange={(e) => setFormData({...formData, full_name: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-                placeholder="Juan Pérez"
+                value={formData.fullName}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                placeholder="Nombre del administrador"
                 disabled={loading}
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email *
+                Email
               </label>
               <input
                 type="email"
+                name="email"
                 required
                 value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-                placeholder="usuario@corg.com"
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                placeholder="admin@corg.com"
                 disabled={loading}
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Contraseña *
+                Contraseña
               </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-                  placeholder="••••••••"
-                  minLength={6}
-                  disabled={loading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 transition-colors"
-                  disabled={loading}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Rol *
-              </label>
-              <select
+              <input
+                type="password"
+                name="password"
                 required
-                value={formData.role}
-                onChange={(e) => setFormData({...formData, role: e.target.value as any})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                placeholder="Contraseña segura"
                 disabled={loading}
-              >
-                <option value="admin">Administrador</option>
-                <option value="secretary">Secretaria</option>
-                <option value="doctor">Médico</option>
-              </select>
+                minLength={6}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Mínimo 6 caracteres
+              </p>
             </div>
 
-            <div className="flex gap-4">
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={onBack}
+                disabled={loading}
+                className="flex-1 flex items-center justify-center gap-2 bg-gray-100 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
+              >
+                <ArrowLeft className="h-5 w-5" />
+                Volver
+              </button>
+
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 bg-primary-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
@@ -306,27 +220,20 @@ export function UserRegistration() {
                   </>
                 )}
               </button>
-              
-              <button
-                type="button"
-                onClick={resetForm}
-                className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                disabled={loading}
-              >
-                Volver
-              </button>
             </div>
           </form>
-        </div>
-        
-        {/* Enlace para volver al login */}
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => window.location.reload()}
-            className="text-sm text-green-600 hover:text-green-800 font-medium underline"
-          >
-            ← Volver al Login
-          </button>
+
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+            <h3 className="text-sm font-medium text-blue-900 mb-2">
+              Información del Usuario Administrador:
+            </h3>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• Acceso completo al sistema</li>
+              <li>• Puede gestionar todos los módulos</li>
+              <li>• Puede crear y administrar otros usuarios</li>
+              <li>• Sin restricciones de permisos</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

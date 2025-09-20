@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { LoginForm } from './LoginForm';
 import { UserRegistration } from './UserRegistration';
+import { UserRegistration } from './UserRegistration';
 import { LoadingSpinner } from './LoadingSpinner';
 import { AppContent } from './AppContent';
 
 export function AuthenticatedApp() {
   const { user, profile, loading } = useAuth();
+  const [showRegistration, setShowRegistration] = useState(false);
   const [showRegistration, setShowRegistration] = useState(false);
 
   console.log('AuthenticatedApp - Estado:', { 
@@ -24,10 +26,15 @@ export function AuthenticatedApp() {
     );
   }
 
+  // Si no hay usuario y se solicita registro
+  if (!user && showRegistration) {
+    return <UserRegistration onBack={() => setShowRegistration(false)} />;
+  }
+
   // Si no hay usuario autenticado, mostrar login
   if (!user) {
     console.log('No hay usuario, mostrando login');
-    if (showRegistration) {
+    return <LoginForm onShowRegistration={() => setShowRegistration(true)} />;
       return <UserRegistration />;
     }
     return (
