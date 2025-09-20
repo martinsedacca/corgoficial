@@ -25,7 +25,11 @@ export function LoginForm({ onShowRegistration }: LoginFormProps) {
       if (error) {
         console.error('Login error:', error);
         if (error.message.includes('Invalid login credentials') || error.message.includes('invalid_credentials')) {
-          setError('Email o contraseña incorrectos');
+          if (onShowRegistration) {
+            setError('Email o contraseña incorrectos. Si es la primera vez que usa el sistema, debe crear el usuario administrador primero.');
+          } else {
+            setError('Email o contraseña incorrectos');
+          }
         } else if (error.message.includes('Email not confirmed')) {
           setError('Por favor confirme su email antes de iniciar sesión');
         } else if (error.message.includes('signup_disabled')) {
