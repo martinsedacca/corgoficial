@@ -479,6 +479,83 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
         </div>
       </div>
 
+      {/* Estadísticas basadas en filtros */}
+      <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Estadísticas del Período Seleccionado</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          {/* Días seleccionados */}
+          <div className="text-center p-3 bg-blue-50 rounded-lg">
+            <div className="text-2xl font-bold text-blue-700">
+              {(() => {
+                if (!filterDateFrom || !filterDateTo) return '-';
+                const startDate = new Date(filterDateFrom);
+                const endDate = new Date(filterDateTo);
+                const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                return diffDays;
+              })()}
+            </div>
+            <div className="text-sm text-blue-600">Días Seleccionados</div>
+          </div>
+
+          {/* Recetas autorizadas */}
+          <div className="text-center p-3 bg-green-50 rounded-lg">
+            <div className="text-2xl font-bold text-green-700">
+              {filteredPrescriptions.filter(p => p.authorized).length}
+            </div>
+            <div className="text-sm text-green-600">Recetas Autorizadas</div>
+          </div>
+
+          {/* Recetas sin autorizar */}
+          <div className="text-center p-3 bg-orange-50 rounded-lg">
+            <div className="text-2xl font-bold text-orange-700">
+              {filteredPrescriptions.filter(p => !p.authorized).length}
+            </div>
+            <div className="text-sm text-orange-600">Recetas Sin Autorizar</div>
+          </div>
+
+          {/* Total estudios autorizados */}
+          <div className="text-center p-3 bg-purple-50 rounded-lg">
+            <div className="text-2xl font-bold text-purple-700">
+              {(() => {
+                let total = 0;
+                filteredPrescriptions
+                  .filter(p => p.authorized)
+                  .forEach(prescription => {
+                    prescription.items.forEach(item => {
+                      if (['study', 'treatment', 'surgery'].includes(item.practice.category)) {
+                        total++;
+                      }
+                    });
+                  });
+                return total;
+              })()}
+            </div>
+            <div className="text-sm text-purple-600">Estudios Autorizados</div>
+          </div>
+
+          {/* Total estudios sin autorizar */}
+          <div className="text-center p-3 bg-red-50 rounded-lg">
+            <div className="text-2xl font-bold text-red-700">
+              {(() => {
+                let total = 0;
+                filteredPrescriptions
+                  .filter(p => !p.authorized)
+                  .forEach(prescription => {
+                    prescription.items.forEach(item => {
+                      if (['study', 'treatment', 'surgery'].includes(item.practice.category)) {
+                        total++;
+                      }
+                    });
+                  });
+                return total;
+              })()}
+            </div>
+            <div className="text-sm text-red-600">Estudios Sin Autorizar</div>
+          </div>
+        </div>
+      </div>
+
       {/* Lista de recetas */}
       <div className="space-y-4">
         {loadingPrescriptions ? (
