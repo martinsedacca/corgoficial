@@ -163,7 +163,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
 
   const doctorOptions = doctors.map(doctor => ({
     id: doctor.id,
-    label: `${doctor.name} - ${doctor.specialty}`,
+    label: `${doctor.name} - ${doctor.license}`,
     value: doctor
   })).sort((a, b) => a.value.name.localeCompare(b.value.name, 'es', { sensitivity: 'base' }));
 
