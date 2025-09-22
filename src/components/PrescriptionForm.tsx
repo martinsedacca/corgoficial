@@ -33,11 +33,6 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const { profile, isDoctor } = useAuth();
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [selectedSocialWorkForNewPatient, setSelectedSocialWorkForNewPatient] = useState<SocialWork | null>(null);
-  const [dniValidation, setDniValidation] = useState<{
-    isChecking: boolean;
-    exists: boolean;
-    message: string;
-  }>({ isChecking: false, exists: false, message: '' });
   const [newPatientData, setNewPatientData] = useState({
     name: '',
     lastName: '',
@@ -70,6 +65,17 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
     loadSocialWorkPlans();
   }, []);
 
+  // Si es doctor, preseleccionar su información
+  useEffect(() => {
+    if (isDoctor && profile?.doctor_id && doctors.length > 0) {
+      const doctorData = doctors.find(d => d.id === profile.doctor_id);
+      if (doctorData) {
+        setSelectedDoctor(doctorData);
+        setDoctorSearch(doctorData.name);
+      }
+    }
+  }, [isDoctor, profile, doctors]);
+
   // Función para buscar pacientes en el autocomplete
   const handlePatientSearch = async (searchTerm: string): Promise<Option[]> => {
     try {
@@ -85,66 +91,16 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
     }
   };
 
-  // Si es doctor, preseleccionar su información
-  useEffect(() => {
-    if (isDoctor && profile?.doctor_id && doctors.length > 0) {
-      const doctorData = doctors.find(d => d.id === profile.doctor_id);
-      if (doctorData) {
-        setSelectedDoctor(doctorData);
-        setDoctorSearch(doctorData.name);
-      }
-    }
-  }, [isDoctor, profile, doctors]);
-
-  // Validar DNI en tiempo real para nuevo paciente
-  const validateDNI = async (dni: string) => {
-    if (dni.length < 4) {
-      setDniValidation({ isChecking: false, exists: false, message: '' });
-      return;
-    }
-
-    setDniValidation({ isChecking: true, exists: false, message: 'Verificando DNI...' });
-
-    try {
-      const { data, error } = await supabase
-        .from('patients')
-        .select('id, name, last_name, social_work')
-        .eq('dni', dni)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error checking DNI:', error);
-        setDniValidation({ isChecking: false, exists: false, message: 'Error al verificar DNI' });
-        return;
-      }
-
-      if (data && data.length > 0) {
-        const count = data.length;
-        const firstPatient = data[0];
-        setDniValidation({
-          isChecking: false,
-          exists: false, // Cambiar a false ya que ahora es permitido
-          message: `${count} paciente${count > 1 ? 's' : ''} con este DNI: ${firstPatient.name} ${firstPatient.last_name || ''}${count > 1 ? ` y ${count - 1} más` : ''}`
-        });
-      } else {
-        setDniValidation({ isChecking: false, exists: false, message: '' });
-      }
-    } catch (error) {
-      console.error('Error validating DNI:', error);
-      setDniValidation({ isChecking: false, exists: false, message: 'Error al verificar DNI' });
-    }
-  };
-
   // Validar si el formulario de nuevo paciente es válido
   const isNewPatientFormValid = () => {
     return (
       newPatientData.name.trim() !== '' &&
       newPatientData.lastName.trim() !== '' &&
       newPatientData.dni.length >= 4 &&
-      !dniValidation.isChecking &&
       newPatientData.socialWork.trim() !== ''
     );
   };
+
   // Cargar el siguiente número de receta
   useEffect(() => {
     if (!editingPrescription) {
@@ -505,36 +461,12 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                       onChange={(e) => {
                         const newDni = e.target.value.replace(/\D/g, '');
                         setNewPatientData({...newPatientData, dni: newDni});
-                        if (newDni.length >= 8) {
-                          validateDNI(newDni);
-                        } else if (newDni.length >= 4) {
-                          // Validar después de 2 segundos si tiene más de 4 caracteres
-                          setTimeout(() => {
-                            if (newPatientData.dni === newDni && newDni.length >= 4) {
-                              validateDNI(newDni);
-                            }
-                          }, 2000);
-                        } else {
-                          setDniValidation({ isChecking: false, exists: false, message: '' });
-                        }
                       }}
                       disabled={creatingPatient}
-                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 transition-colors ${
-                        'border-gray-300 focus:ring-primary-500 focus:border-primary-500'
-                      }`}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                       placeholder="12345678"
                       pattern="[0-9]{4,}"
                     />
-                    {dniValidation.message && (
-                      <div className={`mt-1 text-sm flex items-center gap-1 ${
-                        'text-blue-600'
-                      }`}>
-                        {dniValidation.isChecking && (
-                          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
-                        )}
-                        <span>{dniValidation.message}</span>
-                      </div>
-                    )}
                   </div>
                   <div>
                     <SocialWorkAutocomplete
