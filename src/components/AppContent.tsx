@@ -60,7 +60,7 @@ export function AppContent() {
     ...(hasPermission('manage_patients') ? [{ key: 'patients', label: 'Pacientes', icon: Users, color: 'text-green-600' }] : []),
     ...(hasPermission('manage_practices') ? [{ key: 'admin-practices', label: 'Prácticas', icon: Activity, color: 'text-purple-600' }] : []),
     ...(hasPermission('manage_social_works') ? [{ key: 'social-works', label: 'Obras Sociales', icon: Building2, color: 'text-blue-600' }] : []),
-    ...(hasPermission('manage_practices') ? [{ key: 'print-settings', label: 'Configuración de Impresión', icon: Settings, color: 'text-orange-600' }] : []),
+    ...(hasPermission('manage_practices') ? [{ key: 'print-settings', label: 'Impresora', icon: Settings, color: 'text-orange-600' }] : []),
     ...(hasPermission('manage_users') ? [{ key: 'users', label: 'Usuarios', icon: Settings, color: 'text-red-600' }] : [])
   ].filter(Boolean);
 
