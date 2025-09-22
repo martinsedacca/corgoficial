@@ -623,6 +623,31 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
         </div>
       </div>
 
+      {/* Controles de selección en lote - Solo para formato A4 */}
+      {printFormat === 'A4' && filteredPrescriptions.length > 0 && (
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
+          <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+            <input
+              type="checkbox"
+              checked={selectedPrescriptions.size === filteredPrescriptions.length && filteredPrescriptions.length > 0}
+              onChange={handleSelectAll}
+              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+            />
+            Seleccionar todas ({filteredPrescriptions.length})
+          </label>
+          
+          {selectedPrescriptions.size > 0 && (
+            <button
+              onClick={handleBatchPrint}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+            >
+              <Printer className="h-4 w-4" />
+              Imprimir Lote ({selectedPrescriptions.size})
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Lista de recetas */}
       <div className="space-y-4">
         {loadingPrescriptions ? (
@@ -852,35 +877,10 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           )}
         </div>
       )}
-
       {/* Controles de selección en lote - Solo para formato A4 */}
       {printFormat === 'A4' && filteredPrescriptions.length > 0 && (
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={selectedPrescriptions.size === filteredPrescriptions.length && filteredPrescriptions.length > 0}
-                onChange={handleSelectAll}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-              />
-              <span className="text-sm text-gray-700">
-                Seleccionar todas ({filteredPrescriptions.length})
-              </span>
-            </label>
-          </div>
-          
-          {selectedPrescriptions.size > 0 && (
-            <button
-              onClick={handleBatchPrint}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
-            >
-              <Printer className="h-4 w-4" />
-              Imprimir Lote ({selectedPrescriptions.size})
-            </button>
-          )}
-        </div>
-      )}
 
       {/* Modal de error */}
       {showErrorModal && (
