@@ -5,7 +5,6 @@ import { supabase } from '../lib/supabase';
 import { AutoComplete } from './AutoComplete';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
 import { SocialWorkPlanSelector } from './SocialWorkPlanSelector';
-import { SocialWorkPlanSelector } from './SocialWorkPlanSelector';
 import { PrescriptionItem, Doctor, Patient, Practice, Prescription, SocialWork } from '../types';
 import { Plus, Trash2, FileText, Save, X, AlertTriangle } from 'lucide-react';
 
