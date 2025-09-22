@@ -44,7 +44,7 @@ export function useRealtimeNotifications() {
 
   useEffect(() => {
     // Solo configurar notificaciones para administradores y secretarias
-    // Los médicos no necesitan ver cambios de otros usuarios
+    // Los médicos NO deben recibir actualizaciones en tiempo real de recetas
     if (!user || isDoctor) return;
 
     console.log('Setting up realtime notifications for user:', user.id);
