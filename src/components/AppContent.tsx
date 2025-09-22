@@ -15,11 +15,11 @@ import { Prescription } from '../types';
 import { FileText, History, User, Users, Activity, Building2, BarChart3, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { Printer } from 'lucide-react';
 
-type View = 'dashboard' | 'new' | 'history' | 'doctors' | 'patients' | 'practices' | 'admin-practices' | 'social-works' | 'users' | 'print-settings';
+type View = 'history' | 'dashboard' | 'new' | 'doctors' | 'patients' | 'practices' | 'admin-practices' | 'social-works' | 'users' | 'print-settings';
 
 export function AppContent() {
   const { user, profile, signOut, hasPermission } = useAuth();
-  const [currentView, setCurrentView] = useState<View>('dashboard');
+  const [currentView, setCurrentView] = useState<View>('history');
   const [showAdminDropdown, setShowAdminDropdown] = useState(false);
   const [viewingPrescription, setViewingPrescription] = useState<Prescription | null>(null);
   const [editingPrescription, setEditingPrescription] = useState<Prescription | null>(null);
@@ -52,8 +52,8 @@ export function AppContent() {
   };
 
   const mainMenuItems = [
-    ...(hasPermission('view_dashboard') ? [{ key: 'dashboard', label: 'Dashboard', icon: BarChart3, color: 'text-blue-600' }] : []),
-    { key: 'history', label: 'Recetas', icon: History, color: 'text-gray-600' }
+    { key: 'history', label: 'Recetas', icon: History, color: 'text-gray-600' },
+    ...(hasPermission('view_dashboard') ? [{ key: 'dashboard', label: 'Dashboard', icon: BarChart3, color: 'text-blue-600' }] : [])
   ];
 
   const adminMenuItems = [
