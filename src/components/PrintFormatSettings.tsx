@@ -7,13 +7,13 @@ export function PrintFormatSettings() {
   const { printFormat, setPrintFormat } = usePrintConfig();
   const { hasPermission } = useAuth();
 
-  // Solo administradores y secretarias pueden cambiar la configuración
-  if (!hasPermission('manage_practices')) {
+  // Administradores, secretarias y médicos pueden cambiar la configuración
+  if (!hasPermission('manage_practices') && !hasPermission('manage_prescriptions')) {
     return (
       <div className="bg-white rounded-lg shadow-lg p-6 text-center">
         <Shield className="h-12 w-12 text-red-500 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Acceso Denegado</h3>
-        <p className="text-gray-600">No tiene permisos para cambiar la configuración de impresión.</p>
+        <p className="text-gray-600">No tiene permisos para acceder a la configuración de impresión.</p>
       </div>
     );
   }
