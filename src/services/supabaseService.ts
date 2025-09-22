@@ -74,25 +74,42 @@ export const doctorService = {
 
 // Servicios para Pacientes
 export const patientService = {
-  async getAll(): Promise<Patient[]> {
+  async getAll(page: number = 1, pageSize: number = 100): Promise<{ patients: Patient[]; totalCount: number; hasMore: boolean }> {
     try {
       // Check if Supabase is properly configured
       if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
         console.warn('Supabase not configured, returning empty patients array');
-        return [];
+        return { patients: [], totalCount: 0, hasMore: false };
       }
 
+      // Calcular offset para la paginación
+      const offset = (page - 1) * pageSize;
+
+      // Obtener el total de registros
+      const { count, error: countError } = await supabase
+        .from('patients')
+        .select('*', { count: 'exact', head: true });
+
+      if (countError) {
+        console.error('Error fetching patients count:', countError);
+        return { patients: [], totalCount: 0, hasMore: false };
+      }
+
+      const totalCount = count || 0;
+
+      // Obtener los pacientes paginados
       const { data, error } = await supabase
         .from('patients')
         .select('*')
+        .range(offset, offset + pageSize - 1)
         .order('name', { ascending: true });
       
       if (error) {
         console.error('Error fetching patients:', error);
-        return [];
+        return { patients: [], totalCount: 0, hasMore: false };
       }
       
-      return data.map(patient => ({
+      const patients = data.map(patient => ({
         id: patient.id,
         name: patient.name,
         lastName: patient.last_name || '',
@@ -104,9 +121,92 @@ export const patientService = {
         email: patient.email,
         address: patient.address
       }));
+
+      const hasMore = offset + pageSize < totalCount;
+
+      return { patients, totalCount, hasMore };
     } catch (error) {
       console.error('Network error fetching patients:', error);
-      return [];
+      return { patients: [], totalCount: 0, hasMore: false };
+    }
+  },
+
+  async search(searchTerm: string, filters: {
+    name?: string;
+    dni?: string;
+    socialWork?: string;
+    affiliateNumber?: string;
+  } = {}, page: number = 1, pageSize: number = 100): Promise<{ patients: Patient[]; totalCount: number; hasMore: boolean }> {
+    try {
+      // Check if Supabase is properly configured
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        console.warn('Supabase not configured, returning empty patients array');
+        return { patients: [], totalCount: 0, hasMore: false };
+      }
+
+      const offset = (page - 1) * pageSize;
+      let query = supabase.from('patients').select('*', { count: 'exact' });
+
+      // Aplicar filtros de búsqueda
+      if (searchTerm) {
+        query = query.or(`name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,dni.ilike.%${searchTerm}%,social_work.ilike.%${searchTerm}%,affiliate_number.ilike.%${searchTerm}%`);
+      }
+
+      if (filters.name) {
+        query = query.or(`name.ilike.%${filters.name}%,last_name.ilike.%${filters.name}%`);
+      }
+
+      if (filters.dni) {
+        query = query.ilike('dni', `%${filters.dni}%`);
+      }
+
+      if (filters.socialWork) {
+        query = query.ilike('social_work', `%${filters.socialWork}%`);
+      }
+
+      if (filters.affiliateNumber) {
+        query = query.ilike('affiliate_number', `%${filters.affiliateNumber}%`);
+      }
+
+      // Obtener total con filtros
+      const { count, error: countError } = await query;
+      
+      if (countError) {
+        console.error('Error fetching filtered patients count:', countError);
+        return { patients: [], totalCount: 0, hasMore: false };
+      }
+
+      const totalCount = count || 0;
+
+      // Obtener datos paginados
+      const { data, error } = await query
+        .range(offset, offset + pageSize - 1)
+        .order('name', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching filtered patients:', error);
+        return { patients: [], totalCount: 0, hasMore: false };
+      }
+      
+      const patients = data.map(patient => ({
+        id: patient.id,
+        name: patient.name,
+        lastName: patient.last_name || '',
+        dni: patient.dni,
+        socialWork: patient.social_work,
+        affiliateNumber: patient.affiliate_number || '',
+        plan: patient.plan || '',
+        phone: patient.phone,
+        email: patient.email,
+        address: patient.address
+      }));
+
+      const hasMore = offset + pageSize < totalCount;
+
+      return { patients, totalCount, hasMore };
+    } catch (error) {
+      console.error('Network error searching patients:', error);
+      return { patients: [], totalCount: 0, hasMore: false };
     }
   },
 

@@ -8,6 +8,12 @@ import { doctorService, patientService, practiceService, prescriptionService, so
 interface DataContextType {
   doctors: Doctor[];
   patients: Patient[];
+  patientsMetadata: {
+    totalCount: number;
+    currentPage: number;
+    pageSize: number;
+    hasMore: boolean;
+  };
   practices: Practice[];
   prescriptions: Prescription[];
   socialWorks: SocialWork[];
@@ -17,7 +23,8 @@ interface DataContextType {
   loadingPrescriptions: boolean;
   loadingSocialWorks: boolean;
   loadDoctors: () => Promise<void>;
-  loadPatients: () => Promise<void>;
+  loadPatients: (page?: number, reset?: boolean) => Promise<void>;
+  searchPatients: (searchTerm: string, filters?: any, page?: number, reset?: boolean) => Promise<void>;
   loadPractices: () => Promise<void>;
   loadPrescriptions: () => Promise<void>;
   loadSocialWorks: () => Promise<void>;
@@ -47,6 +54,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [patientsMetadata, setPatientsMetadata] = useState({
+    totalCount: 0,
+    currentPage: 1,
+    pageSize: 100,
+    hasMore: false
+  });
   const [practices, setPractices] = useState<Practice[]>([]);
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [socialWorks, setSocialWorks] = useState<SocialWork[]>([]);
@@ -125,20 +138,85 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   }, [loadingDoctors]);
 
-  const loadPatients = useCallback(async () => {
+  const loadPatients = useCallback(async (page: number = 1, reset: boolean = true) => {
     if (loadingPatients) return;
     
     setLoadingPatients(true);
     try {
-      const patientsData = await patientService.getAll();
-      setPatients(patientsData);
+      const { patients: patientsData, totalCount, hasMore } = await patientService.getAll(page, 100);
+      
+      if (reset || page === 1) {
+        setPatients(patientsData);
+      } else {
+        setPatients(prev => [...prev, ...patientsData]);
+      }
+      
+      setPatientsMetadata({
+        totalCount,
+        currentPage: page,
+        pageSize: 100,
+        hasMore
+      });
     } catch (err) {
       console.error('Error loading patients:', err);
+      if (reset || page === 1) {
+        setPatients([]);
+        setPatientsMetadata({
+          totalCount: 0,
+          currentPage: 1,
+          pageSize: 100,
+          hasMore: false
+        });
+      }
     } finally {
       setLoadingPatients(false);
     }
   }, [loadingPatients]);
 
+  const searchPatients = useCallback(async (
+    searchTerm: string, 
+    filters: any = {}, 
+    page: number = 1, 
+    reset: boolean = true
+  ) => {
+    if (loadingPatients) return;
+    
+    setLoadingPatients(true);
+    try {
+      const { patients: patientsData, totalCount, hasMore } = await patientService.search(
+        searchTerm, 
+        filters, 
+        page, 
+        100
+      );
+      
+      if (reset || page === 1) {
+        setPatients(patientsData);
+      } else {
+        setPatients(prev => [...prev, ...patientsData]);
+      }
+      
+      setPatientsMetadata({
+        totalCount,
+        currentPage: page,
+        pageSize: 100,
+        hasMore
+      });
+    } catch (err) {
+      console.error('Error searching patients:', err);
+      if (reset || page === 1) {
+        setPatients([]);
+        setPatientsMetadata({
+          totalCount: 0,
+          currentPage: 1,
+          pageSize: 100,
+          hasMore: false
+        });
+      }
+    } finally {
+      setLoadingPatients(false);
+    }
+  }, [loadingPatients]);
   const loadPractices = useCallback(async () => {
     if (loadingPractices) return;
     
@@ -234,6 +312,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     try {
       const newPatient = await patientService.create(patientData);
       setPatients(prev => [...prev, newPatient]);
+      setPatientsMetadata(prev => ({
+        ...prev,
+        totalCount: prev.totalCount + 1
+      }));
       return newPatient;
     } catch (err) {
       console.error('Error adding patient:', err);
@@ -255,6 +337,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
     try {
       await patientService.delete(id);
       setPatients(prev => prev.filter(p => p.id !== id));
+      setPatientsMetadata(prev => ({
+        ...prev,
+        totalCount: Math.max(0, prev.totalCount - 1)
+      }));
     } catch (err) {
       console.error('Error deleting patient:', err);
       throw err;
@@ -376,6 +462,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const value = {
     doctors,
     patients,
+    patientsMetadata,
     practices,
     prescriptions,
     socialWorks,
@@ -386,6 +473,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     loadingSocialWorks,
     loadDoctors,
     loadPatients,
+    searchPatients,
     loadPractices,
     loadPrescriptions,
     loadSocialWorks,
