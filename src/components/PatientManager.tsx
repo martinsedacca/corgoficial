@@ -76,9 +76,10 @@ export function PatientManager() {
   const [isSearching, setIsSearching] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [dniValidation, setDniValidation] = useState<{
-    isValid: boolean;
+    isChecking: boolean;
+    exists: boolean;
     message: string;
-  }>({ isValid: true, message: '' });
+  }>({ isChecking: false, exists: false, message: '' });
   const [selectedSocialWorkForForm, setSelectedSocialWorkForForm] = useState<any>(null);
   const [debouncedFilters, setDebouncedFilters] = useState({
     searchTerm: '',
@@ -98,6 +99,40 @@ export function PatientManager() {
     email: '',
     address: ''
   });
+
+  // Función para validar DNI
+  const validateDNI = async (dni: string) => {
+    if (editingPatient && editingPatient.dni === dni) {
+      setDniValidation({ isChecking: false, exists: false, message: '' });
+      return;
+    }
+
+    setDniValidation({ isChecking: true, exists: false, message: 'Verificando DNI...' });
+    
+    try {
+      const { data, error } = await supabase
+        .from('patients')
+        .select('id')
+        .eq('dni', dni)
+        .limit(1);
+
+      if (error) throw error;
+
+      const exists = data && data.length > 0;
+      setDniValidation({
+        isChecking: false,
+        exists,
+        message: exists ? 'Este DNI ya está registrado' : 'DNI disponible'
+      });
+    } catch (error) {
+      console.error('Error validating DNI:', error);
+      setDniValidation({
+        isChecking: false,
+        exists: false,
+        message: 'Error al verificar DNI'
+      });
+    }
+  };
 
   // Cargar pacientes cuando se monta el componente
   useEffect(() => {
@@ -272,6 +307,7 @@ export function PatientManager() {
       email: '',
       address: ''
     });
+    setDniValidation({ isChecking: false, exists: false, message: '' });
     setEditingPatient(null);
     setShowForm(false);
     setSelectedSocialWorkForForm(null);
@@ -338,11 +374,37 @@ export function PatientManager() {
                   onChange={(e) => {
                     const newDni = e.target.value.replace(/\D/g, '');
                     setFormData({...formData, dni: newDni});
+                    if (newDni.length >= 8) {
+                      validateDNI(newDni);
+                    } else if (newDni.length >= 4) {
+                      // Validar después de 2 segundos si tiene más de 4 caracteres
+                      setTimeout(() => {
+                        if (formData.dni === newDni && newDni.length >= 4) {
+                          validateDNI(newDni);
+                        }
+                      }, 2000);
+                    } else {
+                      setDniValidation({ isChecking: false, exists: false, message: '' });
+                    }
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 transition-colors ${
+                    dniValidation.exists
+                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50'
+                      : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                  }`}
                   placeholder="12345678"
                   pattern="[0-9]{4,}"
                 />
+                {dniValidation.message && (
+                  <div className={`mt-1 text-sm flex items-center gap-1 ${
+                    dniValidation.exists ? 'text-red-600' : 'text-blue-600'
+                  }`}>
+                    {dniValidation.isChecking && (
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
+                    )}
+                    <span>{dniValidation.message}</span>
+                  </div>
+                )}
               </div>
               <div>
                 <SocialWorkAutocomplete
