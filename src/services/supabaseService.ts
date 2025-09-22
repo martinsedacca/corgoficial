@@ -149,13 +149,35 @@ export const patientService = {
 
       // Aplicar filtros de búsqueda
       if (searchTerm) {
-        const searchTermLower = searchTerm.toLowerCase();
-        query = query.or(`name.ilike.%${searchTermLower}%,last_name.ilike.%${searchTermLower}%,dni.ilike.%${searchTermLower}%,social_work.ilike.%${searchTermLower}%,affiliate_number.ilike.%${searchTermLower}%`);
+        const searchTermLower = searchTerm.toLowerCase().trim();
+        const words = searchTermLower.split(/\s+/).filter(word => word.length > 0);
+        
+        if (words.length === 1) {
+          // Búsqueda de una sola palabra
+          const word = words[0];
+          query = query.or(`name.ilike.%${word}%,last_name.ilike.%${word}%,dni.ilike.%${word}%,social_work.ilike.%${word}%,affiliate_number.ilike.%${word}%`);
+        } else if (words.length > 1) {
+          // Búsqueda de múltiples palabras - cada palabra debe aparecer en algún campo
+          const conditions = words.map(word => 
+            `(name.ilike.%${word}% or last_name.ilike.%${word}% or dni.ilike.%${word}% or social_work.ilike.%${word}% or affiliate_number.ilike.%${word}%)`
+          ).join(' and ');
+          query = query.or(conditions);
+        }
       }
 
       if (filters.name) {
-        const nameLower = filters.name.toLowerCase();
-        query = query.or(`name.ilike.%${nameLower}%,last_name.ilike.%${nameLower}%`);
+        const nameLower = filters.name.toLowerCase().trim();
+        const nameWords = nameLower.split(/\s+/).filter(word => word.length > 0);
+        
+        if (nameWords.length === 1) {
+          const word = nameWords[0];
+          query = query.or(`name.ilike.%${word}%,last_name.ilike.%${word}%`);
+        } else if (nameWords.length > 1) {
+          const conditions = nameWords.map(word => 
+            `(name.ilike.%${word}% or last_name.ilike.%${word}%)`
+          ).join(' and ');
+          query = query.or(conditions);
+        }
       }
 
       if (filters.dni) {
@@ -224,11 +246,24 @@ export const patientService = {
       }
 
       // Búsqueda específica para autocomplete con límite reducido
-      const searchTermLower = searchTerm.toLowerCase();
-      const { data, error } = await supabase
-        .from('patients')
-        .select('*')
-        .or(`name.ilike.%${searchTermLower}%,last_name.ilike.%${searchTermLower}%,dni.ilike.%${searchTermLower}%`)
+      const searchTermLower = searchTerm.toLowerCase().trim();
+      const words = searchTermLower.split(/\s+/).filter(word => word.length > 0);
+      
+      let query = supabase.from('patients').select('*');
+      
+      if (words.length === 1) {
+        // Búsqueda de una sola palabra
+        const word = words[0];
+        query = query.or(`name.ilike.%${word}%,last_name.ilike.%${word}%,dni.ilike.%${word}%`);
+      } else if (words.length > 1) {
+        // Búsqueda de múltiples palabras - cada palabra debe aparecer en algún campo
+        const conditions = words.map(word => 
+          `(name.ilike.%${word}% or last_name.ilike.%${word}% or dni.ilike.%${word}%)`
+        ).join(' and ');
+        query = query.or(conditions);
+      }
+      
+      const { data, error } = await query
         .order('name', { ascending: true })
         .limit(limit);
       
