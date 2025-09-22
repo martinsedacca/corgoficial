@@ -264,7 +264,7 @@ export const patientService = {
         const wordConditions = words.map(word => 
           `or(name.ilike.%${word}%,last_name.ilike.%${word}%,dni.ilike.%${word}%,social_work.ilike.%${word}%,affiliate_number.ilike.%${word}%)`
         );
-        query = query.and(wordConditions.join(','));
+        query = query.filter('and', `(${wordConditions.join(',')})`);
       }
       
       const { data, error } = await query
