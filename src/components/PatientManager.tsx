@@ -3,6 +3,7 @@ import { useData } from '../contexts/DataContext';
 import { supabase } from '../lib/supabase';
 import { Patient } from '../types';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
+import { SocialWorkPlanSelector } from './SocialWorkPlanSelector';
 import { UserPlus, Edit3, Trash2, Users, Phone, Mail, MapPin, Search, Filter, X, AlertTriangle, Plus } from 'lucide-react';
 
 // Componente Skeleton para la lista de pacientes
