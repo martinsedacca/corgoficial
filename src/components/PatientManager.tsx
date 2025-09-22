@@ -156,9 +156,9 @@ export function PatientManager() {
     try {
       const { data, error } = await supabase
         .from('patients')
-        .select('id, name, last_name')
+        .select('id, name, last_name, social_work')
         .eq('dni', dni)
-        .limit(1);
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error checking DNI:', error);
@@ -167,16 +167,21 @@ export function PatientManager() {
       }
 
       if (data && data.length > 0) {
-        // Si estamos editando y el DNI pertenece al mismo paciente, está OK
-        if (editingPatient && data[0].id === editingPatient.id) {
-          setDniValidation({ isChecking: false, exists: false, message: '' });
-        } else {
-          const existingPatient = data[0];
+        // Filtrar pacientes que no sean el que estamos editando
+        const otherPatients = editingPatient 
+          ? data.filter(p => p.id !== editingPatient.id)
+          : data;
+        
+        if (otherPatients.length > 0) {
+          const count = otherPatients.length;
+          const firstPatient = otherPatients[0];
           setDniValidation({
             isChecking: false,
-            exists: true,
-            message: `DNI ya registrado para: ${existingPatient.name} ${existingPatient.last_name || ''}`
+            exists: false, // Cambiar a false ya que ahora es permitido
+            message: `${count} paciente${count > 1 ? 's' : ''} con este DNI: ${firstPatient.name} ${firstPatient.last_name || ''}${count > 1 ? ` y ${count - 1} más` : ''}`
           });
+        } else {
+          setDniValidation({ isChecking: false, exists: false, message: '' });
         }
       } else {
         setDniValidation({ isChecking: false, exists: false, message: '' });
@@ -193,7 +198,6 @@ export function PatientManager() {
       formData.name.trim() !== '' &&
       formData.lastName.trim() !== '' &&
       formData.dni.length >= 4 &&
-      !dniValidation.exists &&
       !dniValidation.isChecking &&
       formData.socialWork.trim() !== ''
     );
@@ -370,13 +374,11 @@ export function PatientManager() {
                     }
                   }}
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 transition-colors ${
-                    dniValidation.exists
-                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50'
-                      : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                    'border-gray-300 focus:ring-green-500 focus:border-green-500'
                   }`}
                   placeholder="12345678"
                   pattern="[0-9]{4,}"
-                />
+                        'text-blue-600'
                 {dniValidation.message && (
                   <div className={`mt-1 text-sm flex items-center gap-1 ${
                     dniValidation.exists ? 'text-red-600' : 'text-blue-600'

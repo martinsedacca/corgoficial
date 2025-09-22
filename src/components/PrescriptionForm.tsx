@@ -103,9 +103,9 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
     try {
       const { data, error } = await supabase
         .from('patients')
-        .select('id, name, last_name')
+        .select('id, name, last_name, social_work')
         .eq('dni', dni)
-        .limit(1);
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error checking DNI:', error);
@@ -114,11 +114,12 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       }
 
       if (data && data.length > 0) {
-        const existingPatient = data[0];
+        const count = data.length;
+        const firstPatient = data[0];
         setDniValidation({
           isChecking: false,
-          exists: true,
-          message: `DNI ya registrado para: ${existingPatient.name} ${existingPatient.last_name || ''}`
+          exists: false, // Cambiar a false ya que ahora es permitido
+          message: `${count} paciente${count > 1 ? 's' : ''} con este DNI: ${firstPatient.name} ${firstPatient.last_name || ''}${count > 1 ? ` y ${count - 1} más` : ''}`
         });
       } else {
         setDniValidation({ isChecking: false, exists: false, message: '' });
@@ -135,7 +136,6 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       newPatientData.name.trim() !== '' &&
       newPatientData.lastName.trim() !== '' &&
       newPatientData.dni.length >= 4 &&
-      !dniValidation.exists &&
       !dniValidation.isChecking &&
       newPatientData.socialWork.trim() !== ''
     );
@@ -514,16 +514,14 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                       }}
                       disabled={creatingPatient}
                       className={`w-full px-3 py-2 border rounded-lg focus:ring-2 transition-colors ${
-                        dniValidation.exists
-                          ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50'
-                          : 'border-gray-300 focus:ring-primary-500 focus:border-primary-500'
+                        'border-gray-300 focus:ring-primary-500 focus:border-primary-500'
                       }`}
                       placeholder="12345678"
                       pattern="[0-9]{4,}"
                     />
                     {dniValidation.message && (
                       <div className={`mt-1 text-sm flex items-center gap-1 ${
-                        dniValidation.exists ? 'text-red-600' : 'text-blue-600'
+                        'text-blue-600'
                       }`}>
                         {dniValidation.isChecking && (
                           <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
