@@ -107,7 +107,7 @@ export function Dashboard() {
 
     // Suscripción específica para el dashboard que actualiza automáticamente
     const dashboardSubscription = supabase
-      .channel('dashboard_updates')
+      .channel('dashboard:prescriptions')
       .on(
         'postgres_changes',
         {
@@ -117,8 +117,10 @@ export function Dashboard() {
         },
         (payload) => {
           console.log('Dashboard: Prescription change detected:', payload);
-          // Recargar datos del dashboard
-          loadPrescriptions();
+          // Recargar datos del dashboard con delay para asegurar consistencia
+          setTimeout(() => {
+            loadPrescriptions();
+          }, 200);
         }
       )
       .on(
@@ -130,8 +132,10 @@ export function Dashboard() {
         },
         (payload) => {
           console.log('Dashboard: Prescription items change detected:', payload);
-          // Recargar datos del dashboard
-          loadPrescriptions();
+          // Recargar datos del dashboard con delay
+          setTimeout(() => {
+            loadPrescriptions();
+          }, 200);
         }
       )
       .subscribe();

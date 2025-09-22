@@ -96,7 +96,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
 
     // Suscripción específica para el historial que actualiza la lista en tiempo real
     const historySubscription = supabase
-      .channel('prescription_history_updates')
+      .channel('history:prescriptions')
       .on(
         'postgres_changes',
         {
@@ -106,8 +106,10 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
         },
         (payload) => {
           console.log('History: Prescription change detected:', payload);
-          // Recargar prescripciones para mostrar cambios inmediatos
-          loadPrescriptions();
+          // Recargar prescripciones para mostrar cambios inmediatos con delay
+          setTimeout(() => {
+            loadPrescriptions();
+          }, 150);
         }
       )
       .on(
@@ -119,8 +121,10 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
         },
         (payload) => {
           console.log('History: Prescription items change detected:', payload);
-          // Recargar prescripciones cuando cambian los items
-          loadPrescriptions();
+          // Recargar prescripciones cuando cambian los items con delay
+          setTimeout(() => {
+            loadPrescriptions();
+          }, 150);
         }
       )
       .subscribe();

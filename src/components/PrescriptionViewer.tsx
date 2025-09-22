@@ -30,11 +30,11 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
   // Configurar suscripción en tiempo real para esta receta específica
   useEffect(() => {
-    console.log('Setting up prescription viewer realtime subscription...');
+    console.log('Setting up prescription viewer realtime subscription for:', prescription.id);
 
     // Suscripción específica para cambios en esta receta
     const viewerSubscription = supabase
-      .channel(`prescription_viewer_${prescription.id}`)
+      .channel(`viewer:prescription:${prescription.id}`)
       .on(
         'postgres_changes',
         {
@@ -45,8 +45,10 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
         },
         (payload) => {
           console.log('Viewer: Prescription update detected:', payload);
-          // Recargar prescripciones para actualizar la vista
-          loadPrescriptions();
+          // Recargar prescripciones para actualizar la vista con delay
+          setTimeout(() => {
+            loadPrescriptions();
+          }, 100);
         }
       )
       .subscribe();

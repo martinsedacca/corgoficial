@@ -60,11 +60,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user) return;
 
-    console.log('Setting up realtime subscriptions...');
+    console.log('Setting up realtime subscriptions for user:', user.id);
 
     // Suscripción a cambios en prescriptions
     const prescriptionsSubscription = supabase
-      .channel('prescriptions_changes')
+      .channel('public:prescriptions')
       .on(
         'postgres_changes',
         {
@@ -74,15 +74,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
         },
         (payload) => {
           console.log('Prescription change detected:', payload);
-          // Recargar prescripciones cuando hay cambios
-          loadPrescriptions();
+          // Recargar prescripciones inmediatamente
+          setTimeout(() => {
+            loadPrescriptions();
+          }, 100);
         }
       )
       .subscribe();
 
     // Suscripción a cambios en prescription_items
     const prescriptionItemsSubscription = supabase
-      .channel('prescription_items_changes')
+      .channel('public:prescription_items')
       .on(
         'postgres_changes',
         {
@@ -92,15 +94,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
         },
         (payload) => {
           console.log('Prescription items change detected:', payload);
-          // Recargar prescripciones cuando hay cambios en los items
-          loadPrescriptions();
+          // Recargar prescripciones inmediatamente
+          setTimeout(() => {
+            loadPrescriptions();
+          }, 100);
         }
       )
       .subscribe();
 
     // Suscripción a cambios en doctors
     const doctorsSubscription = supabase
-      .channel('doctors_changes')
+      .channel('public:doctors')
       .on(
         'postgres_changes',
         {
@@ -110,14 +114,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
         },
         (payload) => {
           console.log('Doctor change detected:', payload);
-          loadDoctors();
+          setTimeout(() => {
+            loadDoctors();
+          }, 100);
         }
       )
       .subscribe();
 
     // Suscripción a cambios en patients
     const patientsSubscription = supabase
-      .channel('patients_changes')
+      .channel('public:patients')
       .on(
         'postgres_changes',
         {
@@ -127,14 +133,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
         },
         (payload) => {
           console.log('Patient change detected:', payload);
-          loadPatients();
+          setTimeout(() => {
+            loadPatients();
+          }, 100);
         }
       )
       .subscribe();
 
     // Suscripción a cambios en practices
     const practicesSubscription = supabase
-      .channel('practices_changes')
+      .channel('public:practices')
       .on(
         'postgres_changes',
         {
@@ -144,14 +152,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
         },
         (payload) => {
           console.log('Practice change detected:', payload);
-          loadPractices();
+          setTimeout(() => {
+            loadPractices();
+          }, 100);
         }
       )
       .subscribe();
 
     // Suscripción a cambios en social_works
     const socialWorksSubscription = supabase
-      .channel('social_works_changes')
+      .channel('public:social_works')
       .on(
         'postgres_changes',
         {
@@ -161,7 +171,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         },
         (payload) => {
           console.log('Social work change detected:', payload);
-          loadSocialWorks();
+          setTimeout(() => {
+            loadSocialWorks();
+          }, 100);
         }
       )
       .subscribe();
