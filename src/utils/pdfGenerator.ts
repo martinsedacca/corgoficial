@@ -259,8 +259,24 @@ export const generatePrescriptionPDF_A5 = async (prescription: Prescription): Pr
     // Agregar la receta ocupando toda la hoja A5
     pdf.addImage(imgData, 'PNG', 2, yOffset, imgWidth, Math.min(imgHeight, pdfHeight));
 
-    // Descargar el PDF
-    pdf.save(`Receta_A5_${prescription.number}_${prescription.patient.name}_${prescription.patient.lastName}`.replace(/\s+/g, '_') + '.pdf');
+    // Abrir en nueva ventana para imprimir directamente
+    const pdfBlob = pdf.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    
+    const printWindow = window.open(pdfUrl, '_blank');
+    if (printWindow) {
+      printWindow.onload = () => {
+        printWindow.print();
+        // Limpiar la URL después de un tiempo
+        setTimeout(() => {
+          URL.revokeObjectURL(pdfUrl);
+        }, 1000);
+      };
+    } else {
+      // Fallback: descargar si no se puede abrir ventana
+      pdf.save(`Receta_A5_${prescription.number}_${prescription.patient.name}_${prescription.patient.lastName}.pdf`);
+      URL.revokeObjectURL(pdfUrl);
+    }
 
   } catch (error) {
     console.error('Error generando PDF A5:', error);
@@ -807,25 +823,6 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     pdf.setDrawColor(200, 200, 200);
     pdf.setLineDashPattern([2, 2], 0);
     pdf.line(pdfWidth / 2, 0, pdfWidth / 2, pdfHeight);
-
-    // Abrir en nueva ventana para imprimir directamente
-    const pdfBlob = pdf.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    
-    const printWindow = window.open(pdfUrl, '_blank');
-    if (printWindow) {
-      printWindow.onload = () => {
-        printWindow.print();
-        // Limpiar la URL después de un tiempo
-        setTimeout(() => {
-          URL.revokeObjectURL(pdfUrl);
-        }, 1000);
-      };
-    } else {
-      // Fallback: descargar si no se puede abrir ventana
-      pdf.save(`Receta_${prescription.number}_${prescription.patient.name}_${prescription.patient.lastName}.pdf`);
-      URL.revokeObjectURL(pdfUrl);
-    }
 
     // Descargar el PDF
     pdf.save(`Receta_${prescription.number}_${prescription.patient.name}_${prescription.patient.lastName}`.replace(/\s+/g, '_') + '.pdf');
