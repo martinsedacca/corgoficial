@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
+import { useAuth } from '../contexts/AuthContext';
 import { usePrintConfig } from '../contexts/PrintConfigContext';
 import { Prescription } from '../types';
 import { PrescriptionForm } from './PrescriptionForm';
