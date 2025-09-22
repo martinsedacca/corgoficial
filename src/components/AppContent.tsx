@@ -103,7 +103,7 @@ export function AppContent() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Notification Banner */}
-      {hasAnyNotification && (
+      {!isDoctor && hasAnyNotification && (
         <NotificationBanner
           hasNewPrescriptions={notifications.hasNewPrescriptions}
           hasUpdatedPrescriptions={notifications.hasUpdatedPrescriptions}
@@ -117,7 +117,7 @@ export function AppContent() {
       )}
 
       {/* Header */}
-      <div className={`bg-white shadow-sm border-b transition-all duration-300 ${hasAnyNotification ? 'mt-16' : ''}`}>
+      <div className={`bg-white shadow-sm border-b transition-all duration-300 ${!isDoctor && hasAnyNotification ? 'mt-16' : ''}`}>
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between py-3 sm:h-16">
             <div className="flex items-center space-x-2 sm:space-x-4">
