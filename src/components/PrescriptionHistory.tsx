@@ -6,9 +6,9 @@ import { usePrintConfig } from '../contexts/PrintConfigContext';
 import { Prescription } from '../types';
 import { PrescriptionForm } from './PrescriptionForm';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
-import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X, Printer, Clock, CheckCircle } from 'lucide-react';
+import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X, Printer, Clock, CheckCircle, Square, CheckSquare } from 'lucide-react';
 import { Download } from 'lucide-react';
-import { printPrescriptionPDF, printPrescriptionPDF_A5 } from '../utils/pdfGenerator';
+import { printPrescriptionPDF, printPrescriptionPDF_A5, generateMultiplePrescriptionsPDF } from '../utils/pdfGenerator';
 import { generateStatisticsReport } from '../utils/reportGenerator';
 import { AlertTriangle } from 'lucide-react';
 import { DateRangePicker } from './DateRangePicker';
@@ -70,6 +70,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   const { prescriptions, updatePrescriptionAuthorization, loadingPrescriptions, loadPrescriptions, loadSocialWorks } = useData();
   const { isDoctor, hasPermission } = useAuth();
   const { printFormat } = usePrintConfig();
+  const [selectedPrescriptions, setSelectedPrescriptions] = useState<Set<string>>(new Set());
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -282,6 +283,47 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     }));
   };
 
+  const handleSelectPrescription = (prescriptionId: string) => {
+    setSelectedPrescriptions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(prescriptionId)) {
+        newSet.delete(prescriptionId);
+      } else {
+        newSet.add(prescriptionId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedPrescriptions.size === filteredPrescriptions.length) {
+      // Si todas están seleccionadas, deseleccionar todas
+      setSelectedPrescriptions(new Set());
+    } else {
+      // Seleccionar todas las visibles
+      setSelectedPrescriptions(new Set(filteredPrescriptions.map(p => p.id)));
+    }
+  };
+
+  const handleBatchPrint = async () => {
+    if (selectedPrescriptions.size === 0) {
+      setErrorMessage('Debe seleccionar al menos una receta para imprimir en lote.');
+      setShowErrorModal(true);
+      return;
+    }
+
+    try {
+      const prescriptionsToProcess = filteredPrescriptions.filter(p => selectedPrescriptions.has(p.id));
+      await generateMultiplePrescriptionsPDF(prescriptionsToProcess);
+      // Limpiar selección después de imprimir
+      setSelectedPrescriptions(new Set());
+    } catch (error) {
+      console.error('Error al imprimir lote:', error);
+      setErrorMessage('Error al generar el PDF en lote. Por favor, intente nuevamente.');
+      setShowErrorModal(true);
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
       <div className="flex items-center justify-between mb-6">
@@ -292,6 +334,38 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           </h2>
         </div>
         <div className="flex gap-2">
+          {/* Botones de selección en lote - Solo para formato A4 */}
+          {printFormat === 'A4' && (
+            <>
+              <button
+                onClick={handleSelectAll}
+                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
+                title={selectedPrescriptions.size === filteredPrescriptions.length ? 'Deseleccionar todas' : 'Seleccionar todas'}
+              >
+                {selectedPrescriptions.size === filteredPrescriptions.length ? (
+                  <CheckSquare className="h-4 w-4" />
+                ) : (
+                  <Square className="h-4 w-4" />
+                )}
+                <span className="hidden sm:inline">
+                  {selectedPrescriptions.size === filteredPrescriptions.length ? 'Deseleccionar' : 'Seleccionar'} Todas
+                </span>
+                <span className="sm:hidden">Todas</span>
+              </button>
+              
+              {selectedPrescriptions.size > 0 && (
+                <button
+                  onClick={handleBatchPrint}
+                  className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base"
+                >
+                  <Printer className="h-4 w-4" />
+                  <span className="hidden sm:inline">Imprimir Lote ({selectedPrescriptions.size})</span>
+                  <span className="sm:hidden">Lote ({selectedPrescriptions.size})</span>
+                </button>
+              )}
+            </>
+          )}
+          
           <button
             onClick={handleGenerateReport}
             className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
@@ -626,6 +700,24 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
               })()}`}
             >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                {/* Checkbox para selección en lote - Solo para formato A4 */}
+                {printFormat === 'A4' && (
+                  <div className="flex items-center">
+                    <button
+                      type="button"
+                      onClick={() => handleSelectPrescription(prescription.id)}
+                      className="mr-3 p-1 rounded hover:bg-gray-100 transition-colors"
+                      title={selectedPrescriptions.has(prescription.id) ? 'Deseleccionar receta' : 'Seleccionar receta'}
+                    >
+                      {selectedPrescriptions.has(prescription.id) ? (
+                        <CheckSquare className="h-5 w-5 text-blue-600" />
+                      ) : (
+                        <Square className="h-5 w-5 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
+                )}
+                
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-2">
                     <div className="text-base sm:text-lg font-semibold text-primary-700">
