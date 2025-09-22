@@ -3,7 +3,7 @@ import { useData } from '../contexts/DataContext';
 import { supabase } from '../lib/supabase';
 import { Patient } from '../types';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
-import { UserPlus, Edit3, Trash2, Users, Phone, Mail, MapPin, Search, Filter, X, AlertTriangle } from 'lucide-react';
+import { UserPlus, Edit3, Trash2, Users, Phone, Mail, MapPin, Search, Filter, X, AlertTriangle, Plus } from 'lucide-react';
 
 // Componente Skeleton para la lista de pacientes
 const SkeletonPatientCard = () => (
@@ -47,7 +47,16 @@ const SkeletonPatientCard = () => (
 );
 
 export function PatientManager() {
-  const { patients, addPatient, updatePatient, deletePatient, loadingPatients, loadPatients } = useData();
+  const { 
+    patients, 
+    patientsMetadata,
+    addPatient, 
+    updatePatient, 
+    deletePatient, 
+    loadingPatients, 
+    loadPatients,
+    searchPatients
+  } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -60,6 +69,8 @@ export function PatientManager() {
   const [filterSocialWork, setFilterSocialWork] = useState('');
   const [filterAffiliateNumber, setFilterAffiliateNumber] = useState('');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [dniValidation, setDniValidation] = useState<{
     isChecking: boolean;
     exists: boolean;
@@ -79,8 +90,59 @@ export function PatientManager() {
 
   // Cargar pacientes cuando se monta el componente
   useEffect(() => {
-    loadPatients();
+    loadPatients(1, true);
   }, []);
+
+  // Función para buscar pacientes con debounce
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleSearch();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, filterName, filterDNI, filterSocialWork, filterAffiliateNumber]);
+
+  const handleSearch = async () => {
+    const hasFilters = searchTerm || filterName || filterDNI || filterSocialWork || filterAffiliateNumber;
+    
+    if (hasFilters) {
+      setIsSearching(true);
+      const filters = {
+        name: filterName,
+        dni: filterDNI,
+        socialWork: filterSocialWork,
+        affiliateNumber: filterAffiliateNumber
+      };
+      await searchPatients(searchTerm, filters, 1, true);
+      setIsSearching(false);
+    } else {
+      // Si no hay filtros, cargar todos los pacientes
+      await loadPatients(1, true);
+    }
+  };
+
+  const handleLoadMore = async () => {
+    if (loadingMore || !patientsMetadata.hasMore) return;
+    
+    setLoadingMore(true);
+    const nextPage = patientsMetadata.currentPage + 1;
+    
+    const hasFilters = searchTerm || filterName || filterDNI || filterSocialWork || filterAffiliateNumber;
+    
+    if (hasFilters) {
+      const filters = {
+        name: filterName,
+        dni: filterDNI,
+        socialWork: filterSocialWork,
+        affiliateNumber: filterAffiliateNumber
+      };
+      await searchPatients(searchTerm, filters, nextPage, false);
+    } else {
+      await loadPatients(nextPage, false);
+    }
+    
+    setLoadingMore(false);
+  };
 
   // Validar DNI en tiempo real
   const validateDNI = async (dni: string) => {
@@ -137,31 +199,8 @@ export function PatientManager() {
     );
   };
 
-  // Filtrar pacientes
-  const filteredPatients = patients.filter(patient => {
-    const fullName = `${patient.name} ${patient.lastName}`.toLowerCase();
-    
-    // Búsqueda general
-    const matchesSearch = !searchTerm || 
-      fullName.includes(searchTerm.toLowerCase()) ||
-      patient.dni.includes(searchTerm) ||
-      patient.socialWork.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (patient.affiliateNumber && patient.affiliateNumber.includes(searchTerm));
-    
-    // Filtros específicos
-    const matchesName = !filterName || fullName.includes(filterName.toLowerCase());
-    const matchesDNI = !filterDNI || patient.dni.includes(filterDNI);
-    const matchesSocialWork = !filterSocialWork || 
-      patient.socialWork.toLowerCase().includes(filterSocialWork.toLowerCase());
-    const matchesAffiliateNumber = !filterAffiliateNumber || 
-      (patient.affiliateNumber && patient.affiliateNumber.includes(filterAffiliateNumber));
-    
-    return matchesSearch && matchesName && matchesDNI && matchesSocialWork && matchesAffiliateNumber;
-  }).sort((a, b) => {
-    const fullNameA = `${a.name} ${a.lastName}`.trim();
-    const fullNameB = `${b.name} ${b.lastName}`.trim();
-    return fullNameA.localeCompare(fullNameB, 'es', { sensitivity: 'base' });
-  });
+  // Los pacientes ya vienen filtrados y ordenados desde el servidor
+  const filteredPatients = patients;
 
   const clearAllFilters = () => {
     setSearchTerm('');
@@ -169,6 +208,8 @@ export function PatientManager() {
     setFilterDNI('');
     setFilterSocialWork('');
     setFilterAffiliateNumber('');
+    // Recargar la primera página sin filtros
+    loadPatients(1, true);
   };
 
   const hasActiveFilters = searchTerm || filterName || filterDNI || filterSocialWork || filterAffiliateNumber;
@@ -435,6 +476,28 @@ export function PatientManager() {
 
       {/* Filtros de búsqueda */}
       <div className="mb-6">
+        {/* Información de paginación */}
+        <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="text-sm text-blue-800">
+              <span className="font-medium">
+                Mostrando {patients.length} de {patientsMetadata.totalCount.toLocaleString()} pacientes
+              </span>
+              {patientsMetadata.currentPage > 1 && (
+                <span className="ml-2">
+                  (Página {patientsMetadata.currentPage})
+                </span>
+              )}
+            </div>
+            {(isSearching || loadingPatients) && (
+              <div className="flex items-center gap-2 text-sm text-blue-600">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                <span>{isSearching ? 'Buscando...' : 'Cargando...'}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Búsqueda principal */}
         <div className="flex flex-col sm:flex-row gap-4 mb-4">
           <div className="flex-1">
@@ -445,6 +508,7 @@ export function PatientManager() {
                 placeholder="Búsqueda general (nombre, DNI, obra social, afiliado)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                disabled={loadingPatients}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
             </div>
@@ -488,6 +552,7 @@ export function PatientManager() {
                   placeholder="Ej: Juan Pérez"
                   value={filterName}
                   onChange={(e) => setFilterName(e.target.value)}
+                  disabled={loadingPatients}
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 />
               </div>
@@ -500,6 +565,7 @@ export function PatientManager() {
                   placeholder="Ej: 12345678"
                   value={filterDNI}
                   onChange={(e) => setFilterDNI(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                  disabled={loadingPatients}
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   maxLength={8}
                 />
@@ -511,6 +577,7 @@ export function PatientManager() {
                 <SocialWorkAutocomplete
                   value={filterSocialWork}
                   onChange={(value) => setFilterSocialWork(value)}
+                  disabled={loadingPatients}
                   placeholder="Ej: OSDE, IOMA"
                   label=""
                 />
@@ -524,6 +591,7 @@ export function PatientManager() {
                   placeholder="Ej: 123456789"
                   value={filterAffiliateNumber}
                   onChange={(e) => setFilterAffiliateNumber(e.target.value)}
+                  disabled={loadingPatients}
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                 />
               </div>
@@ -532,7 +600,7 @@ export function PatientManager() {
         )}
       </div>
       <div className="grid gap-4">
-        {loadingPatients ? (
+        {loadingPatients && patients.length === 0 ? (
           // Mostrar skeletons mientras carga
           [...Array(5)].map((_, index) => (
             <SkeletonPatientCard key={index} />
@@ -541,12 +609,12 @@ export function PatientManager() {
           <div className="text-center py-12">
             <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">
-              {patients.length === 0 
+              {patientsMetadata.totalCount === 0 
                 ? 'No hay pacientes registrados'
                 : 'No se encontraron pacientes con los filtros aplicados'
               }
             </p>
-            {hasActiveFilters && patients.length > 0 && (
+            {hasActiveFilters && patientsMetadata.totalCount > 0 && (
               <p className="text-gray-400 mt-2">
                 Intente ajustar los filtros de búsqueda
               </p>
@@ -617,15 +685,29 @@ export function PatientManager() {
         )}
       </div>
 
-      {/* Contador de resultados */}
-      {filteredPatients.length > 0 && (
-        <div className="mt-6 text-center text-sm text-gray-500">
-          Mostrando {filteredPatients.length} de {patients.length} pacientes
-          {hasActiveFilters && (
-            <span className="ml-2 text-green-600">
-              (filtrados)
-            </span>
-          )}
+      {/* Botón para cargar más */}
+      {patientsMetadata.hasMore && (
+        <div className="mt-6 text-center">
+          <button
+            onClick={handleLoadMore}
+            disabled={loadingMore}
+            className="flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed mx-auto"
+          >
+            {loadingMore ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Cargando más...
+              </>
+            ) : (
+              <>
+                <Plus className="h-4 w-4" />
+                Cargar más pacientes
+              </>
+            )}
+          </button>
+          <p className="text-sm text-gray-500 mt-2">
+            Mostrando {patients.length} de {patientsMetadata.totalCount.toLocaleString()} pacientes
+          </p>
         </div>
       )}
 

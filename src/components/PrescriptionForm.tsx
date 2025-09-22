@@ -63,7 +63,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   // Cargar datos necesarios para el formulario
   useEffect(() => {
     loadDoctors();
-    loadPatients();
+    loadPatients(1, true);
     loadPractices();
   }, []);
 

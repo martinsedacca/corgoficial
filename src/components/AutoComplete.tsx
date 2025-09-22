@@ -15,9 +15,10 @@ interface AutoCompleteProps {
   label: string;
   onCreateNew?: (value: string) => void;
   createNewLabel?: string;
+  disabled?: boolean;
 }
 
-export function AutoComplete({ options, value, onChange, placeholder, label, onCreateNew, createNewLabel }: AutoCompleteProps) {
+export function AutoComplete({ options, value, onChange, placeholder, label, onCreateNew, createNewLabel, disabled = false }: AutoCompleteProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -63,14 +64,15 @@ export function AutoComplete({ options, value, onChange, placeholder, label, onC
           value={value}
           onChange={handleInputChange}
           onFocus={() => setIsOpen(true)}
+          disabled={disabled}
           placeholder={placeholder}
-          className="w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          className="w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          className="w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
         />
         <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
+          disabled={disabled}
           className="absolute right-3 top-2.5 h-4 w-4 text-gray-400 hover:text-gray-600"
         >
           <ChevronDown className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
