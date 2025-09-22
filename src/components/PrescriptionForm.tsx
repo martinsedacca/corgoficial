@@ -4,7 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { AutoComplete } from './AutoComplete';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
-import { PrescriptionItem, Doctor, Patient, Practice, Prescription } from '../types';
+import { SocialWorkPlanSelector } from './SocialWorkPlanSelector';
+import { PrescriptionItem, Doctor, Patient, Practice, Prescription, SocialWork } from '../types';
 import { Plus, Trash2, FileText, Save, X, AlertTriangle } from 'lucide-react';
 
 interface PrescriptionFormProps {
@@ -16,11 +17,13 @@ interface PrescriptionFormProps {
 export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: PrescriptionFormProps) {
   const { 
     doctors, 
+    socialWorks,
     practices, 
     loadingDoctors,
     loadingPractices,
     loadDoctors,
     loadPractices,
+    loadSocialWorkPlans,
     searchPatientsForAutocomplete,
     getNextPrescriptionNumber, 
     addPrescription, 
@@ -29,6 +32,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   } = useData();
   const { profile, isDoctor } = useAuth();
   const [showPatientForm, setShowPatientForm] = useState(false);
+  const [selectedSocialWorkForNewPatient, setSelectedSocialWorkForNewPatient] = useState<SocialWork | null>(null);
   const [dniValidation, setDniValidation] = useState<{
     isChecking: boolean;
     exists: boolean;
@@ -63,6 +67,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   useEffect(() => {
     loadDoctors();
     loadPractices();
+    loadSocialWorkPlans();
   }, []);
 
   // Función para buscar pacientes en el autocomplete
@@ -212,6 +217,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       // Solo una palabra, va al nombre
       setNewPatientData({ ...newPatientData, name: name.trim(), lastName: '' });
     }
+    setSelectedSocialWorkForNewPatient(null);
     setShowPatientForm(true);
   };
 

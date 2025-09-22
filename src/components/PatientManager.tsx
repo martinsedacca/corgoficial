@@ -414,8 +414,20 @@ export function PatientManager() {
               <div>
                 <SocialWorkAutocomplete
                   value={formData.socialWork}
-                  onChange={(value) => setFormData({...formData, socialWork: value})}
+                  onChange={(value) => {
+                    setFormData({...formData, socialWork: value, plan: ''});
+                    const socialWork = socialWorks.find(sw => sw.name === value);
+                    setSelectedSocialWorkForForm(socialWork || null);
+                  }}
                   required
+                />
+              </div>
+              <div>
+                <SocialWorkPlanSelector
+                  selectedSocialWork={selectedSocialWorkForForm}
+                  value={formData.plan}
+                  onChange={(value) => setFormData({...formData, plan: value})}
+                  placeholder="Seleccionar plan..."
                 />
               </div>
               <div>
@@ -428,18 +440,6 @@ export function PatientManager() {
                   onChange={(e) => setFormData({...formData, affiliateNumber: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="123456789"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Plan
-                </label>
-                <input
-                  type="text"
-                  value={formData.plan}
-                  onChange={(e) => setFormData({...formData, plan: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  placeholder="Plan 210, Plan Premium, etc."
                 />
               </div>
               <div>

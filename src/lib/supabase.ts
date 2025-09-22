@@ -270,6 +270,38 @@ export interface Database {
           updated_at?: string;
         };
       };
+      social_work_plans: {
+        Row: {
+          id: string;
+          social_work_id: string;
+          name: string;
+          code: string | null;
+          description: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          social_work_id: string;
+          name: string;
+          code?: string | null;
+          description?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          social_work_id?: string;
+          name?: string;
+          code?: string | null;
+          description?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
     Functions: {
       get_next_prescription_number: {

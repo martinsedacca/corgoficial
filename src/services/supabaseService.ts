@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { Doctor, Patient, Practice, Prescription, PrescriptionItem, SocialWork } from '../types';
+import { Doctor, Patient, Practice, Prescription, PrescriptionItem, SocialWork, SocialWorkPlan } from '../types';
 
 // Servicios para Médicos
 export const doctorService = {
@@ -735,6 +735,136 @@ export const socialWorkService = {
   async delete(id: string): Promise<void> {
     const { error } = await supabase
       .from('social_works')
+      .delete()
+      .eq('id', id);
+    
+    if (error) throw error;
+  }
+};
+
+// Servicios para Planes de Obras Sociales
+export const socialWorkPlanService = {
+  async getAll(): Promise<SocialWorkPlan[]> {
+    try {
+      // Check if Supabase is properly configured
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        console.warn('Supabase not configured, returning empty social work plans array');
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('social_work_plans')
+        .select('*')
+        .eq('is_active', true)
+        .order('name', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching social work plans:', error);
+        return [];
+      }
+      
+      return data.map(plan => ({
+        id: plan.id,
+        socialWorkId: plan.social_work_id,
+        name: plan.name,
+        code: plan.code,
+        description: plan.description,
+        isActive: plan.is_active
+      }));
+    } catch (error) {
+      console.error('Network error fetching social work plans:', error);
+      return [];
+    }
+  },
+
+  async getBySocialWork(socialWorkId: string): Promise<SocialWorkPlan[]> {
+    try {
+      // Check if Supabase is properly configured
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        console.warn('Supabase not configured, returning empty social work plans array');
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('social_work_plans')
+        .select('*')
+        .eq('social_work_id', socialWorkId)
+        .eq('is_active', true)
+        .order('name', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching social work plans by social work:', error);
+        return [];
+      }
+      
+      return data.map(plan => ({
+        id: plan.id,
+        socialWorkId: plan.social_work_id,
+        name: plan.name,
+        code: plan.code,
+        description: plan.description,
+        isActive: plan.is_active
+      }));
+    } catch (error) {
+      console.error('Network error fetching social work plans by social work:', error);
+      return [];
+    }
+  },
+
+  async create(plan: Omit<SocialWorkPlan, 'id'>): Promise<SocialWorkPlan> {
+    const { data, error } = await supabase
+      .from('social_work_plans')
+      .insert({
+        social_work_id: plan.socialWorkId,
+        name: plan.name,
+        code: plan.code || null,
+        description: plan.description || null,
+        is_active: plan.isActive
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return {
+      id: data.id,
+      socialWorkId: data.social_work_id,
+      name: data.name,
+      code: data.code,
+      description: data.description,
+      isActive: data.is_active
+    };
+  },
+
+  async update(id: string, updates: Partial<SocialWorkPlan>): Promise<SocialWorkPlan> {
+    const { data, error } = await supabase
+      .from('social_work_plans')
+      .update({
+        social_work_id: updates.socialWorkId,
+        name: updates.name,
+        code: updates.code || null,
+        description: updates.description || null,
+        is_active: updates.isActive
+      })
+      .eq('id', id)
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    return {
+      id: data.id,
+      socialWorkId: data.social_work_id,
+      name: data.name,
+      code: data.code,
+      description: data.description,
+      isActive: data.is_active
+    };
+  },
+
+  async delete(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('social_work_plans')
       .delete()
       .eq('id', id);
     

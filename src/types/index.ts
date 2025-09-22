@@ -70,3 +70,12 @@ export interface SocialWork {
   code?: string;
   description?: string;
 }
+
+export interface SocialWorkPlan {
+  id: string;
+  socialWorkId: string;
+  name: string;
+  code?: string;
+  description?: string;
+  isActive: boolean;
+}
