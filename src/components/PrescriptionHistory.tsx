@@ -334,38 +334,6 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           </h2>
         </div>
         <div className="flex gap-2">
-          {/* Botones de selección en lote - Solo para formato A4 */}
-          {printFormat === 'A4' && (
-            <>
-              <button
-                onClick={handleSelectAll}
-                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
-                title={selectedPrescriptions.size === filteredPrescriptions.length ? 'Deseleccionar todas' : 'Seleccionar todas'}
-              >
-                {selectedPrescriptions.size === filteredPrescriptions.length ? (
-                  <CheckSquare className="h-4 w-4" />
-                ) : (
-                  <Square className="h-4 w-4" />
-                )}
-                <span className="hidden sm:inline">
-                  {selectedPrescriptions.size === filteredPrescriptions.length ? 'Deseleccionar' : 'Seleccionar'} Todas
-                </span>
-                <span className="sm:hidden">Todas</span>
-              </button>
-              
-              {selectedPrescriptions.size > 0 && (
-                <button
-                  onClick={handleBatchPrint}
-                  className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm sm:text-base"
-                >
-                  <Printer className="h-4 w-4" />
-                  <span className="hidden sm:inline">Imprimir Lote ({selectedPrescriptions.size})</span>
-                  <span className="sm:hidden">Lote ({selectedPrescriptions.size})</span>
-                </button>
-              )}
-            </>
-          )}
-          
           <button
             onClick={handleGenerateReport}
             className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
@@ -881,6 +849,35 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
             <span className="ml-2 text-primary-600">
               (filtradas)
             </span>
+          )}
+        </div>
+      )}
+
+      {/* Controles de selección en lote - Solo para formato A4 */}
+      {printFormat === 'A4' && filteredPrescriptions.length > 0 && (
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={selectedPrescriptions.size === filteredPrescriptions.length && filteredPrescriptions.length > 0}
+                onChange={handleSelectAll}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              />
+              <span className="text-sm text-gray-700">
+                Seleccionar todas ({filteredPrescriptions.length})
+              </span>
+            </label>
+          </div>
+          
+          {selectedPrescriptions.size > 0 && (
+            <button
+              onClick={handleBatchPrint}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+            >
+              <Printer className="h-4 w-4" />
+              Imprimir Lote ({selectedPrescriptions.size})
+            </button>
           )}
         </div>
       )}
