@@ -172,9 +172,9 @@ export function AutoComplete({
                   key={option.id}
                   type="button"
                   onClick={() => handleSelect(option)}
-                  className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 text-sm"
+                  className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 text-sm leading-relaxed"
                 >
-                  <div className="font-medium">{option.label}</div>
+                  <div className="font-medium break-words">{option.label}</div>
                 </button>
               ))}
               {onSearch && hasSearched && searchResults.length > 0 && (

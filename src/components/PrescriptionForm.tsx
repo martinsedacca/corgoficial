@@ -71,7 +71,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       const patients = await searchPatientsForAutocomplete(searchTerm);
       return patients.map(patient => ({
         id: patient.id,
-        label: `${patient.name} ${patient.lastName} - DNI: ${patient.dni}`,
+        label: `${patient.name} ${patient.lastName} - DNI: ${patient.dni} - ${patient.socialWork}${patient.plan ? ` (${patient.plan})` : ''}`,
         value: patient
       }));
     } catch (error) {
@@ -162,7 +162,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       setSelectedPatient(editingPrescription.patient);
       setPrescriptionType(editingPrescription.type);
       setDoctorSearch(editingPrescription.doctor.name);
-      setPatientSearch(`${editingPrescription.patient.name} ${editingPrescription.patient.lastName} - DNI: ${editingPrescription.patient.dni}`);
+      setPatientSearch(`${editingPrescription.patient.name} ${editingPrescription.patient.lastName} - DNI: ${editingPrescription.patient.dni} - ${editingPrescription.patient.socialWork}${editingPrescription.patient.plan ? ` (${editingPrescription.patient.plan})` : ''}`);
       setAdditionalNotes(editingPrescription.additionalNotes || '');
       
       // Configurar prácticas seleccionadas
@@ -233,7 +233,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       
       // Seleccionar el paciente creado directamente
       setSelectedPatient(createdPatient);
-      setPatientSearch(`${createdPatient.name} ${createdPatient.lastName} - DNI: ${createdPatient.dni}`);
+      setPatientSearch(`${createdPatient.name} ${createdPatient.lastName} - DNI: ${createdPatient.dni} - ${createdPatient.socialWork}${createdPatient.plan ? ` (${createdPatient.plan})` : ''}`);
       
       // Limpiar formulario y cerrar después de un tiempo más corto
       setTimeout(() => {
