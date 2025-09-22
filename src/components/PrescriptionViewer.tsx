@@ -3,8 +3,9 @@ import { useState, useMemo } from 'react';
 import { Prescription } from '../types';
 import { companyInfo } from '../data/mockData';
 import { useData } from '../contexts/DataContext';
+import { usePrintConfig } from '../contexts/PrintConfigContext';
 import { Calendar, User, Stethoscope, FileText, Download, Printer, Clock, CheckCircle } from 'lucide-react';
-import { generatePrescriptionPDF, printPrescriptionPDF } from '../utils/pdfGenerator';
+import { generatePrescriptionPDF, printPrescriptionPDF, generatePrescriptionPDF_A5, printPrescriptionPDF_A5 } from '../utils/pdfGenerator';
 import { AlertTriangle } from 'lucide-react';
 
 interface PrescriptionViewerProps {
@@ -13,6 +14,7 @@ interface PrescriptionViewerProps {
 
 export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
   const { updatePrescriptionAuthorization, prescriptions } = useData();
+  const { printFormat } = usePrintConfig();
   const [showDeauthorizeModal, setShowDeauthorizeModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -30,7 +32,11 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
   const handleExportPDF = async () => {
     try {
-      await generatePrescriptionPDF(currentPrescription);
+      if (printFormat === 'A5') {
+        await generatePrescriptionPDF_A5(currentPrescription);
+      } else {
+        await generatePrescriptionPDF(currentPrescription);
+      }
     } catch (error) {
       console.error('Error al exportar PDF:', error);
       setErrorMessage('Error al exportar el PDF. Por favor, intente nuevamente.');
@@ -40,7 +46,11 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
   const handlePrintPDF = async () => {
     try {
-      await printPrescriptionPDF(currentPrescription);
+      if (printFormat === 'A5') {
+        await printPrescriptionPDF_A5(currentPrescription);
+      } else {
+        await printPrescriptionPDF(currentPrescription);
+      }
     } catch (error) {
       console.error('Error al imprimir PDF:', error);
       setErrorMessage('Error al imprimir el PDF. Por favor, intente nuevamente.');

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
+import { usePrintConfig } from '../contexts/PrintConfigContext';
 import { Prescription } from '../types';
 import { PrescriptionForm } from './PrescriptionForm';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
 import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X, Printer, Clock, CheckCircle } from 'lucide-react';
 import { Download } from 'lucide-react';
-import { printPrescriptionPDF } from '../utils/pdfGenerator';
+import { printPrescriptionPDF, printPrescriptionPDF_A5 } from '../utils/pdfGenerator';
 import { generateStatisticsReport } from '../utils/reportGenerator';
 import { AlertTriangle } from 'lucide-react';
 import { DateRangePicker } from './DateRangePicker';
@@ -65,6 +66,7 @@ interface PrescriptionHistoryProps {
 
 export default function PrescriptionHistory({ onViewPrescription, onEditPrescription, onNewPrescription }: PrescriptionHistoryProps) {
   const { prescriptions, updatePrescriptionAuthorization, loadingPrescriptions, loadPrescriptions, loadSocialWorks } = useData();
+  const { printFormat } = usePrintConfig();
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -157,7 +159,11 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
 
   const handlePrintPrescription = async (prescription: Prescription) => {
     try {
-      await printPrescriptionPDF(prescription);
+      if (printFormat === 'A5') {
+        await printPrescriptionPDF_A5(prescription);
+      } else {
+        await printPrescriptionPDF(prescription);
+      }
     } catch (error) {
       console.error('Error al imprimir receta:', error);
       setErrorMessage('Error al imprimir la receta. Por favor, intente nuevamente.');

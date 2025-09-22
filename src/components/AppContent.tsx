@@ -10,10 +10,11 @@ import { PracticeAdmin } from './PracticeAdmin';
 import { SocialWorkManager } from './SocialWorkManager';
 import { Dashboard } from './Dashboard';
 import { UserManager } from './UserManager';
+import { PrintFormatSettings } from './PrintFormatSettings';
 import { Prescription } from '../types';
 import { FileText, History, User, Users, Activity, Building2, BarChart3, Settings, LogOut, ChevronDown } from 'lucide-react';
 
-type View = 'dashboard' | 'new' | 'history' | 'doctors' | 'patients' | 'practices' | 'admin-practices' | 'social-works' | 'users';
+type View = 'dashboard' | 'new' | 'history' | 'doctors' | 'patients' | 'practices' | 'admin-practices' | 'social-works' | 'users' | 'print-settings';
 
 export function AppContent() {
   const { user, profile, signOut, hasPermission } = useAuth();
@@ -59,6 +60,7 @@ export function AppContent() {
     ...(hasPermission('manage_patients') ? [{ key: 'patients', label: 'Pacientes', icon: Users, color: 'text-green-600' }] : []),
     ...(hasPermission('manage_practices') ? [{ key: 'admin-practices', label: 'Prácticas', icon: Activity, color: 'text-purple-600' }] : []),
     ...(hasPermission('manage_social_works') ? [{ key: 'social-works', label: 'Obras Sociales', icon: Building2, color: 'text-blue-600' }] : []),
+    ...(hasPermission('manage_practices') ? [{ key: 'print-settings', label: 'Configuración de Impresión', icon: Settings, color: 'text-orange-600' }] : []),
     ...(hasPermission('manage_users') ? [{ key: 'users', label: 'Usuarios', icon: Settings, color: 'text-red-600' }] : [])
   ].filter(Boolean);
 
@@ -206,6 +208,7 @@ export function AppContent() {
         {currentView === 'admin-practices' && <PracticeAdmin />}
         {currentView === 'social-works' && <SocialWorkManager />}
         {currentView === 'users' && <UserManager />}
+        {currentView === 'print-settings' && <PrintFormatSettings />}
       </div>
     </div>
   );
