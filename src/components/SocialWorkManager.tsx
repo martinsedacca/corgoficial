@@ -29,6 +29,8 @@ export function SocialWorkManager() {
   const [editingSocialWork, setEditingSocialWork] = useState<SocialWork | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [socialWorkToDelete, setSocialWorkToDelete] = useState<SocialWork | null>(null);
+  const [showDeletePlanModal, setShowDeletePlanModal] = useState(false);
+  const [planToDelete, setPlanToDelete] = useState<any>(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -113,6 +115,22 @@ export function SocialWorkManager() {
       setShowDeleteModal(false);
       setSocialWorkToDelete(null);
       setErrorMessage('Error al eliminar la obra social. Verifique que no esté siendo utilizada por pacientes.');
+      setShowErrorModal(true);
+    }
+  };
+
+  const handleDeletePlanConfirm = async () => {
+    if (!planToDelete) return;
+    
+    try {
+      await deleteSocialWorkPlan(planToDelete.id);
+      setShowDeletePlanModal(false);
+      setPlanToDelete(null);
+    } catch (error) {
+      console.error('Error deleting social work plan:', error);
+      setShowDeletePlanModal(false);
+      setPlanToDelete(null);
+      setErrorMessage('Error al eliminar el plan. Verifique que no esté siendo utilizado por pacientes.');
       setShowErrorModal(true);
     }
   };
