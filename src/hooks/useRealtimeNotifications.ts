@@ -164,6 +164,8 @@ export function useRealtimeNotifications() {
       practicesChannel.unsubscribe();
       socialWorksChannel.unsubscribe();
     };
+  }
+  )
 
   return {
     notifications,
