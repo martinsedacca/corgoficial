@@ -1380,7 +1380,29 @@ export const generateMultiplePrescriptionsPDF = async (prescriptions: Prescripti
     }
   }
 
-  // Descargar el PDF
-  const fileName = `Recetas_Lote_${prescriptions.length}_${new Date().toISOString().split('T')[0]}.pdf`;
-  pdf.save(fileName);
+  try {
+    // Descargar el PDF
+    const fileName = `Recetas_Lote_${new Date().toISOString().split('T')[0]}_${prescriptions.length}_recetas.pdf`;
+    
+    // Abrir el PDF en una nueva ventana para imprimir
+    const pdfBlob = pdf.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const printWindow = window.open(pdfUrl, '_blank');
+    
+    if (printWindow) {
+      printWindow.onload = () => {
+        printWindow.print();
+        // Limpiar la URL después de un tiempo
+        setTimeout(() => {
+          URL.revokeObjectURL(pdfUrl);
+        }, 1000);
+      };
+    } else {
+      // Fallback: descargar si no se puede abrir ventana
+      pdf.save(fileName);
+    }
+  } catch (error) {
+    console.error('Error generando PDF múltiple:', error);
+    throw new Error('Error al generar el PDF múltiple. Por favor, intente nuevamente.');
+  }
 };
