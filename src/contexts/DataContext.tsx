@@ -1,4 +1,5 @@
 import React, { createContext, useContext, ReactNode, useState, useCallback, useEffect } from 'react';
+import { useRef } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabase';
 import { Doctor, Patient, Practice, Prescription, SocialWork } from '../types';
@@ -55,6 +56,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [loadingPrescriptions, setLoadingPrescriptions] = useState(false);
   const [loadingSocialWorks, setLoadingSocialWorks] = useState(false);
 
+  // Create refs to hold current loading states for stable function references
+  const loadingPrescriptionsRef = useRef(loadingPrescriptions);
+  
+  // Update refs when state changes
+  useEffect(() => {
+    loadingPrescriptionsRef.current = loadingPrescriptions;
+  }, [loadingPrescriptions]);
+
   // Configurar suscripciones en tiempo real
   useEffect(() => {
     const setupSubscriptions = async () => {
@@ -99,7 +108,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     };
 
     setupSubscriptions();
-  }, [user, loadPrescriptions]);
+  }, [user]);
 
   // Funciones de carga individuales
   const loadDoctors = useCallback(async () => {
@@ -147,7 +156,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [loadingPractices]);
 
   const loadPrescriptions = useCallback(async () => {
-    if (loadingPrescriptions) return;
+    if (loadingPrescriptionsRef.current) return;
     
     setLoadingPrescriptions(true);
     try {
@@ -158,7 +167,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoadingPrescriptions(false);
     }
-  }, [loadingPrescriptions]);
+  }, []);
 
   const loadSocialWorks = useCallback(async () => {
     if (loadingSocialWorks) return;
