@@ -22,7 +22,7 @@ import { Printer, ToggleLeft, ToggleRight } from 'lucide-react';
 type View = 'history' | 'dashboard' | 'new' | 'doctors' | 'patients' | 'practices' | 'admin-practices' | 'social-works' | 'users' | 'print-settings';
 
 export function AppContent() {
-  const { user, profile, signOut, hasPermission } = useAuth();
+  const { user, profile, signOut, hasPermission, isDoctor } = useAuth();
   const { printFormat, setPrintFormat } = usePrintConfig();
   const { refreshData } = useData();
   const { notifications, hasAnyNotification, clearNotifications } = useRealtimeNotifications();
