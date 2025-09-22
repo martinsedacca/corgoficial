@@ -51,13 +51,15 @@ export function PatientManager() {
   const { 
     patients, 
     patientsMetadata,
+    socialWorks,
     addPatient, 
     updatePatient, 
     deletePatient, 
     loadingPatients, 
     loadPatients,
     searchPatients,
-    loadSocialWorkPlans
+    loadSocialWorkPlans,
+    loadSocialWorks
   } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
@@ -101,6 +103,7 @@ export function PatientManager() {
   // Cargar pacientes cuando se monta el componente
   useEffect(() => {
     loadPatients(1, true);
+    loadSocialWorks();
     loadSocialWorkPlans();
   }, []);
 
@@ -270,6 +273,8 @@ export function PatientManager() {
 
   const handleEdit = (patient: Patient) => {
     setEditingPatient(patient);
+    const socialWork = socialWorks.find(sw => sw.name === patient.socialWork);
+    setSelectedSocialWorkForForm(socialWork || null);
     setFormData({
       name: patient.name,
       lastName: patient.lastName,
@@ -421,9 +426,8 @@ export function PatientManager() {
                   value={formData.socialWork}
                   onChange={(value) => {
                     setFormData({...formData, socialWork: value, plan: ''});
-                    // Buscar la obra social seleccionada en los datos cargados
-                    // Nota: Necesitaríamos acceso a socialWorks desde el contexto
-                    setSelectedSocialWorkForForm(null); // Por ahora null hasta tener acceso a socialWorks
+                    const socialWork = socialWorks.find(sw => sw.name === value);
+                    setSelectedSocialWorkForForm(socialWork || null);
                   }}
                   required
                 />
