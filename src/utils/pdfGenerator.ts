@@ -7,25 +7,7 @@ import { companyInfo } from '../data/mockData';
 export const generatePrescriptionPDF_A5 = async (prescription: Prescription): Promise<void> => {
   // Convertir el logo a base64 para incluirlo en el PDF
   const getLogoBase64 = async (): Promise<string> => {
-    
-    // Abrir en nueva ventana para imprimir directamente
-    const pdfBlob = pdf.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    
-    const printWindow = window.open(pdfUrl, '_blank');
-    if (printWindow) {
-      printWindow.onload = () => {
-        printWindow.print();
-        // Limpiar la URL después de un tiempo
-        setTimeout(() => {
-          URL.revokeObjectURL(pdfUrl);
-        }, 1000);
-      };
-    } else {
-      // Fallback: descargar si no se puede abrir ventana
-      pdf.save(`Receta_A5_${prescription.number}_${prescription.patient.name}_${prescription.patient.lastName}.pdf`);
-      URL.revokeObjectURL(pdfUrl);
-    }
+    try {
       const response = await fetch('/Logo-corg.png');
       const blob = await response.blob();
       return new Promise((resolve, reject) => {
@@ -825,6 +807,25 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     pdf.setDrawColor(200, 200, 200);
     pdf.setLineDashPattern([2, 2], 0);
     pdf.line(pdfWidth / 2, 0, pdfWidth / 2, pdfHeight);
+
+    // Abrir en nueva ventana para imprimir directamente
+    const pdfBlob = pdf.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    
+    const printWindow = window.open(pdfUrl, '_blank');
+    if (printWindow) {
+      printWindow.onload = () => {
+        printWindow.print();
+        // Limpiar la URL después de un tiempo
+        setTimeout(() => {
+          URL.revokeObjectURL(pdfUrl);
+        }, 1000);
+      };
+    } else {
+      // Fallback: descargar si no se puede abrir ventana
+      pdf.save(`Receta_${prescription.number}_${prescription.patient.name}_${prescription.patient.lastName}.pdf`);
+      URL.revokeObjectURL(pdfUrl);
+    }
 
     // Descargar el PDF
     pdf.save(`Receta_${prescription.number}_${prescription.patient.name}_${prescription.patient.lastName}`.replace(/\s+/g, '_') + '.pdf');
