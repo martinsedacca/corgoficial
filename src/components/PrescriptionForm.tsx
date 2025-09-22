@@ -401,7 +401,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
               Médico
             </label>
             <div className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700">
-              {selectedDoctor?.name} - {selectedDoctor?.specialty}
+              {selectedDoctor?.name} - {selectedDoctor?.license}
             </div>
           </div>
         ) : (
