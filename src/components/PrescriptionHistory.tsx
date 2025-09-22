@@ -66,6 +66,7 @@ interface PrescriptionHistoryProps {
 
 export default function PrescriptionHistory({ onViewPrescription, onEditPrescription, onNewPrescription }: PrescriptionHistoryProps) {
   const { prescriptions, updatePrescriptionAuthorization, loadingPrescriptions, loadPrescriptions, loadSocialWorks } = useData();
+  const { isDoctor, hasPermission } = useAuth();
   const { printFormat } = usePrintConfig();
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -94,7 +95,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   };
 
   // Usar todas las prescripciones (modo público)
-  const availablePrescriptions = prescriptions;
+  const availablePrescriptions = prescriptions; // Las políticas RLS ya filtran automáticamente para médicos
 
   const filteredPrescriptions = availablePrescriptions.filter(prescription => {
     const matchesSearch = 
@@ -722,14 +723,22 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                         <span>Autorizado</span>
                       </div>
                     ) : (
-                      <button
-                        onClick={() => handleToggleAuthorization(prescription)}
-                        className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200 transition-colors"
-                        title="Autorizar receta"
-                      >
-                        <Clock className="h-3 w-3" />
-                        <span>Autorizar</span>
-                      </button>
+                      // Solo admin y secretary pueden autorizar recetas
+                      hasPermission('manage_prescriptions') && !isDoctor ? (
+                        <button
+                          onClick={() => handleToggleAuthorization(prescription)}
+                          className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200 transition-colors"
+                          title="Autorizar receta"
+                        >
+                          <Clock className="h-3 w-3" />
+                          <span>Autorizar</span>
+                        </button>
+                      ) : (
+                        <div className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
+                          <Clock className="h-3 w-3" />
+                          <span>Pendiente</span>
+                        </div>
+                      )
                     )}
                     <button
                       onClick={() => onViewPrescription(prescription)}
@@ -738,13 +747,16 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                       <Eye className="h-4 w-4" />
                       <span className="hidden sm:inline">Ver</span>
                     </button>
-                    <button
-                      onClick={() => onEditPrescription(prescription)}
-                      className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
-                    >
-                      <Edit3 className="h-4 w-4" />
-                      <span className="hidden sm:inline">Editar</span>
-                    </button>
+                    {/* Solo mostrar botón de editar si el usuario tiene permisos */}
+                    {(hasPermission('manage_prescriptions') || isDoctor) && (
+                      <button
+                        onClick={() => onEditPrescription(prescription)}
+                        className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                      >
+                        <Edit3 className="h-4 w-4" />
+                        <span className="hidden sm:inline">Editar</span>
+                      </button>
+                    )}
                     <button
                       onClick={() => handlePrintPrescription(prescription)}
                       className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"

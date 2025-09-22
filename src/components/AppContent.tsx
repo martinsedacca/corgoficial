@@ -52,7 +52,7 @@ export function AppContent() {
   };
 
   const mainMenuItems = [
-    { key: 'dashboard', label: 'Dashboard', icon: BarChart3, color: 'text-blue-600' },
+    ...(hasPermission('view_dashboard') ? [{ key: 'dashboard', label: 'Dashboard', icon: BarChart3, color: 'text-blue-600' }] : []),
     { key: 'history', label: 'Recetas', icon: History, color: 'text-gray-600' }
   ];
 

@@ -273,6 +273,10 @@ export const prescriptionService = {
     // Obtener el siguiente número
     const number = await this.getNextNumber();
     
+    // Obtener el usuario actual
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Usuario no autenticado');
+    
     // Crear la receta
     const { data: prescription, error: prescriptionError } = await supabase
       .from('prescriptions')
@@ -283,7 +287,8 @@ export const prescriptionService = {
         patient_id: prescriptionData.patientId,
         additional_notes: prescriptionData.additionalNotes || null,
         date: prescriptionData.date,
-        authorized: false
+        authorized: false,
+        created_by: user.id
       })
       .select()
       .single();
@@ -355,6 +360,10 @@ export const prescriptionService = {
   },
 
   async update(id: string, updates: Partial<Prescription>): Promise<Prescription> {
+    // Obtener el usuario actual
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Usuario no autenticado');
+    
     // Actualizar la receta principal
     const { data: prescription, error: prescriptionError } = await supabase
       .from('prescriptions')
@@ -363,7 +372,8 @@ export const prescriptionService = {
         doctor_id: updates.doctorId,
         patient_id: updates.patientId,
         additional_notes: updates.additionalNotes || null,
-        date: updates.date
+        date: updates.date,
+        created_by: user.id
       })
       .eq('id', id)
       .select()

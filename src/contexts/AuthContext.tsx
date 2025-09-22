@@ -166,7 +166,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ],
       doctor: [
         'manage_patients',
-        'manage_prescriptions'
+        'manage_prescriptions',
+        'create_prescriptions_own_name'
       ]
     };
 

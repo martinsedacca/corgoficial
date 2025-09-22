@@ -281,6 +281,13 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       return;
     }
 
+    // Validación adicional para médicos: solo pueden crear recetas a su nombre
+    if (isDoctor && profile?.doctor_id && selectedDoctor.id !== profile.doctor_id) {
+      setErrorMessage('Los médicos solo pueden crear recetas a su propio nombre');
+      setShowErrorModal(true);
+      return;
+    }
+
     const selectedPracticesList = Object.entries(selectedPractices)
       .filter(([_, ao]) => ao !== null)
       .map(([practiceId, ao]) => {
