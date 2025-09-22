@@ -4,13 +4,27 @@ import { Doctor, Patient, Practice, Prescription, PrescriptionItem, SocialWork }
 // Servicios para Médicos
 export const doctorService = {
   async getAll(): Promise<Doctor[]> {
-    const { data, error } = await supabase
-      .from('doctors')
-      .select('*')
-      .order('name', { ascending: true });
-    
-    if (error) throw error;
-    return data || [];
+    try {
+      // Check if Supabase is properly configured
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        console.warn('Supabase not configured, returning empty doctors array');
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('doctors')
+        .select('*')
+        .order('name', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching doctors:', error);
+        return [];
+      }
+      return data || [];
+    } catch (error) {
+      console.error('Network error fetching doctors:', error);
+      return [];
+    }
   },
 
   async create(doctor: Omit<Doctor, 'id'>): Promise<Doctor> {
@@ -61,24 +75,39 @@ export const doctorService = {
 // Servicios para Pacientes
 export const patientService = {
   async getAll(): Promise<Patient[]> {
-    const { data, error } = await supabase
-      .from('patients')
-      .select('*')
-      .order('name', { ascending: true });
-    
-    if (error) throw error;
-    return data.map(patient => ({
-      id: patient.id,
-      name: patient.name,
-      lastName: patient.last_name || '',
-      dni: patient.dni,
-      socialWork: patient.social_work,
-      affiliateNumber: patient.affiliate_number || '',
-      plan: patient.plan || '',
-      phone: patient.phone,
-      email: patient.email,
-      address: patient.address
-    }));
+    try {
+      // Check if Supabase is properly configured
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        console.warn('Supabase not configured, returning empty patients array');
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('patients')
+        .select('*')
+        .order('name', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching patients:', error);
+        return [];
+      }
+      
+      return data.map(patient => ({
+        id: patient.id,
+        name: patient.name,
+        lastName: patient.last_name || '',
+        dni: patient.dni,
+        socialWork: patient.social_work,
+        affiliateNumber: patient.affiliate_number || '',
+        plan: patient.plan || '',
+        phone: patient.phone,
+        email: patient.email,
+        address: patient.address
+      }));
+    } catch (error) {
+      console.error('Network error fetching patients:', error);
+      return [];
+    }
   },
 
   async create(patient: Omit<Patient, 'id'>): Promise<Patient> {
@@ -160,14 +189,28 @@ export const patientService = {
 // Servicios para Prácticas
 export const practiceService = {
   async getAll(): Promise<Practice[]> {
-    const { data, error } = await supabase
-      .from('practices')
-      .select('*')
-      .order('category', { ascending: true })
-      .order('name', { ascending: true });
-    
-    if (error) throw error;
-    return data || [];
+    try {
+      // Check if Supabase is properly configured
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        console.warn('Supabase not configured, returning empty practices array');
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('practices')
+        .select('*')
+        .order('category', { ascending: true })
+        .order('name', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching practices:', error);
+        return [];
+      }
+      return data || [];
+    } catch (error) {
+      console.error('Network error fetching practices:', error);
+      return [];
+    }
   },
 
   async create(practice: Omit<Practice, 'id'>): Promise<Practice> {
@@ -216,52 +259,66 @@ export const practiceService = {
 // Servicios para Recetas
 export const prescriptionService = {
   async getAll(): Promise<Prescription[]> {
-    const { data, error } = await supabase
-      .from('prescriptions')
-      .select(`
-        *,
-        doctor:doctors(*),
-        patient:patients(*),
-        prescription_items(
+    try {
+      // Check if Supabase is properly configured
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        console.warn('Supabase not configured, returning empty prescriptions array');
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('prescriptions')
+        .select(`
           *,
-          practice:practices(*)
-        )
-      `)
-      .order('created_at', { ascending: false });
-    
-    if (error) throw error;
-    
-    return data.map(prescription => ({
-      id: prescription.id,
-      number: prescription.number,
-      type: prescription.type,
-      doctorId: prescription.doctor_id,
-      doctor: prescription.doctor,
-      patientId: prescription.patient_id,
-      patient: {
-        id: prescription.patient.id,
-        name: prescription.patient.name,
-        lastName: prescription.patient.last_name || '',
-        dni: prescription.patient.dni,
-        socialWork: prescription.patient.social_work,
-        affiliateNumber: prescription.patient.affiliate_number,
-        plan: prescription.patient.plan,
-        phone: prescription.patient.phone,
-        email: prescription.patient.email,
-        address: prescription.patient.address
-      },
-      items: prescription.prescription_items.map((item: any) => ({
-        practiceId: item.practice_id,
-        practice: item.practice,
-        ao: item.ao,
-        notes: item.notes
-      })),
-      additionalNotes: prescription.additional_notes,
-      date: prescription.date,
-      createdAt: prescription.created_at,
-      createdBy: prescription.created_by,
-      authorized: prescription.authorized
-    }));
+          doctor:doctors(*),
+          patient:patients(*),
+          prescription_items(
+            *,
+            practice:practices(*)
+          )
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching prescriptions:', error);
+        return [];
+      }
+      
+      return data.map(prescription => ({
+        id: prescription.id,
+        number: prescription.number,
+        type: prescription.type,
+        doctorId: prescription.doctor_id,
+        doctor: prescription.doctor,
+        patientId: prescription.patient_id,
+        patient: {
+          id: prescription.patient.id,
+          name: prescription.patient.name,
+          lastName: prescription.patient.last_name || '',
+          dni: prescription.patient.dni,
+          socialWork: prescription.patient.social_work,
+          affiliateNumber: prescription.patient.affiliate_number,
+          plan: prescription.patient.plan,
+          phone: prescription.patient.phone,
+          email: prescription.patient.email,
+          address: prescription.patient.address
+        },
+        items: prescription.prescription_items.map((item: any) => ({
+          practiceId: item.practice_id,
+          practice: item.practice,
+          ao: item.ao,
+          notes: item.notes
+        })),
+        additionalNotes: prescription.additional_notes,
+        date: prescription.date,
+        createdAt: prescription.created_at,
+        createdBy: prescription.created_by,
+        authorized: prescription.authorized
+      }));
+    } catch (error) {
+      console.error('Network error fetching prescriptions:', error);
+      return [];
+    }
   },
 
   async getNextNumber(): Promise<number> {
@@ -482,13 +539,27 @@ export const prescriptionService = {
 // Servicios para Obras Sociales
 export const socialWorkService = {
   async getAll(): Promise<SocialWork[]> {
-    const { data, error } = await supabase
-      .from('social_works')
-      .select('*')
-      .order('name', { ascending: true });
-    
-    if (error) throw error;
-    return data || [];
+    try {
+      // Check if Supabase is properly configured
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        console.warn('Supabase not configured, returning empty social works array');
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('social_works')
+        .select('*')
+        .order('name', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching social works:', error);
+        return [];
+      }
+      return data || [];
+    } catch (error) {
+      console.error('Network error fetching social works:', error);
+      return [];
+    }
   },
 
   async create(socialWork: Omit<SocialWork, 'id'>): Promise<SocialWork> {
