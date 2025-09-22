@@ -72,6 +72,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (error) {
+        // Handle Supabase not configured error
+        if (error.message?.includes('Supabase not configured')) {
+          console.warn('Supabase not configured, using fallback profile');
+          // Create a fallback admin profile for development
+          const fallbackProfile: UserProfile = {
+            id: 'fallback-admin',
+            user_id: userId,
+            email: user?.email || 'admin@corg.com',
+            full_name: 'Administrador',
+            role: 'admin',
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          setProfile(fallbackProfile);
+          return;
+        }
+        
         // If JWT is expired, sign out the user
         if (error.message?.includes('JWT expired')) {
           console.log('JWT expired, signing out user');

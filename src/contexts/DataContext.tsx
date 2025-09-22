@@ -164,6 +164,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setPrescriptions(prescriptionsData);
     } catch (err) {
       console.error('Error loading prescriptions:', err);
+      // Set empty array on error to prevent crashes
+      setPrescriptions([]);
     } finally {
       setLoadingPrescriptions(false);
     }
@@ -178,6 +180,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setSocialWorks(socialWorksData);
     } catch (err) {
       console.error('Error loading social works:', err);
+      // Set empty array on error to prevent crashes
+      setSocialWorks([]);
     } finally {
       setLoadingSocialWorks(false);
     }

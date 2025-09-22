@@ -3,17 +3,44 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  realtime: {
-    params: {
-      eventsPerSecond: 20
-    }
+// Create a mock client if environment variables are missing
+const createSupabaseClient = () => {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn('Supabase environment variables not found. Using mock client.');
+    // Return a mock client that doesn't make actual requests
+    return {
+      auth: {
+        getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+        getUser: () => Promise.resolve({ data: { user: null }, error: null }),
+        signInWithPassword: () => Promise.resolve({ data: { user: null, session: null }, error: { message: 'Supabase not configured' } }),
+        signOut: () => Promise.resolve({ error: null }),
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } })
+      },
+      from: () => ({
+        select: () => ({ eq: () => ({ single: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }) }) }),
+        insert: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
+        update: () => ({ eq: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }) }),
+        delete: () => ({ eq: () => Promise.resolve({ error: { message: 'Supabase not configured' } }) })
+      }),
+      channel: () => ({
+        on: () => ({ subscribe: () => {} }),
+        subscribe: () => {},
+        unsubscribe: () => {}
+      }),
+      rpc: () => Promise.resolve({ data: 1, error: null })
+    } as any;
   }
-});
+  
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    realtime: {
+      params: {
+        eventsPerSecond: 20
+      }
+    }
+  });
+};
+
+export const supabase = createSupabaseClient();
 
 // Tipos para TypeScript basados en la base de datos
 export interface Database {
