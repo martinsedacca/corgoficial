@@ -248,9 +248,7 @@ export const generatePrescriptionPDF_A5 = async (prescription: Prescription): Pr
     
     // Dimensiones para A5 vertical
     const pdfWidth = pdf.internal.pageSize.getWidth(); // 148mm
-    const pdfHeight =
-  }
-} pdf.internal.pageSize.getHeight(); // 210mm
+    const pdfHeight = pdf.internal.pageSize.getHeight(); // 210mm
     
     const imgWidth = pdfWidth - 4; // Margen pequeño
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
