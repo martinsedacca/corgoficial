@@ -92,6 +92,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setPractices(practicesData);
     } catch (err) {
       console.error('Error loading practices:', err);
+      // No fallar silenciosamente, mantener el estado anterior
+      // setPractices([]);
     } finally {
       setLoadingPractices(false);
     }
