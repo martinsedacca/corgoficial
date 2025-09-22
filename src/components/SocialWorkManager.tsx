@@ -448,6 +448,142 @@ export function SocialWorkManager() {
                 </button>
               </div>
             </form>
+            
+            {/* Sección de Gestión de Planes */}
+            <div className="border-t border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-semibold text-gray-900">
+                  Planes de {editingSocialWork?.name}
+                </h4>
+                <button
+                  onClick={handleAddPlan}
+                  className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                >
+                  <Plus className="h-4 w-4" />
+                  Agregar Plan
+                </button>
+              </div>
+              
+              {/* Formulario para agregar/editar plan */}
+              {showPlanForm && (
+                <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h5 className="text-md font-medium text-gray-900 mb-3">
+                    {editingPlan ? 'Editar Plan' : 'Nuevo Plan'}
+                  </h5>
+                  <form onSubmit={handlePlanSubmit} className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Nombre del Plan *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={planFormData.name}
+                          onChange={(e) => setPlanFormData({...planFormData, name: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                          placeholder="Ej: 210, SMG01, Todos los planes"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Código
+                        </label>
+                        <input
+                          type="text"
+                          value={planFormData.code}
+                          onChange={(e) => setPlanFormData({...planFormData, code: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                          placeholder="Código del plan"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Descripción
+                        </label>
+                        <textarea
+                          value={planFormData.description}
+                          onChange={(e) => setPlanFormData({...planFormData, description: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                          placeholder="Descripción del plan..."
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="submit"
+                        className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
+                      >
+                        {editingPlan ? 'Actualizar Plan' : 'Crear Plan'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowPlanForm(false);
+                          setEditingPlan(null);
+                          setPlanFormData({ name: '', code: '', description: '' });
+                        }}
+                        className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors text-sm"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+              
+              {/* Lista de planes */}
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {(() => {
+                  const plans = editingSocialWork ? getSocialWorkPlans(editingSocialWork.id) : [];
+                  
+                  if (plans.length === 0) {
+                    return (
+                      <div className="text-center py-8 text-gray-500">
+                        <Building2 className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                        <p>No hay planes registrados</p>
+                        <p className="text-sm">Agregue el primer plan para esta obra social</p>
+                      </div>
+                    );
+                  }
+                  
+                  return plans.map((plan) => (
+                    <div key={plan.id} className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-gray-900">{plan.name}</span>
+                          {plan.code && (
+                            <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-mono">
+                              {plan.code}
+                            </span>
+                          )}
+                        </div>
+                        {plan.description && (
+                          <p className="text-sm text-gray-600">{plan.description}</p>
+                        )}
+                      </div>
+                      <div className="flex gap-1 ml-3">
+                        <button
+                          onClick={() => handleEditPlan(plan)}
+                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                          title="Editar plan"
+                        >
+                          <Edit3 className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeletePlan(plan)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Eliminar plan"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            </div>
           </div>
         </div>
       )}
