@@ -1401,10 +1401,30 @@ export const generateMultiplePrescriptionsPDF = async (prescriptions: Prescripti
     }
   }
 
-  // Descargar el PDF con todas las recetas
-  const fileName = prescriptions.length === 1 
-    ? `Receta_${prescriptions[0].number}_${prescriptions[0].patient.name}_${prescriptions[0].patient.lastName}`.replace(/\s+/g, '_')
-    : `Recetas_Multiples_${prescriptions.length}_recetas`;
+  // Abrir PDF en nueva ventana para imprimir directamente
+  const pdfBlob = pdf.output('blob');
+  const pdfUrl = URL.createObjectURL(pdfBlob);
   
-  pdf.save(fileName + '.pdf');
+  try {
+    const printWindow = window.open(pdfUrl, '_blank');
+    if (printWindow) {
+      printWindow.onload = () => {
+        printWindow.print();
+      };
+    } else {
+      // Fallback: descargar si no se puede abrir ventana
+      const fileName = `Recetas_Lote_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+    }
+  } catch (error) {
+    console.error('Error opening print window:', error);
+    // Fallback: descargar
+    const fileName = `Recetas_Lote_${new Date().toISOString().split('T')[0]}.pdf`;
+    pdf.save(fileName);
+  } finally {
+    // Limpiar URL después de un tiempo
+    setTimeout(() => {
+      URL.revokeObjectURL(pdfUrl);
+    }, 1000);
+  }
 };
