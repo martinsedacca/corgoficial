@@ -374,11 +374,13 @@ export function PatientManager() {
                     }
                   }}
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 transition-colors ${
-                    'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                    dniValidation.exists
+                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50'
+                      : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
                   }`}
                   placeholder="12345678"
                   pattern="[0-9]{4,}"
-                        'text-blue-600'
+                />
                 {dniValidation.message && (
                   <div className={`mt-1 text-sm flex items-center gap-1 ${
                     dniValidation.exists ? 'text-red-600' : 'text-blue-600'
@@ -516,8 +518,8 @@ export function PatientManager() {
                 placeholder="Búsqueda general (nombre, DNI, obra social, afiliado)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onChange={(e) => setFilterDNI(e.target.value.replace(/\D/g, ''))}
                 disabled={loadingPatients}
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
             </div>
           </div>
