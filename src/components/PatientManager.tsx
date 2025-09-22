@@ -98,6 +98,7 @@ export function PatientManager() {
   // Cargar pacientes cuando se monta el componente
   useEffect(() => {
     loadPatients(1, true);
+    loadSocialWorkPlans();
   }, []);
 
   // Función para buscar pacientes con debounce
