@@ -100,40 +100,6 @@ export function PatientManager() {
     address: ''
   });
 
-  // Función para validar DNI
-  const validateDNI = async (dni: string) => {
-    if (editingPatient && editingPatient.dni === dni) {
-      setDniValidation({ isChecking: false, exists: false, message: '' });
-      return;
-    }
-
-    setDniValidation({ isChecking: true, exists: false, message: 'Verificando DNI...' });
-    
-    try {
-      const { data, error } = await supabase
-        .from('patients')
-        .select('id')
-        .eq('dni', dni)
-        .limit(1);
-
-      if (error) throw error;
-
-      const exists = data && data.length > 0;
-      setDniValidation({
-        isChecking: false,
-        exists,
-        message: exists ? 'Este DNI ya está registrado' : 'DNI disponible'
-      });
-    } catch (error) {
-      console.error('Error validating DNI:', error);
-      setDniValidation({
-        isChecking: false,
-        exists: false,
-        message: 'Error al verificar DNI'
-      });
-    }
-  };
-
   // Cargar pacientes cuando se monta el componente
   useEffect(() => {
     loadPatients(1, true);
@@ -204,12 +170,61 @@ export function PatientManager() {
     setLoadingMore(false);
   };
 
+  // Validar DNI en tiempo real
+  const validateDNI = async (dni: string) => {
+    if (dni.length < 4) {
+      setDniValidation({ isChecking: false, exists: false, message: '' });
+      return;
+    }
+
+    setDniValidation({ isChecking: true, exists: false, message: 'Verificando DNI...' });
+
+    try {
+      const { data, error } = await supabase
+        .from('patients')
+        .select('id, name, last_name, social_work')
+        .eq('dni', dni)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error checking DNI:', error);
+        setDniValidation({ isChecking: false, exists: false, message: 'Error al verificar DNI' });
+        return;
+      }
+
+      if (data && data.length > 0) {
+        // Filtrar pacientes que no sean el que estamos editando
+        const otherPatients = editingPatient 
+          ? data.filter(p => p.id !== editingPatient.id)
+          : data;
+        
+        if (otherPatients.length > 0) {
+          const count = otherPatients.length;
+          const firstPatient = otherPatients[0];
+          setDniValidation({
+            isChecking: false,
+            exists: false, // Cambiar a false ya que ahora es permitido
+            message: `${count} paciente${count > 1 ? 's' : ''} con este DNI: ${firstPatient.name} ${firstPatient.last_name || ''}${count > 1 ? ` y ${count - 1} más` : ''}`
+          });
+        } else {
+          setDniValidation({ isChecking: false, exists: false, message: '' });
+        }
+      } else {
+        setDniValidation({ isChecking: false, exists: false, message: '' });
+      }
+    } catch (error) {
+      console.error('Error validating DNI:', error);
+      setDniValidation({ isChecking: false, exists: false, message: 'Error al verificar DNI' });
+    }
+  };
+
   // Validar si el formulario es válido
   const isFormValid = () => {
     return (
       formData.name.trim() !== '' &&
       formData.lastName.trim() !== '' &&
       formData.dni.length >= 4 &&
+      !dniValidation.isChecking &&
       formData.socialWork.trim() !== ''
     );
   };
