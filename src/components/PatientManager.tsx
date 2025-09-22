@@ -224,7 +224,6 @@ export function PatientManager() {
       formData.name.trim() !== '' &&
       formData.lastName.trim() !== '' &&
       formData.dni.length >= 4 &&
-      !dniValidation.isChecking &&
       formData.socialWork.trim() !== ''
     );
   };
@@ -389,37 +388,11 @@ export function PatientManager() {
                   onChange={(e) => {
                     const newDni = e.target.value.replace(/\D/g, '');
                     setFormData({...formData, dni: newDni});
-                    if (newDni.length >= 8) {
-                      validateDNI(newDni);
-                    } else if (newDni.length >= 4) {
-                      // Validar después de 2 segundos si tiene más de 4 caracteres
-                      setTimeout(() => {
-                        if (formData.dni === newDni && newDni.length >= 4) {
-                          validateDNI(newDni);
-                        }
-                      }, 2000);
-                    } else {
-                      setDniValidation({ isChecking: false, exists: false, message: '' });
-                    }
                   }}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 transition-colors ${
-                    dniValidation.exists
-                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50'
-                      : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
-                  }`}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   placeholder="12345678"
                   pattern="[0-9]{4,}"
                 />
-                {dniValidation.message && (
-                  <div className={`mt-1 text-sm flex items-center gap-1 ${
-                    dniValidation.exists ? 'text-red-600' : 'text-blue-600'
-                  }`}>
-                    {dniValidation.isChecking && (
-                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
-                    )}
-                    <span>{dniValidation.message}</span>
-                  </div>
-                )}
               </div>
               <div>
                 <SocialWorkAutocomplete
