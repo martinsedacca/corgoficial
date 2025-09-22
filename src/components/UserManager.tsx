@@ -71,27 +71,32 @@ export function UserManager() {
 
         if (error) throw error;
       } else {
-        // Crear nuevo usuario
-        const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-          email: formData.email,
-          password: formData.password,
-          email_confirm: true
-        });
+        // Crear nuevo usuario usando Edge Function
+        const { data: session } = await supabase.auth.getSession();
+        if (!session.session) {
+          throw new Error('No authenticated session');
+        }
 
-        if (authError) throw authError;
-
-        // Crear perfil de usuario
-        const { error: profileError } = await supabase
-          .from('user_profiles')
-          .insert({
-            user_id: authData.user.id,
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
             email: formData.email,
+            password: formData.password,
             full_name: formData.full_name,
             role: formData.role,
             doctor_id: formData.doctor_id || null
-          });
+          })
+        });
 
-        if (profileError) throw profileError;
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to create user');
+        }
       }
 
       await loadUsers();
