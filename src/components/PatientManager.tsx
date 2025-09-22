@@ -55,7 +55,8 @@ export function PatientManager() {
     deletePatient, 
     loadingPatients, 
     loadPatients,
-    searchPatients
+    searchPatients,
+    loadSocialWorkPlans
   } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
