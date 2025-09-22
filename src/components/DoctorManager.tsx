@@ -104,7 +104,12 @@ export function DoctorManager() {
       
       // Check if it's a foreign key constraint error
       const errorMessage = error instanceof Error ? error.message : String(error);
-      if (errorMessage.includes('foreign key constraint') || errorMessage.includes('23503')) {
+      const errorString = JSON.stringify(error);
+      
+      if (errorMessage.includes('foreign key constraint') || 
+          errorMessage.includes('23503') || 
+          errorString.includes('23503') ||
+          errorString.includes('foreign key constraint')) {
         setErrorMessage(`No se puede eliminar al médico ${doctorToDelete.name} porque tiene recetas asociadas. Para eliminarlo, primero debe eliminar o reasignar todas sus recetas.`);
       } else {
         setErrorMessage('Error al eliminar el médico. Por favor, intente nuevamente.');
