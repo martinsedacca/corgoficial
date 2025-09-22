@@ -387,11 +387,14 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
             />
           </div>
           <div>
+           <label className="block text-xs font-medium text-gray-600 mb-1">
+             Obra Social
+           </label>
             <SocialWorkAutocomplete
               value={filterSocialWork}
               onChange={(value) => setFilterSocialWork(value)}
               placeholder="Ej: OSDE, IOMA"
-              label="Obra Social"
+             label=""
             />
           </div>
         </div>
