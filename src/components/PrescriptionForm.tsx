@@ -93,7 +93,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
 
   // Validar DNI en tiempo real para nuevo paciente
   const validateDNI = async (dni: string) => {
-    if (dni.length !== 8) {
+    if (dni.length < 4) {
       setDniValidation({ isChecking: false, exists: false, message: '' });
       return;
     }
@@ -134,7 +134,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
     return (
       newPatientData.name.trim() !== '' &&
       newPatientData.lastName.trim() !== '' &&
-      newPatientData.dni.length === 8 &&
+      newPatientData.dni.length >= 4 &&
       !dniValidation.exists &&
       !dniValidation.isChecking &&
       newPatientData.socialWork.trim() !== ''
@@ -497,10 +497,17 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                       required
                       value={newPatientData.dni}
                       onChange={(e) => {
-                        const newDni = e.target.value.replace(/\D/g, '').slice(0, 8);
+                        const newDni = e.target.value.replace(/\D/g, '');
                         setNewPatientData({...newPatientData, dni: newDni});
-                        if (newDni.length === 8) {
+                        if (newDni.length >= 8) {
                           validateDNI(newDni);
+                        } else if (newDni.length >= 4) {
+                          // Validar después de 2 segundos si tiene más de 4 caracteres
+                          setTimeout(() => {
+                            if (newPatientData.dni === newDni && newDni.length >= 4) {
+                              validateDNI(newDni);
+                            }
+                          }, 2000);
                         } else {
                           setDniValidation({ isChecking: false, exists: false, message: '' });
                         }
@@ -512,8 +519,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
                           : 'border-gray-300 focus:ring-primary-500 focus:border-primary-500'
                       }`}
                       placeholder="12345678"
-                      maxLength={8}
-                      pattern="[0-9]{8}"
+                      pattern="[0-9]{4,}"
                     />
                     {dniValidation.message && (
                       <div className={`mt-1 text-sm flex items-center gap-1 ${

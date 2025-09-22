@@ -146,7 +146,7 @@ export function PatientManager() {
 
   // Validar DNI en tiempo real
   const validateDNI = async (dni: string) => {
-    if (dni.length !== 8) {
+    if (dni.length < 4) {
       setDniValidation({ isChecking: false, exists: false, message: '' });
       return;
     }
@@ -192,7 +192,7 @@ export function PatientManager() {
     return (
       formData.name.trim() !== '' &&
       formData.lastName.trim() !== '' &&
-      formData.dni.length === 8 &&
+      formData.dni.length >= 4 &&
       !dniValidation.exists &&
       !dniValidation.isChecking &&
       formData.socialWork.trim() !== ''
@@ -354,10 +354,17 @@ export function PatientManager() {
                   required
                   value={formData.dni}
                   onChange={(e) => {
-                    const newDni = e.target.value.replace(/\D/g, '').slice(0, 8);
+                    const newDni = e.target.value.replace(/\D/g, '');
                     setFormData({...formData, dni: newDni});
-                    if (newDni.length === 8) {
+                    if (newDni.length >= 8) {
                       validateDNI(newDni);
+                    } else if (newDni.length >= 4) {
+                      // Validar después de 2 segundos si tiene más de 4 caracteres
+                      setTimeout(() => {
+                        if (formData.dni === newDni && newDni.length >= 4) {
+                          validateDNI(newDni);
+                        }
+                      }, 2000);
                     } else {
                       setDniValidation({ isChecking: false, exists: false, message: '' });
                     }
@@ -368,8 +375,7 @@ export function PatientManager() {
                       : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
                   }`}
                   placeholder="12345678"
-                  maxLength={8}
-                  pattern="[0-9]{8}"
+                  pattern="[0-9]{4,}"
                 />
                 {dniValidation.message && (
                   <div className={`mt-1 text-sm flex items-center gap-1 ${
@@ -508,8 +514,8 @@ export function PatientManager() {
                 placeholder="Búsqueda general (nombre, DNI, obra social, afiliado)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => setFilterDNI(e.target.value.replace(/\D/g, ''))}
                 disabled={loadingPatients}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
             </div>
           </div>
