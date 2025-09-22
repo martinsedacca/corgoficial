@@ -101,50 +101,11 @@ export function Dashboard() {
 
   // Configurar suscripción en tiempo real específica para el dashboard
   useEffect(() => {
-    if (!hasPermission('view_dashboard')) return;
-
-    console.log('Setting up dashboard realtime subscription...');
-
-    // Suscripción específica para el dashboard que actualiza automáticamente
-    const dashboardSubscription = supabase
-      .channel('dashboard:prescriptions')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'prescriptions'
-        },
-        (payload) => {
-          console.log('Dashboard: Prescription change detected:', payload);
-          // Recargar datos del dashboard con delay para asegurar consistencia
-          setTimeout(() => {
-            loadPrescriptions();
-          }, 200);
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'prescription_items'
-        },
-        (payload) => {
-          console.log('Dashboard: Prescription items change detected:', payload);
-          // Recargar datos del dashboard con delay
-          setTimeout(() => {
-            loadPrescriptions();
-          }, 200);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      console.log('Cleaning up dashboard subscription...');
-      dashboardSubscription.unsubscribe();
-    };
-  }, [hasPermission, loadPrescriptions]);
+    // Cargar datos necesarios para el dashboard
+    loadPrescriptions();
+    loadDoctors();
+    loadPractices();
+  }, []);
 
   // Solo usuarios con permisos de dashboard pueden acceder
   if (!hasPermission('view_dashboard')) {

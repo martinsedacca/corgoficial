@@ -92,48 +92,10 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
 
   // Configurar suscripción en tiempo real para el historial de recetas
   useEffect(() => {
-    console.log('Setting up prescription history realtime subscription...');
-
-    // Suscripción específica para el historial que actualiza la lista en tiempo real
-    const historySubscription = supabase
-      .channel('history:prescriptions')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'prescriptions'
-        },
-        (payload) => {
-          console.log('History: Prescription change detected:', payload);
-          // Recargar prescripciones para mostrar cambios inmediatos con delay
-          setTimeout(() => {
-            loadPrescriptions();
-          }, 150);
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'prescription_items'
-        },
-        (payload) => {
-          console.log('History: Prescription items change detected:', payload);
-          // Recargar prescripciones cuando cambian los items con delay
-          setTimeout(() => {
-            loadPrescriptions();
-          }, 150);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      console.log('Cleaning up prescription history subscription...');
-      historySubscription.unsubscribe();
-    };
-  }, [loadPrescriptions]);
+    // Cargar recetas cuando se monta el componente
+    loadPrescriptions();
+    loadSocialWorks();
+  }, []);
 
   const typeLabels = {
     studies: 'Estudios',

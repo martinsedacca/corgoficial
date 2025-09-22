@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePrintConfig } from '../contexts/PrintConfigContext';
+import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications';
+import { useData } from '../contexts/DataContext';
+import { NotificationBanner } from './NotificationBanner';
 import { LoadingSpinner } from './LoadingSpinner';
 import { PrescriptionForm } from './PrescriptionForm';
 import { PrescriptionViewer } from './PrescriptionViewer';
@@ -21,6 +24,8 @@ type View = 'history' | 'dashboard' | 'new' | 'doctors' | 'patients' | 'practice
 export function AppContent() {
   const { user, profile, signOut, hasPermission } = useAuth();
   const { printFormat, setPrintFormat } = usePrintConfig();
+  const { refreshData } = useData();
+  const { notifications, hasAnyNotification, clearNotifications } = useRealtimeNotifications();
   const [currentView, setCurrentView] = useState<View>('history');
   const [showAdminDropdown, setShowAdminDropdown] = useState(false);
   const [viewingPrescription, setViewingPrescription] = useState<Prescription | null>(null);
@@ -50,6 +55,15 @@ export function AppContent() {
       await signOut();
     } catch (error) {
       console.error('Error signing out:', error);
+    }
+  };
+
+  const handleRefreshData = async () => {
+    try {
+      await refreshData();
+      clearNotifications();
+    } catch (error) {
+      console.error('Error refreshing data:', error);
     }
   };
 
@@ -88,8 +102,22 @@ export function AppContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Notification Banner */}
+      {hasAnyNotification && (
+        <NotificationBanner
+          hasNewPrescriptions={notifications.hasNewPrescriptions}
+          hasUpdatedPrescriptions={notifications.hasUpdatedPrescriptions}
+          hasNewPatients={notifications.hasNewPatients}
+          hasNewDoctors={notifications.hasNewDoctors}
+          hasNewPractices={notifications.hasNewPractices}
+          hasNewSocialWorks={notifications.hasNewSocialWorks}
+          onRefresh={handleRefreshData}
+          onDismiss={clearNotifications}
+        />
+      )}
+
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className={`bg-white shadow-sm border-b transition-all duration-300 ${hasAnyNotification ? 'mt-16' : ''}`}>
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between py-3 sm:h-16">
             <div className="flex items-center space-x-2 sm:space-x-4">
@@ -230,7 +258,7 @@ export function AppContent() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+      <div className={`max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8 transition-all duration-300`}>
         {currentView === 'dashboard' && <Dashboard />}
         {currentView === 'new' && (
           <PrescriptionForm
