@@ -175,7 +175,7 @@ export const generatePrescriptionPDF_A5 = async (prescription: Prescription): Pr
       <div style="display: flex; align-items: center; margin-bottom: 12px; color: #4A5568; font-size: 12px;">
         <span style="margin-right: 10px;">N° AFILIADO</span>
         <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
-          ${prescription.patient.affiliateNumber}
+          ${prescription.patient.affiliateNumber || ''}
           <div style="position: absolute; bottom: -8px; left: 0; right: 0; border-bottom: 1px solid #000;"></div>
         </div>
       </div>
@@ -443,7 +443,7 @@ export const printPrescriptionPDF_A5 = async (prescription: Prescription): Promi
       <div style="display: flex; align-items: center; margin-bottom: 12px; color: #4A5568; font-size: 12px;">
         <span style="margin-right: 10px;">N° AFILIADO</span>
         <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
-          ${prescription.patient.affiliateNumber}
+          ${prescription.patient.affiliateNumber || ''}
           <div style="position: absolute; bottom: -8px; left: 0; right: 0; border-bottom: 1px solid #000;"></div>
         </div>
       </div>
@@ -717,7 +717,7 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
         <span style="margin-right: 8px;">N° AFILIADO</span>
         <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
-          ${prescription.patient.affiliateNumber}
+          ${prescription.patient.affiliateNumber || ''}
           <div style="position: absolute; bottom: -6px; left: 0; right: 0; border-bottom: 1px solid #000;"></div>
         </div>
       </div>
@@ -998,7 +998,7 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
       <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
         <span style="margin-right: 8px;">N° AFILIADO</span>
         <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
-          ${prescription.patient.affiliateNumber}
+          ${prescription.patient.affiliateNumber || ''}
           <div style="position: absolute; bottom: -6px; left: 0; right: 0; border-bottom: 1px solid #000;"></div>
         </div>
       </div>
@@ -1289,7 +1289,7 @@ export const generateMultiplePrescriptionsPDF = async (prescriptions: Prescripti
         <div style="display: flex; align-items: center; margin-bottom: 8px; color: #4A5568; font-size: 10px;">
           <span style="margin-right: 8px;">N° AFILIADO</span>
           <div style="flex: 1; font-weight: bold; color: #000; position: relative;">
-            ${prescription.patient.affiliateNumber}
+            ${prescription.patient.affiliateNumber || ''}
             <div style="position: absolute; bottom: -6px; left: 0; right: 0; border-bottom: 1px solid #000;"></div>
           </div>
         </div>
@@ -1356,53 +1356,4 @@ export const generateMultiplePrescriptionsPDF = async (prescriptions: Prescripti
         height: 794  // Alto A4
       });
 
-      const imgData = canvas.toDataURL('image/png');
-      const imgWidth = recipeWidth - 4; // Margen pequeño
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const yOffset = imgHeight > pdfHeight ? 0 : (pdfHeight - imgHeight) / 2;
-      const xOffset = isLeftSide ? 2 : recipeWidth + 2;
-      
-      // Agregar la receta al PDF
-      pdf.addImage(imgData, 'PNG', xOffset, yOffset, imgWidth, Math.min(imgHeight, pdfHeight));
-      
-    } catch (error) {
-      console.error(`Error processing prescription ${prescription.number}:`, error);
-    } finally {
-      // Remover el contenido temporal del DOM
-      document.body.removeChild(pdfContent);
-    }
-
-    // Agregar línea divisoria vertical si es el lado derecho
-    if (!isLeftSide && prescriptions.length > 1) {
-      pdf.setDrawColor(200, 200, 200);
-      pdf.setLineDashPattern([2, 2], 0);
-      pdf.line(pdfWidth / 2, 0, pdfWidth / 2, pdfHeight);
-    }
-  }
-
-  try {
-    // Descargar el PDF
-    const fileName = `Recetas_Lote_${new Date().toISOString().split('T')[0]}_${prescriptions.length}_recetas.pdf`;
-    
-    // Abrir el PDF en una nueva ventana para imprimir
-    const pdfBlob = pdf.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const printWindow = window.open(pdfUrl, '_blank');
-    
-    if (printWindow) {
-      printWindow.onload = () => {
-        printWindow.print();
-        // Limpiar la URL después de un tiempo
-        setTimeout(() => {
-          URL.revokeObjectURL(pdfUrl);
-        }, 1000);
-      };
-    } else {
-      // Fallback: descargar si no se puede abrir ventana
-      pdf.save(fileName);
-    }
-  } catch (error) {
-    console.error('Error generando PDF múltiple:', error);
-    throw new Error('Error al generar el PDF múltiple. Por favor, intente nuevamente.');
-  }
-};
+      const imgData = canvas.toDataURL('
