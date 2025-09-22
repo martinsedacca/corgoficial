@@ -12,7 +12,7 @@ interface NotificationState {
 }
 
 export function useRealtimeNotifications() {
-  const { user, isDoctor } = useAuth();
+  const { user, profile } = useAuth();
   const [notifications, setNotifications] = useState<NotificationState>({
     hasNewPrescriptions: false,
     hasUpdatedPrescriptions: false,
@@ -45,7 +45,10 @@ export function useRealtimeNotifications() {
   useEffect(() => {
     // Solo configurar notificaciones para administradores y secretarias
     // Los médicos NO deben recibir actualizaciones en tiempo real de recetas
-    if (!user || isDoctor) return;
+    if (!user || !profile) return;
+    
+    // Excluir específicamente a los médicos
+    if (profile.role === 'doctor') return;
 
     console.log('Setting up realtime notifications for user:', user.id);
 
@@ -161,7 +164,6 @@ export function useRealtimeNotifications() {
       practicesChannel.unsubscribe();
       socialWorksChannel.unsubscribe();
     };
-  }, [user, isDoctor]);
 
   return {
     notifications,
