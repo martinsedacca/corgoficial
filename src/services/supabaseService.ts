@@ -164,8 +164,6 @@ export const patientService = {
           } else {
             query = query.filter('and', `(${wordConditions.join(',')})`);
           }
-            query = query.filter('and', `(${wordConditions.join(',')})`);
-          }
         }
       }
 
