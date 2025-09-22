@@ -179,22 +179,40 @@ export function AppContent() {
               {(hasPermission('manage_practices') || hasPermission('manage_prescriptions')) && (
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-600 hidden sm:inline">Papel:</span>
-                  <button
-                    onClick={() => setPrintFormat(printFormat === 'A4' ? 'A5' : 'A4')}
-                    className={`flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors border ${
-                      printFormat === 'A4'
-                        ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
-                        : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
-                    }`}
-                    title={`Cambiar a formato ${printFormat === 'A4' ? 'A5' : 'A4'}`}
-                  >
-                    {printFormat === 'A4' ? (
-                      <ToggleLeft className="h-3 w-3 sm:h-4 sm:w-4" />
-                    ) : (
-                      <ToggleRight className="h-3 w-3 sm:h-4 sm:w-4" />
-                    )}
-                    <span className="font-mono">{printFormat}</span>
-                  </button>
+                  <div className="relative inline-flex items-center">
+                    <div className="flex bg-gray-200 rounded-full p-1 relative">
+                      {/* Fondo deslizante */}
+                      <div 
+                        className={`absolute top-1 bottom-1 w-12 bg-primary-600 rounded-full transition-transform duration-200 ease-in-out ${
+                          printFormat === 'A4' ? 'translate-x-0' : 'translate-x-12'
+                        }`}
+                      ></div>
+                      
+                      {/* Opción A4 */}
+                      <button
+                        onClick={() => setPrintFormat('A4')}
+                        className={`relative z-10 px-3 py-1 text-xs font-medium rounded-full transition-colors duration-200 ${
+                          printFormat === 'A4'
+                            ? 'text-white'
+                            : 'text-gray-600 hover:text-gray-800'
+                        }`}
+                      >
+                        A4
+                      </button>
+                      
+                      {/* Opción A5 */}
+                      <button
+                        onClick={() => setPrintFormat('A5')}
+                        className={`relative z-10 px-3 py-1 text-xs font-medium rounded-full transition-colors duration-200 ${
+                          printFormat === 'A5'
+                            ? 'text-white'
+                            : 'text-gray-600 hover:text-gray-800'
+                        }`}
+                      >
+                        A5
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
               
