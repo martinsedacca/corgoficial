@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react';
 import { Prescription } from '../types';
 import { companyInfo } from '../data/mockData';
 import { useData } from '../contexts/DataContext';
+import { useAuth } from '../contexts/AuthContext';
 import { usePrintConfig } from '../contexts/PrintConfigContext';
 import { Calendar, User, Stethoscope, FileText, Download, Printer, Clock, CheckCircle } from 'lucide-react';
 import { generatePrescriptionPDF, printPrescriptionPDF, generatePrescriptionPDF_A5, printPrescriptionPDF_A5 } from '../utils/pdfGenerator';
