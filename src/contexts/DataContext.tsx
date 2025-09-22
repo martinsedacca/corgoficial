@@ -58,44 +58,48 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   // Configurar suscripciones en tiempo real
   useEffect(() => {
-    // Solo configurar suscripciones automáticas para médicos (sus propias recetas)
-    // Los administradores y secretarias usan el sistema de notificaciones
-    if (!user) return;
+    const setupSubscriptions = async () => {
+      // Solo configurar suscripciones automáticas para médicos (sus propias recetas)
+      // Los administradores y secretarias usan el sistema de notificaciones
+      if (!user) return;
 
-    // Para médicos: suscripción automática solo a sus propias recetas
-    const { data: { user: currentUser } } = await supabase.auth.getUser();
-    if (!currentUser) return;
+      // Para médicos: suscripción automática solo a sus propias recetas
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) return;
 
-    // Obtener el perfil del usuario para verificar si es médico
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('role, doctor_id')
-      .eq('user_id', currentUser.id)
-      .single();
+      // Obtener el perfil del usuario para verificar si es médico
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role, doctor_id')
+        .eq('user_id', currentUser.id)
+        .single();
 
-    if (profile?.role === 'doctor') {
-      // Solo suscribirse a cambios de sus propias recetas
-      const doctorPrescriptionsChannel = supabase
-        .channel('doctor_prescriptions')
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'prescriptions',
-            filter: `created_by=eq.${currentUser.id}`
-          },
-          () => {
-            // Recargar solo las recetas del médico
-            loadPrescriptions();
-          }
-        )
-        .subscribe();
+      if (profile?.role === 'doctor') {
+        // Solo suscribirse a cambios de sus propias recetas
+        const doctorPrescriptionsChannel = supabase
+          .channel('doctor_prescriptions')
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'prescriptions',
+              filter: `created_by=eq.${currentUser.id}`
+            },
+            () => {
+              // Recargar solo las recetas del médico
+              loadPrescriptions();
+            }
+          )
+          .subscribe();
 
-      return () => {
-        doctorPrescriptionsChannel.unsubscribe();
-      };
-    }
+        return () => {
+          doctorPrescriptionsChannel.unsubscribe();
+        };
+      }
+    };
+
+    setupSubscriptions();
   }, [user, loadPrescriptions]);
 
   // Funciones de carga individuales
