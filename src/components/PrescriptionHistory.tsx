@@ -376,7 +376,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-          <div className="lg:col-span-1">
+          <div>
             <DateRangePicker
               startDate={filterDateFrom}
               endDate={filterDateTo}
