@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
+import { useAuth } from '../contexts/AuthContext';
 import { generateStatisticsReport } from '../utils/reportGenerator';
 import { DateRangePicker } from './DateRangePicker';
 import { BarChart3, Calendar, User, Activity, TrendingUp, FileText, Filter, Download, CheckCircle } from 'lucide-react';
