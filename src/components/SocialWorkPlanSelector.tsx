@@ -55,6 +55,14 @@ export function SocialWorkPlanSelector({
     }
   }, [selectedSocialWork, availablePlans, value, onChange]);
 
+  // Auto-seleccionar si solo hay un plan disponible
+  useEffect(() => {
+    if (selectedSocialWork && availablePlans.length === 1 && !value) {
+      const singlePlan = availablePlans[0];
+      onChange(singlePlan.name);
+    }
+  }, [selectedSocialWork, availablePlans, value, onChange]);
+
   const handleSelect = (plan: SocialWorkPlan) => {
     onChange(plan.name);
     setFilter('');
