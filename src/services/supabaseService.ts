@@ -261,10 +261,11 @@ export const patientService = {
         query = query.or(`name.ilike.%${word}%,last_name.ilike.%${word}%,dni.ilike.%${word}%`);
       } else if (words.length > 1) {
         // Búsqueda de múltiples palabras - cada palabra debe aparecer en algún campo
-        const conditions = words.map(word => 
-          `(name.ilike.%${word}% or last_name.ilike.%${word}% or dni.ilike.%${word}%)`
-        ).join(' and ');
-        query = query.or(conditions);
+        const orConditions = words.map(word => 
+          `or(name.ilike.%${word}%,last_name.ilike.%${word}%,dni.ilike.%${word}%)`
+        );
+        const andCondition = `and(${orConditions.join(',')})`;
+        query = query.filter('or', andCondition);
       }
       
       const { data, error } = await query
