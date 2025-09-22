@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Search } from 'lucide-react';
+import { ChevronDown, Search, Loader2 } from 'lucide-react';
 
 interface Option {
   id: string;
@@ -16,15 +16,34 @@ interface AutoCompleteProps {
   onCreateNew?: (value: string) => void;
   createNewLabel?: string;
   disabled?: boolean;
+  onSearch?: (searchTerm: string) => Promise<Option[]>;
+  minSearchLength?: number;
+  searchPlaceholder?: string;
 }
 
-export function AutoComplete({ options, value, onChange, placeholder, label, onCreateNew, createNewLabel, disabled = false }: AutoCompleteProps) {
+export function AutoComplete({ 
+  options, 
+  value, 
+  onChange, 
+  placeholder, 
+  label, 
+  onCreateNew, 
+  createNewLabel, 
+  disabled = false,
+  onSearch,
+  minSearchLength = 3,
+  searchPlaceholder
+}: AutoCompleteProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState('');
+  const [searchResults, setSearchResults] = useState<Option[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const filteredOptions = options.filter(option =>
+  // Usar resultados de búsqueda si están disponibles, sino usar opciones filtradas
+  const displayOptions = onSearch && hasSearched ? searchResults : options.filter(option =>
     option.label.toLowerCase().includes(filter.toLowerCase())
   );
 
@@ -39,10 +58,37 @@ export function AutoComplete({ options, value, onChange, placeholder, label, onC
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Efecto para búsqueda con debounce
+  useEffect(() => {
+    if (!onSearch || filter.length < minSearchLength) {
+      setSearchResults([]);
+      setHasSearched(false);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const results = await onSearch(filter);
+        setSearchResults(results);
+        setHasSearched(true);
+      } catch (error) {
+        console.error('Error searching:', error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [filter, onSearch, minSearchLength]);
+
   const handleSelect = (option: Option) => {
     onChange(option.label, option);
     setFilter('');
     setIsOpen(false);
+    setHasSearched(false);
+    setSearchResults([]);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,6 +97,16 @@ export function AutoComplete({ options, value, onChange, placeholder, label, onC
     setFilter(inputValue);
     setIsOpen(true);
   };
+
+  const handleCreateNew = () => {
+    if (onCreateNew && value.trim()) {
+      onCreateNew(value.trim());
+      setIsOpen(false);
+    }
+  };
+
+  const showMinLengthMessage = onSearch && filter.length > 0 && filter.length < minSearchLength;
+  const showNoResults = displayOptions.length === 0 && !isSearching && !showMinLengthMessage;
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -65,7 +121,7 @@ export function AutoComplete({ options, value, onChange, placeholder, label, onC
           onChange={handleInputChange}
           onFocus={() => setIsOpen(true)}
           disabled={disabled}
-          placeholder={placeholder}
+          placeholder={searchPlaceholder || placeholder}
           className="w-full px-3 py-2 pl-10 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
         />
         <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
@@ -81,7 +137,20 @@ export function AutoComplete({ options, value, onChange, placeholder, label, onC
       
       {isOpen && (
         <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
-          {filteredOptions.length === 0 ? (
+          {isSearching ? (
+            <div className="px-3 py-4 text-center">
+              <div className="flex items-center justify-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin text-primary-600" />
+                <span className="text-sm text-gray-600">Buscando...</span>
+              </div>
+            </div>
+          ) : showMinLengthMessage ? (
+            <div className="px-3 py-4 text-center">
+              <div className="text-sm text-gray-500">
+                Escriba al menos {minSearchLength} caracteres para buscar
+              </div>
+            </div>
+          ) : showNoResults ? (
             <div>
               <div className="px-3 py-2 text-gray-500 text-sm">
                 No se encontraron resultados
@@ -89,10 +158,7 @@ export function AutoComplete({ options, value, onChange, placeholder, label, onC
               {onCreateNew && value.trim() && (
                 <button
                   type="button"
-                  onClick={() => {
-                    onCreateNew(value.trim());
-                    setIsOpen(false);
-                  }}
+                  onClick={handleCreateNew}
                   className="w-full px-3 py-2 text-left hover:bg-primary-50 focus:bg-primary-50 focus:outline-none border-t border-gray-200 text-primary-600 font-medium text-sm"
                 >
                   + {createNewLabel || 'Crear nuevo'}: "{value.trim()}"
@@ -100,16 +166,32 @@ export function AutoComplete({ options, value, onChange, placeholder, label, onC
               )}
             </div>
           ) : (
-            filteredOptions.map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                onClick={() => handleSelect(option)}
-                className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 text-sm"
-              >
-                <div className="font-medium">{option.label}</div>
-              </button>
-            ))
+            <>
+              {displayOptions.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => handleSelect(option)}
+                  className="w-full px-3 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0 text-sm"
+                >
+                  <div className="font-medium">{option.label}</div>
+                </button>
+              ))}
+              {onSearch && hasSearched && searchResults.length > 0 && (
+                <div className="px-3 py-2 text-xs text-gray-500 border-t border-gray-200 bg-gray-50">
+                  Mostrando {searchResults.length} resultados
+                </div>
+              )}
+              {onCreateNew && value.trim() && !displayOptions.some(opt => opt.label.toLowerCase() === value.trim().toLowerCase()) && (
+                <button
+                  type="button"
+                  onClick={handleCreateNew}
+                  className="w-full px-3 py-2 text-left hover:bg-primary-50 focus:bg-primary-50 focus:outline-none border-t border-gray-200 text-primary-600 font-medium text-sm"
+                >
+                  + {createNewLabel || 'Crear nuevo'}: "{value.trim()}"
+                </button>
+              )}
+            </>
           )}
         </div>
       )}

@@ -34,6 +34,7 @@ interface DataContextType {
   addPatient: (patient: Omit<Patient, 'id'>) => Promise<Patient>;
   updatePatient: (id: string, patient: Partial<Patient>) => Promise<void>;
   deletePatient: (id: string) => Promise<void>;
+  searchPatientsForAutocomplete: (searchTerm: string) => Promise<Patient[]>;
   addPractice: (practice: Omit<Practice, 'id'>) => Promise<void>;
   updatePractice: (id: string, practice: Partial<Practice>) => Promise<void>;
   deletePractice: (id: string) => Promise<void>;
@@ -459,6 +460,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const searchPatientsForAutocomplete = async (searchTerm: string): Promise<Patient[]> => {
+    try {
+      return await patientService.searchForAutocomplete(searchTerm, 50);
+    } catch (err) {
+      console.error('Error searching patients for autocomplete:', err);
+      return [];
+    }
+  };
+
   const value = {
     doctors,
     patients,
@@ -493,6 +503,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     addSocialWork,
     updateSocialWork,
     deleteSocialWork,
+    searchPatientsForAutocomplete,
     getNextPrescriptionNumber,
     refreshData
   };

@@ -210,6 +210,45 @@ export const patientService = {
     }
   },
 
+  async searchForAutocomplete(searchTerm: string, limit: number = 50): Promise<Patient[]> {
+    try {
+      // Check if Supabase is properly configured
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        console.warn('Supabase not configured, returning empty patients array');
+        return [];
+      }
+
+      // Búsqueda específica para autocomplete con límite reducido
+      const { data, error } = await supabase
+        .from('patients')
+        .select('*')
+        .or(`name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,dni.ilike.%${searchTerm}%`)
+        .order('name', { ascending: true })
+        .limit(limit);
+      
+      if (error) {
+        console.error('Error searching patients for autocomplete:', error);
+        return [];
+      }
+      
+      return data.map(patient => ({
+        id: patient.id,
+        name: patient.name,
+        lastName: patient.last_name || '',
+        dni: patient.dni,
+        socialWork: patient.social_work,
+        affiliateNumber: patient.affiliate_number || '',
+        plan: patient.plan || '',
+        phone: patient.phone,
+        email: patient.email,
+        address: patient.address
+      }));
+    } catch (error) {
+      console.error('Network error searching patients for autocomplete:', error);
+      return [];
+    }
+  },
+
   async create(patient: Omit<Patient, 'id'>): Promise<Patient> {
     const { data, error } = await supabase
       .from('patients')

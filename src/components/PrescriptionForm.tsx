@@ -16,14 +16,12 @@ interface PrescriptionFormProps {
 export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: PrescriptionFormProps) {
   const { 
     doctors, 
-    patients, 
     practices, 
     loadingDoctors,
-    loadingPatients,
     loadingPractices,
     loadDoctors,
-    loadPatients,
     loadPractices,
+    searchPatientsForAutocomplete,
     getNextPrescriptionNumber, 
     addPrescription, 
     updatePrescription, 
@@ -55,6 +53,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [doctorSearch, setDoctorSearch] = useState('');
   const [patientSearch, setPatientSearch] = useState('');
+  const [patientSearchResults, setPatientSearchResults] = useState<Patient[]>([]);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [patientCreationSuccess, setPatientCreationSuccess] = useState(false);
@@ -63,9 +62,23 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   // Cargar datos necesarios para el formulario
   useEffect(() => {
     loadDoctors();
-    loadPatients(1, true);
     loadPractices();
   }, []);
+
+  // Función para buscar pacientes en el autocomplete
+  const handlePatientSearch = async (searchTerm: string): Promise<Option[]> => {
+    try {
+      const patients = await searchPatientsForAutocomplete(searchTerm);
+      return patients.map(patient => ({
+        id: patient.id,
+        label: `${patient.name} ${patient.lastName} - DNI: ${patient.dni}`,
+        value: patient
+      }));
+    } catch (error) {
+      console.error('Error searching patients:', error);
+      return [];
+    }
+  };
 
   // Si es doctor, preseleccionar su información
   useEffect(() => {
@@ -166,16 +179,6 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
     label: `${doctor.name} - ${doctor.license}`,
     value: doctor
   })).sort((a, b) => a.value.name.localeCompare(b.value.name, 'es', { sensitivity: 'base' }));
-
-  const patientOptions = patients.map(patient => ({
-    id: patient.id,
-    label: `${patient.name} ${patient.lastName} - DNI: ${patient.dni}`,
-    value: patient
-  })).sort((a, b) => {
-    const fullNameA = `${a.value.name} ${a.value.lastName}`.trim();
-    const fullNameB = `${b.value.name} ${b.value.lastName}`.trim();
-    return fullNameA.localeCompare(fullNameB, 'es', { sensitivity: 'base' });
-  });
 
   const filteredPractices = practices.filter(practice => {
     if (prescriptionType === 'studies') return practice.category === 'study';
@@ -417,11 +420,14 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
         {/* Paciente */}
         <div>
           <AutoComplete
-            options={patientOptions}
+            options={[]} // No cargar opciones por defecto
             value={patientSearch}
             onChange={handlePatientChange}
-            placeholder="Buscar paciente..."
+            placeholder="Escriba al menos 3 caracteres para buscar..."
+            searchPlaceholder="Buscar por nombre, apellido o DNI..."
             label="Paciente"
+            onSearch={handlePatientSearch}
+            minSearchLength={3}
             onCreateNew={handleCreatePatient}
             createNewLabel="Crear paciente"
           />
