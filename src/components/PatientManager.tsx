@@ -76,6 +76,13 @@ export function PatientManager() {
     exists: boolean;
     message: string;
   }>({ isChecking: false, exists: false, message: '' });
+  const [debouncedFilters, setDebouncedFilters] = useState({
+    searchTerm: '',
+    filterName: '',
+    filterDNI: '',
+    filterSocialWork: '',
+    filterAffiliateNumber: ''
+  });
   const [formData, setFormData] = useState({
     name: '',
     lastName: '',
@@ -95,25 +102,37 @@ export function PatientManager() {
 
   // Función para buscar pacientes con debounce
   useEffect(() => {
+    // Actualizar los filtros con debounce después de 1 segundo
     const timeoutId = setTimeout(() => {
-      handleSearch();
-    }, 300);
+      setDebouncedFilters({
+        searchTerm,
+        filterName,
+        filterDNI,
+        filterSocialWork,
+        filterAffiliateNumber
+      });
+    }, 1000);
 
     return () => clearTimeout(timeoutId);
   }, [searchTerm, filterName, filterDNI, filterSocialWork, filterAffiliateNumber]);
 
+  // Ejecutar búsqueda cuando cambien los filtros con debounce
+  useEffect(() => {
+    handleSearch();
+  }, [debouncedFilters]);
+
   const handleSearch = async () => {
-    const hasFilters = searchTerm || filterName || filterDNI || filterSocialWork || filterAffiliateNumber;
+    const hasFilters = debouncedFilters.searchTerm || debouncedFilters.filterName || debouncedFilters.filterDNI || debouncedFilters.filterSocialWork || debouncedFilters.filterAffiliateNumber;
     
     if (hasFilters) {
       setIsSearching(true);
       const filters = {
-        name: filterName,
-        dni: filterDNI,
-        socialWork: filterSocialWork,
-        affiliateNumber: filterAffiliateNumber
+        name: debouncedFilters.filterName,
+        dni: debouncedFilters.filterDNI,
+        socialWork: debouncedFilters.filterSocialWork,
+        affiliateNumber: debouncedFilters.filterAffiliateNumber
       };
-      await searchPatients(searchTerm, filters, 1, true);
+      await searchPatients(debouncedFilters.searchTerm, filters, 1, true);
       setIsSearching(false);
     } else {
       // Si no hay filtros, cargar todos los pacientes
@@ -127,16 +146,16 @@ export function PatientManager() {
     setLoadingMore(true);
     const nextPage = patientsMetadata.currentPage + 1;
     
-    const hasFilters = searchTerm || filterName || filterDNI || filterSocialWork || filterAffiliateNumber;
+    const hasFilters = debouncedFilters.searchTerm || debouncedFilters.filterName || debouncedFilters.filterDNI || debouncedFilters.filterSocialWork || debouncedFilters.filterAffiliateNumber;
     
     if (hasFilters) {
       const filters = {
-        name: filterName,
-        dni: filterDNI,
-        socialWork: filterSocialWork,
-        affiliateNumber: filterAffiliateNumber
+        name: debouncedFilters.filterName,
+        dni: debouncedFilters.filterDNI,
+        socialWork: debouncedFilters.filterSocialWork,
+        affiliateNumber: debouncedFilters.filterAffiliateNumber
       };
-      await searchPatients(searchTerm, filters, nextPage, false);
+      await searchPatients(debouncedFilters.searchTerm, filters, nextPage, false);
     } else {
       await loadPatients(nextPage, false);
     }
