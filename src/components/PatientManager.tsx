@@ -76,6 +76,10 @@ export function PatientManager() {
   const [isSearching, setIsSearching] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [dniValidation, setDniValidation] = useState<{
+    isValid: boolean;
+    message: string;
+  }>({ isValid: true, message: '' });
+  const [selectedSocialWorkForForm, setSelectedSocialWorkForForm] = useState<any>(null);
   const [debouncedFilters, setDebouncedFilters] = useState({
     searchTerm: '',
     filterName: '',
