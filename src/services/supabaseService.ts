@@ -259,6 +259,7 @@ export const prescriptionService = {
       additionalNotes: prescription.additional_notes,
       date: prescription.date,
       createdAt: prescription.created_at,
+      createdBy: prescription.created_by,
       authorized: prescription.authorized
     }));
   },
@@ -355,7 +356,9 @@ export const prescriptionService = {
       })),
       additionalNotes: fullPrescription.additional_notes,
       date: fullPrescription.date,
-      createdAt: fullPrescription.created_at
+      createdAt: fullPrescription.created_at,
+      createdBy: fullPrescription.created_by,
+      authorized: fullPrescription.authorized
     };
   },
 
@@ -372,8 +375,7 @@ export const prescriptionService = {
         doctor_id: updates.doctorId,
         patient_id: updates.patientId,
         additional_notes: updates.additionalNotes || null,
-        date: updates.date,
-        created_by: user.id
+        date: updates.date
       })
       .eq('id', id)
       .select()
@@ -453,6 +455,7 @@ export const prescriptionService = {
       additionalNotes: fullPrescription.additional_notes,
       date: fullPrescription.date,
       createdAt: fullPrescription.created_at,
+      createdBy: fullPrescription.created_by,
       authorized: fullPrescription.authorized
     };
   },

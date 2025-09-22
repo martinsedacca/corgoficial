@@ -47,6 +47,7 @@ export interface Prescription {
   additionalNotes?: string;
   date: string;
   createdAt: string;
+  createdBy?: string;
   authorized: boolean;
 }
 
