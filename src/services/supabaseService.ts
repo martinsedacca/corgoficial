@@ -152,16 +152,20 @@ export const patientService = {
         const searchTermLower = searchTerm.toLowerCase().trim();
         const words = searchTermLower.split(/\s+/).filter(word => word.length > 0);
         
-        if (words.length === 1) {
-          // Búsqueda de una sola palabra
-          const word = words[0];
-          query = query.or(`name.ilike.%${word}%,last_name.ilike.%${word}%,dni.ilike.%${word}%,social_work.ilike.%${word}%,affiliate_number.ilike.%${word}%`);
-        } else if (words.length > 1) {
-          // Búsqueda de múltiples palabras - cada palabra debe aparecer en algún campo
-          const conditions = words.map(word => 
-            `(name.ilike.%${word}% or last_name.ilike.%${word}% or dni.ilike.%${word}% or social_work.ilike.%${word}% or affiliate_number.ilike.%${word}%)`
-          ).join(' and ');
-          query = query.or(conditions);
+        if (words.length > 0) {
+          // Para cada palabra, crear una condición OR que busque en todos los campos
+          const wordConditions = words.map(word => 
+            `or(name.ilike.%${word}%,last_name.ilike.%${word}%,dni.ilike.%${word}%)`
+          );
+          
+          // Si hay múltiples palabras, usar AND para combinar las condiciones
+          if (wordConditions.length === 1) {
+            query = query.or(wordConditions[0].replace('or(', '').replace(')', ''));
+          } else {
+            query = query.filter('and', `(${wordConditions.join(',')})`);
+          }
+            query = query.filter('and', `(${wordConditions.join(',')})`);
+          }
         }
       }
 
@@ -169,14 +173,16 @@ export const patientService = {
         const nameLower = filters.name.toLowerCase().trim();
         const nameWords = nameLower.split(/\s+/).filter(word => word.length > 0);
         
-        if (nameWords.length === 1) {
-          const word = nameWords[0];
-          query = query.or(`name.ilike.%${word}%,last_name.ilike.%${word}%`);
-        } else if (nameWords.length > 1) {
-          const conditions = nameWords.map(word => 
-            `(name.ilike.%${word}% or last_name.ilike.%${word}%)`
-          ).join(' and ');
-          query = query.or(conditions);
+        if (nameWords.length > 0) {
+          const nameConditions = nameWords.map(word => 
+            `or(name.ilike.%${word}%,last_name.ilike.%${word}%)`
+          );
+          
+          if (nameConditions.length === 1) {
+            query = query.or(nameConditions[0].replace('or(', '').replace(')', ''));
+          } else {
+            query = query.filter('and', `(${nameConditions.join(',')})`);
+          }
         }
       }
 
