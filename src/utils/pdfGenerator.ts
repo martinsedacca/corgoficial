@@ -1357,3 +1357,7 @@ export const generateMultiplePrescriptionsPDF = async (prescriptions: Prescripti
       });
 
       const imgData = canvas.toDataURL('
+      )
+    }
+  }
+}
