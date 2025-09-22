@@ -329,6 +329,9 @@ export function SocialWorkManager() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-base sm:text-lg font-semibold text-gray-900">{socialWork.name}</h3>
+                      <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs">
+                        {getSocialWorkPlans(socialWork.id).length} planes
+                      </span>
                       {socialWork.code && (
                         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-mono">
                           {socialWork.code}
