@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { usePrintConfig } from '../contexts/PrintConfigContext';
 import { LoadingSpinner } from './LoadingSpinner';
 import { PrescriptionForm } from './PrescriptionForm';
 import { PrescriptionViewer } from './PrescriptionViewer';
@@ -13,12 +14,13 @@ import { UserManager } from './UserManager';
 import { PrintFormatSettings } from './PrintFormatSettings';
 import { Prescription } from '../types';
 import { FileText, History, User, Users, Activity, Building2, BarChart3, Settings, LogOut, ChevronDown } from 'lucide-react';
-import { Printer } from 'lucide-react';
+import { Printer, ToggleLeft, ToggleRight } from 'lucide-react';
 
 type View = 'history' | 'dashboard' | 'new' | 'doctors' | 'patients' | 'practices' | 'admin-practices' | 'social-works' | 'users' | 'print-settings';
 
 export function AppContent() {
   const { user, profile, signOut, hasPermission } = useAuth();
+  const { printFormat, setPrintFormat } = usePrintConfig();
   const [currentView, setCurrentView] = useState<View>('history');
   const [showAdminDropdown, setShowAdminDropdown] = useState(false);
   const [viewingPrescription, setViewingPrescription] = useState<Prescription | null>(null);
@@ -61,7 +63,6 @@ export function AppContent() {
     ...(hasPermission('manage_patients') ? [{ key: 'patients', label: 'Pacientes', icon: Users, color: 'text-green-600' }] : []),
     ...(hasPermission('manage_practices') ? [{ key: 'admin-practices', label: 'Prácticas', icon: Activity, color: 'text-purple-600' }] : []),
     ...(hasPermission('manage_social_works') ? [{ key: 'social-works', label: 'Obras Sociales', icon: Building2, color: 'text-blue-600' }] : []),
-    ...(hasPermission('manage_practices') || hasPermission('manage_prescriptions') ? [{ key: 'print-settings', label: 'Impresora', icon: Printer, color: 'text-orange-600' }] : []),
     ...(hasPermission('manage_users') ? [{ key: 'users', label: 'Usuarios', icon: Settings, color: 'text-red-600' }] : [])
   ].filter(Boolean);
 
@@ -173,7 +174,30 @@ export function AppContent() {
               )}
             </div>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 sm:gap-4">
+              {/* Toggle de formato de impresión */}
+              {(hasPermission('manage_practices') || hasPermission('manage_prescriptions')) && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-600 hidden sm:inline">Papel:</span>
+                  <button
+                    onClick={() => setPrintFormat(printFormat === 'A4' ? 'A5' : 'A4')}
+                    className={`flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors border ${
+                      printFormat === 'A4'
+                        ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                        : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
+                    }`}
+                    title={`Cambiar a formato ${printFormat === 'A4' ? 'A5' : 'A4'}`}
+                  >
+                    {printFormat === 'A4' ? (
+                      <ToggleLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                    ) : (
+                      <ToggleRight className="h-3 w-3 sm:h-4 sm:w-4" />
+                    )}
+                    <span className="font-mono">{printFormat}</span>
+                  </button>
+                </div>
+              )}
+              
               <button
                 onClick={handleSignOut}
                 className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium text-red-600 hover:text-red-900 hover:bg-red-50 transition-colors"
@@ -209,7 +233,6 @@ export function AppContent() {
         {currentView === 'admin-practices' && <PracticeAdmin />}
         {currentView === 'social-works' && <SocialWorkManager />}
         {currentView === 'users' && <UserManager />}
-        {currentView === 'print-settings' && <PrintFormatSettings />}
       </div>
     </div>
   );
