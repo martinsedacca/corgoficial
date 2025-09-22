@@ -1,5 +1,4 @@
-import React, { createContext, useContext, ReactNode, useState } from 'react';
-import { useEffect } from 'react';
+import React, { createContext, useContext, ReactNode, useState, useCallback, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabase';
 import { Doctor, Patient, Practice, Prescription, SocialWork } from '../types';
@@ -103,7 +102,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [user, loadPrescriptions]);
 
   // Funciones de carga individuales
-  const loadDoctors = async () => {
+  const loadDoctors = useCallback(async () => {
     if (loadingDoctors) return;
     
     setLoadingDoctors(true);
@@ -115,9 +114,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoadingDoctors(false);
     }
-  };
+  }, [loadingDoctors]);
 
-  const loadPatients = async () => {
+  const loadPatients = useCallback(async () => {
     if (loadingPatients) return;
     
     setLoadingPatients(true);
@@ -129,9 +128,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoadingPatients(false);
     }
-  };
+  }, [loadingPatients]);
 
-  const loadPractices = async () => {
+  const loadPractices = useCallback(async () => {
     if (loadingPractices) return;
     
     setLoadingPractices(true);
@@ -145,9 +144,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoadingPractices(false);
     }
-  };
+  }, [loadingPractices]);
 
-  const loadPrescriptions = async () => {
+  const loadPrescriptions = useCallback(async () => {
     if (loadingPrescriptions) return;
     
     setLoadingPrescriptions(true);
@@ -159,9 +158,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoadingPrescriptions(false);
     }
-  };
+  }, [loadingPrescriptions]);
 
-  const loadSocialWorks = async () => {
+  const loadSocialWorks = useCallback(async () => {
     if (loadingSocialWorks) return;
     
     setLoadingSocialWorks(true);
@@ -173,9 +172,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoadingSocialWorks(false);
     }
-  };
+  }, [loadingSocialWorks]);
 
-  const refreshData = async () => {
+  const refreshData = useCallback(async () => {
     // Recargar todos los datos
     await Promise.all([
       loadDoctors(),
@@ -184,7 +183,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       loadPrescriptions(),
       loadSocialWorks()
     ]);
-  };
+  }, [loadDoctors, loadPatients, loadPractices, loadPrescriptions, loadSocialWorks]);
 
   // Funciones para médicos
   const addDoctor = async (doctorData: Omit<Doctor, 'id'>) => {
