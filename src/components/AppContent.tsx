@@ -180,18 +180,18 @@ export function AppContent() {
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-600 hidden sm:inline">Papel:</span>
                   <div className="relative inline-flex items-center">
-                    <div className="flex bg-gray-200 rounded-full p-1 relative">
+                    <div className="flex bg-gray-200 rounded-full p-1 relative w-24">
                       {/* Fondo deslizante */}
                       <div 
-                        className={`absolute top-1 bottom-1 w-12 bg-primary-600 rounded-full transition-transform duration-200 ease-in-out ${
-                          printFormat === 'A4' ? 'translate-x-0' : 'translate-x-12'
+                        className={`absolute top-1 bottom-1 w-11 bg-primary-600 rounded-full transition-transform duration-200 ease-in-out ${
+                          printFormat === 'A4' ? 'translate-x-0' : 'translate-x-11'
                         }`}
                       ></div>
                       
                       {/* Opción A4 */}
                       <button
                         onClick={() => setPrintFormat('A4')}
-                        className={`relative z-10 px-3 py-1 text-xs font-medium rounded-full transition-colors duration-200 ${
+                        className={`relative z-10 w-11 py-1 text-xs font-medium rounded-full transition-colors duration-200 ${
                           printFormat === 'A4'
                             ? 'text-white'
                             : 'text-gray-600 hover:text-gray-800'
@@ -203,7 +203,7 @@ export function AppContent() {
                       {/* Opción A5 */}
                       <button
                         onClick={() => setPrintFormat('A5')}
-                        className={`relative z-10 px-3 py-1 text-xs font-medium rounded-full transition-colors duration-200 ${
+                        className={`relative z-10 w-11 py-1 text-xs font-medium rounded-full transition-colors duration-200 ${
                           printFormat === 'A5'
                             ? 'text-white'
                             : 'text-gray-600 hover:text-gray-800'
