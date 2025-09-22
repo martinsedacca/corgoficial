@@ -20,6 +20,17 @@ export interface Patient {
   address?: string;
 }
 
+export interface SocialWorkPlan {
+  id: string;
+  socialWorkId: string;
+  name: string;
+  code?: string;
+  description?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Practice {
   id: string;
   name: string;

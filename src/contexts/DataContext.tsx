@@ -17,17 +17,21 @@ interface DataContextType {
   practices: Practice[];
   prescriptions: Prescription[];
   socialWorks: SocialWork[];
+  socialWorkPlans: SocialWorkPlan[];
   loadingDoctors: boolean;
   loadingPatients: boolean;
   loadingPractices: boolean;
   loadingPrescriptions: boolean;
   loadingSocialWorks: boolean;
+  loadingSocialWorkPlans: boolean;
   loadDoctors: () => Promise<void>;
   loadPatients: (page?: number, reset?: boolean) => Promise<void>;
   searchPatients: (searchTerm: string, filters?: any, page?: number, reset?: boolean) => Promise<void>;
   loadPractices: () => Promise<void>;
   loadPrescriptions: () => Promise<void>;
   loadSocialWorks: () => Promise<void>;
+  loadSocialWorkPlans: () => Promise<void>;
+  getSocialWorkPlans: (socialWorkId: string) => SocialWorkPlan[];
   addDoctor: (doctor: Omit<Doctor, 'id'>) => Promise<void>;
   updateDoctor: (id: string, doctor: Partial<Doctor>) => Promise<void>;
   deleteDoctor: (id: string) => Promise<void>;
@@ -44,6 +48,9 @@ interface DataContextType {
   addSocialWork: (socialWork: Omit<SocialWork, 'id'>) => Promise<void>;
   updateSocialWork: (id: string, socialWork: Partial<SocialWork>) => Promise<void>;
   deleteSocialWork: (id: string) => Promise<void>;
+  addSocialWorkPlan: (plan: Omit<SocialWorkPlan, 'id'>) => Promise<void>;
+  updateSocialWorkPlan: (id: string, plan: Partial<SocialWorkPlan>) => Promise<void>;
+  deleteSocialWorkPlan: (id: string) => Promise<void>;
   getNextPrescriptionNumber: () => Promise<number>;
   updatePrescriptionAuthorization: (id: string, authorized: boolean) => Promise<void>;
   refreshData: () => Promise<void>;
@@ -64,11 +71,13 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [practices, setPractices] = useState<Practice[]>([]);
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [socialWorks, setSocialWorks] = useState<SocialWork[]>([]);
+  const [socialWorkPlans, setSocialWorkPlans] = useState<SocialWorkPlan[]>([]);
   const [loadingDoctors, setLoadingDoctors] = useState(false);
   const [loadingPatients, setLoadingPatients] = useState(false);
   const [loadingPractices, setLoadingPractices] = useState(false);
   const [loadingPrescriptions, setLoadingPrescriptions] = useState(false);
   const [loadingSocialWorks, setLoadingSocialWorks] = useState(false);
+  const [loadingSocialWorkPlans, setLoadingSocialWorkPlans] = useState(false);
 
   // Create refs to hold current loading states for stable function references
   const loadingPrescriptionsRef = useRef(loadingPrescriptions);
@@ -266,6 +275,26 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   }, [loadingSocialWorks]);
 
+  const loadSocialWorkPlans = useCallback(async () => {
+    if (loadingSocialWorkPlans) return;
+    
+    setLoadingSocialWorkPlans(true);
+    try {
+      const socialWorkPlansData = await socialWorkPlanService.getAll();
+      setSocialWorkPlans(socialWorkPlansData);
+    } catch (err) {
+      console.error('Error loading social work plans:', err);
+      // Set empty array on error to prevent crashes
+      setSocialWorkPlans([]);
+    } finally {
+      setLoadingSocialWorkPlans(false);
+    }
+  }, [loadingSocialWorkPlans]);
+
+  const getSocialWorkPlans = useCallback((socialWorkId: string): SocialWorkPlan[] => {
+    return socialWorkPlans.filter(plan => plan.socialWorkId === socialWorkId && plan.isActive);
+  }, [socialWorkPlans]);
+
   const refreshData = useCallback(async () => {
     // Recargar todos los datos
     await Promise.all([
@@ -273,9 +302,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       loadPatients(),
       loadPractices(),
       loadPrescriptions(),
-      loadSocialWorks()
+      loadSocialWorks(),
+      loadSocialWorkPlans()
     ]);
-  }, [loadDoctors, loadPatients, loadPractices, loadPrescriptions, loadSocialWorks]);
+  }, [loadDoctors, loadPatients, loadPractices, loadPrescriptions, loadSocialWorks, loadSocialWorkPlans]);
 
   // Funciones para médicos
   const addDoctor = async (doctorData: Omit<Doctor, 'id'>) => {
@@ -456,6 +486,37 @@ export function DataProvider({ children }: { children: ReactNode }) {
       setSocialWorks(prev => prev.filter(sw => sw.id !== id));
     } catch (err) {
       console.error('Error deleting social work:', err);
+      throw err;
+    }
+  };
+
+  // Funciones para planes de obras sociales
+  const addSocialWorkPlan = async (planData: Omit<SocialWorkPlan, 'id'>) => {
+    try {
+      const newPlan = await socialWorkPlanService.create(planData);
+      setSocialWorkPlans(prev => [...prev, newPlan]);
+    } catch (err) {
+      console.error('Error adding social work plan:', err);
+      throw err;
+    }
+  };
+
+  const updateSocialWorkPlan = async (id: string, planData: Partial<SocialWorkPlan>) => {
+    try {
+      const updatedPlan = await socialWorkPlanService.update(id, planData);
+      setSocialWorkPlans(prev => prev.map(p => p.id === id ? updatedPlan : p));
+    } catch (err) {
+      console.error('Error updating social work plan:', err);
+      throw err;
+    }
+  };
+
+  const deleteSocialWorkPlan = async (id: string) => {
+    try {
+      await socialWorkPlanService.delete(id);
+      setSocialWorkPlans(prev => prev.filter(p => p.id !== id));
+    } catch (err) {
+      console.error('Error deleting social work plan:', err);
       throw err;
     }
   };
