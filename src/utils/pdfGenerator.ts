@@ -1356,8 +1356,39 @@ export const generateMultiplePrescriptionsPDF = async (prescriptions: Prescripti
         height: 794  // Alto A4
       });
 
-      const imgData = canvas.toDataURL('
-      )
+      const imgData = canvas.toDataURL('image/png');
+      
+      const imgWidth = recipeWidth - 4; // Margen pequeño
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      // Centrar verticalmente si es necesario
+      const yOffset = imgHeight > pdfHeight ? 0 : (pdfHeight - imgHeight) / 2;
+
+      // Posición X según si es lado izquierdo o derecho
+      const xOffset = isLeftSide ? 2 : pdfWidth / 2 + 2;
+
+      // Agregar la receta
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, imgWidth, Math.min(imgHeight, pdfHeight));
+
+      // Línea divisoria vertical punteada (solo si hay recetas en ambos lados)
+      if (prescriptions.length > 1) {
+        pdf.setDrawColor(200, 200, 200);
+        pdf.setLineDashPattern([2, 2], 0);
+        pdf.line(pdfWidth / 2, 0, pdfWidth / 2, pdfHeight);
+      }
+
+    } catch (error) {
+      console.error(`Error generando PDF para receta ${i + 1}:`, error);
+    } finally {
+      // Remover el contenido temporal del DOM
+      document.body.removeChild(pdfContent);
     }
   }
-}
+
+  // Descargar el PDF con todas las recetas
+  const fileName = prescriptions.length === 1 
+    ? `Receta_${prescriptions[0].number}_${prescriptions[0].patient.name}_${prescriptions[0].patient.lastName}`.replace(/\s+/g, '_')
+    : `Recetas_Multiples_${prescriptions.length}_recetas`;
+  
+  pdf.save(fileName + '.pdf');
+};
