@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabase';
 import { Doctor, Patient, Practice, Prescription, SocialWork } from '../types';
-import { doctorService, patientService, practiceService, prescriptionService, socialWorkService } from '../services/supabaseService';
+import { doctorService, patientService, practiceService, prescriptionService, socialWorkService, socialWorkPlanService } from '../services/supabaseService';
 
 interface DataContextType {
   doctors: Doctor[];
