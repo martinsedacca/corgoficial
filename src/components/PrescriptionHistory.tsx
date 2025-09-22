@@ -877,10 +877,6 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           )}
         </div>
       )}
-      {/* Controles de selección en lote - Solo para formato A4 */}
-      {printFormat === 'A4' && filteredPrescriptions.length > 0 && (
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
-          <div className="flex items-center gap-3">
 
       {/* Modal de error */}
       {showErrorModal && (
