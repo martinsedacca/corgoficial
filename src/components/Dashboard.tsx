@@ -88,6 +88,7 @@ export function Dashboard() {
     loadDoctors,
     loadPractices
   } = useData();
+  const { hasPermission } = useAuth();
   const [dateRange, setDateRange] = useState({
     startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 días atrás
     endDate: new Date().toISOString().split('T')[0]
@@ -95,6 +96,19 @@ export function Dashboard() {
   const [selectedDoctor, setSelectedDoctor] = useState<string>('all');
   const [selectedPractice, setSelectedPractice] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
+
+  // Solo usuarios con permisos de dashboard pueden acceder
+  if (!hasPermission('view_dashboard')) {
+    return (
+      <div className="bg-white rounded-lg shadow-lg p-6 text-center">
+        <div className="flex items-center justify-center mb-4">
+          <BarChart3 className="h-12 w-12 text-gray-400" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Dashboard no disponible</h3>
+        <p className="text-gray-600">Su tipo de usuario no tiene acceso al dashboard de estadísticas.</p>
+      </div>
+    );
+  }
 
   // Usar todas las prescripciones (modo público)
   useEffect(() => {

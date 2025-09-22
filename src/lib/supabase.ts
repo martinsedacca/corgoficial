@@ -123,6 +123,7 @@ export interface Database {
           date: string;
           created_at: string;
           updated_at: string;
+          created_by: string | null;
         };
         Insert: {
           id?: string;
@@ -134,6 +135,7 @@ export interface Database {
           date?: string;
           created_at?: string;
           updated_at?: string;
+          created_by?: string | null;
         };
         Update: {
           id?: string;
@@ -145,6 +147,7 @@ export interface Database {
           date?: string;
           created_at?: string;
           updated_at?: string;
+          created_by?: string | null;
         };
       };
       prescription_items: {
