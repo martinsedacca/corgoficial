@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { generateStatisticsReport } from '../utils/reportGenerator';
 import { DateRangePicker } from './DateRangePicker';
 import { BarChart3, Calendar, User, Activity, TrendingUp, FileText, Filter, Download, CheckCircle } from 'lucide-react';
@@ -97,6 +98,49 @@ export function Dashboard() {
   const [selectedDoctor, setSelectedDoctor] = useState<string>('all');
   const [selectedPractice, setSelectedPractice] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
+
+  // Configurar suscripción en tiempo real específica para el dashboard
+  useEffect(() => {
+    if (!hasPermission('view_dashboard')) return;
+
+    console.log('Setting up dashboard realtime subscription...');
+
+    // Suscripción específica para el dashboard que actualiza automáticamente
+    const dashboardSubscription = supabase
+      .channel('dashboard_updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'prescriptions'
+        },
+        (payload) => {
+          console.log('Dashboard: Prescription change detected:', payload);
+          // Recargar datos del dashboard
+          loadPrescriptions();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'prescription_items'
+        },
+        (payload) => {
+          console.log('Dashboard: Prescription items change detected:', payload);
+          // Recargar datos del dashboard
+          loadPrescriptions();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('Cleaning up dashboard subscription...');
+      dashboardSubscription.unsubscribe();
+    };
+  }, [hasPermission, loadPrescriptions]);
 
   // Solo usuarios con permisos de dashboard pueden acceder
   if (!hasPermission('view_dashboard')) {

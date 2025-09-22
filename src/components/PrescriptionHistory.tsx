@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { usePrintConfig } from '../contexts/PrintConfigContext';
 import { Prescription } from '../types';
 import { PrescriptionForm } from './PrescriptionForm';
@@ -88,6 +89,47 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     loadPrescriptions();
     loadSocialWorks();
   }, []);
+
+  // Configurar suscripción en tiempo real para el historial de recetas
+  useEffect(() => {
+    console.log('Setting up prescription history realtime subscription...');
+
+    // Suscripción específica para el historial que actualiza la lista en tiempo real
+    const historySubscription = supabase
+      .channel('prescription_history_updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'prescriptions'
+        },
+        (payload) => {
+          console.log('History: Prescription change detected:', payload);
+          // Recargar prescripciones para mostrar cambios inmediatos
+          loadPrescriptions();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'prescription_items'
+        },
+        (payload) => {
+          console.log('History: Prescription items change detected:', payload);
+          // Recargar prescripciones cuando cambian los items
+          loadPrescriptions();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('Cleaning up prescription history subscription...');
+      historySubscription.unsubscribe();
+    };
+  }, [loadPrescriptions]);
 
   const typeLabels = {
     studies: 'Estudios',

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, ReactNode, useState } from 'react';
+import { useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { supabase } from '../lib/supabase';
 import { Doctor, Patient, Practice, Prescription, SocialWork } from '../types';
 import { doctorService, patientService, practiceService, prescriptionService, socialWorkService } from '../services/supabaseService';
 
@@ -53,6 +55,128 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [loadingPractices, setLoadingPractices] = useState(false);
   const [loadingPrescriptions, setLoadingPrescriptions] = useState(false);
   const [loadingSocialWorks, setLoadingSocialWorks] = useState(false);
+
+  // Configurar suscripciones en tiempo real
+  useEffect(() => {
+    if (!user) return;
+
+    console.log('Setting up realtime subscriptions...');
+
+    // Suscripción a cambios en prescriptions
+    const prescriptionsSubscription = supabase
+      .channel('prescriptions_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'prescriptions'
+        },
+        (payload) => {
+          console.log('Prescription change detected:', payload);
+          // Recargar prescripciones cuando hay cambios
+          loadPrescriptions();
+        }
+      )
+      .subscribe();
+
+    // Suscripción a cambios en prescription_items
+    const prescriptionItemsSubscription = supabase
+      .channel('prescription_items_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'prescription_items'
+        },
+        (payload) => {
+          console.log('Prescription items change detected:', payload);
+          // Recargar prescripciones cuando hay cambios en los items
+          loadPrescriptions();
+        }
+      )
+      .subscribe();
+
+    // Suscripción a cambios en doctors
+    const doctorsSubscription = supabase
+      .channel('doctors_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'doctors'
+        },
+        (payload) => {
+          console.log('Doctor change detected:', payload);
+          loadDoctors();
+        }
+      )
+      .subscribe();
+
+    // Suscripción a cambios en patients
+    const patientsSubscription = supabase
+      .channel('patients_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'patients'
+        },
+        (payload) => {
+          console.log('Patient change detected:', payload);
+          loadPatients();
+        }
+      )
+      .subscribe();
+
+    // Suscripción a cambios en practices
+    const practicesSubscription = supabase
+      .channel('practices_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'practices'
+        },
+        (payload) => {
+          console.log('Practice change detected:', payload);
+          loadPractices();
+        }
+      )
+      .subscribe();
+
+    // Suscripción a cambios en social_works
+    const socialWorksSubscription = supabase
+      .channel('social_works_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'social_works'
+        },
+        (payload) => {
+          console.log('Social work change detected:', payload);
+          loadSocialWorks();
+        }
+      )
+      .subscribe();
+
+    // Cleanup function para desuscribirse cuando el componente se desmonte
+    return () => {
+      console.log('Cleaning up realtime subscriptions...');
+      prescriptionsSubscription.unsubscribe();
+      prescriptionItemsSubscription.unsubscribe();
+      doctorsSubscription.unsubscribe();
+      patientsSubscription.unsubscribe();
+      practicesSubscription.unsubscribe();
+      socialWorksSubscription.unsubscribe();
+    };
+  }, [user]);
 
   // Funciones de carga individuales
   const loadDoctors = async () => {

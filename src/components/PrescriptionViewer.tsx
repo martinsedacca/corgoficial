@@ -1,9 +1,11 @@
 import React from 'react';
 import { useState, useMemo } from 'react';
+import { useEffect } from 'react';
 import { Prescription } from '../types';
 import { companyInfo } from '../data/mockData';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { usePrintConfig } from '../contexts/PrintConfigContext';
 import { Calendar, User, Stethoscope, FileText, Download, Printer, Clock, CheckCircle } from 'lucide-react';
 import { generatePrescriptionPDF, printPrescriptionPDF, generatePrescriptionPDF_A5, printPrescriptionPDF_A5 } from '../utils/pdfGenerator';
@@ -25,6 +27,35 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
   const currentPrescription = useMemo(() => {
     return prescriptions.find(p => p.id === prescription.id) || prescription;
   }, [prescriptions, prescription.id, prescription]);
+
+  // Configurar suscripción en tiempo real para esta receta específica
+  useEffect(() => {
+    console.log('Setting up prescription viewer realtime subscription...');
+
+    // Suscripción específica para cambios en esta receta
+    const viewerSubscription = supabase
+      .channel(`prescription_viewer_${prescription.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'prescriptions',
+          filter: `id=eq.${prescription.id}`
+        },
+        (payload) => {
+          console.log('Viewer: Prescription update detected:', payload);
+          // Recargar prescripciones para actualizar la vista
+          loadPrescriptions();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('Cleaning up prescription viewer subscription...');
+      viewerSubscription.unsubscribe();
+    };
+  }, [prescription.id, loadPrescriptions]);
   
   const typeLabels = {
     studies: 'Autorización de Estudios',
