@@ -149,23 +149,28 @@ export const patientService = {
 
       // Aplicar filtros de búsqueda
       if (searchTerm) {
-        query = query.or(`name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,dni.ilike.%${searchTerm}%,social_work.ilike.%${searchTerm}%,affiliate_number.ilike.%${searchTerm}%`);
+        const searchTermLower = searchTerm.toLowerCase();
+        query = query.or(`name.ilike.%${searchTermLower}%,last_name.ilike.%${searchTermLower}%,dni.ilike.%${searchTermLower}%,social_work.ilike.%${searchTermLower}%,affiliate_number.ilike.%${searchTermLower}%`);
       }
 
       if (filters.name) {
-        query = query.or(`name.ilike.%${filters.name}%,last_name.ilike.%${filters.name}%`);
+        const nameLower = filters.name.toLowerCase();
+        query = query.or(`name.ilike.%${nameLower}%,last_name.ilike.%${nameLower}%`);
       }
 
       if (filters.dni) {
-        query = query.ilike('dni', `%${filters.dni}%`);
+        const dniLower = filters.dni.toLowerCase();
+        query = query.ilike('dni', `%${dniLower}%`);
       }
 
       if (filters.socialWork) {
-        query = query.ilike('social_work', `%${filters.socialWork}%`);
+        const socialWorkLower = filters.socialWork.toLowerCase();
+        query = query.ilike('social_work', `%${socialWorkLower}%`);
       }
 
       if (filters.affiliateNumber) {
-        query = query.ilike('affiliate_number', `%${filters.affiliateNumber}%`);
+        const affiliateNumberLower = filters.affiliateNumber.toLowerCase();
+        query = query.ilike('affiliate_number', `%${affiliateNumberLower}%`);
       }
 
       // Obtener total con filtros
@@ -219,10 +224,11 @@ export const patientService = {
       }
 
       // Búsqueda específica para autocomplete con límite reducido
+      const searchTermLower = searchTerm.toLowerCase();
       const { data, error } = await supabase
         .from('patients')
         .select('*')
-        .or(`name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%,dni.ilike.%${searchTerm}%`)
+        .or(`name.ilike.%${searchTermLower}%,last_name.ilike.%${searchTermLower}%,dni.ilike.%${searchTermLower}%`)
         .order('name', { ascending: true })
         .limit(limit);
       
