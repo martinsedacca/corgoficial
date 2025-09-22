@@ -24,6 +24,7 @@ const SkeletonSocialWorkCard = () => (
 
 export function SocialWorkManager() {
   const { socialWorks, addSocialWork, updateSocialWork, deleteSocialWork, loadingSocialWorks, loadSocialWorks } = useData();
+  const { socialWorkPlans, addSocialWorkPlan, updateSocialWorkPlan, deleteSocialWorkPlan, loadSocialWorkPlans, getSocialWorkPlans } = useData();
   const [showForm, setShowForm] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingSocialWork, setEditingSocialWork] = useState<SocialWork | null>(null);
@@ -33,6 +34,13 @@ export function SocialWorkManager() {
   const [planToDelete, setPlanToDelete] = useState<any>(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showPlanForm, setShowPlanForm] = useState(false);
+  const [editingPlan, setEditingPlan] = useState<any>(null);
+  const [planFormData, setPlanFormData] = useState({
+    name: '',
+    code: '',
+    description: ''
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     name: '',
@@ -48,6 +56,7 @@ export function SocialWorkManager() {
   // Cargar obras sociales cuando se monta el componente
   useEffect(() => {
     loadSocialWorks();
+    loadSocialWorkPlans();
   }, []);
 
   const filteredSocialWorks = socialWorks.filter(socialWork =>
@@ -153,6 +162,54 @@ export function SocialWorkManager() {
     setEditingSocialWork(null);
     setShowEditModal(false);
   };
+
+  const handleAddPlan = () => {
+    setPlanFormData({ name: '', code: '', description: '' });
+    setEditingPlan(null);
+    setShowPlanForm(true);
+  };
+
+  const handleEditPlan = (plan: any) => {
+    setEditingPlan(plan);
+    setPlanFormData({
+      name: plan.name,
+      code: plan.code || '',
+      description: plan.description || ''
+    });
+    setShowPlanForm(true);
+  };
+
+  const handleDeletePlan = (plan: any) => {
+    setPlanToDelete(plan);
+    setShowDeletePlanModal(true);
+  };
+
+  const handlePlanSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSocialWork) return;
+    
+    try {
+      if (editingPlan) {
+        await updateSocialWorkPlan(editingPlan.id, planFormData);
+      } else {
+        await addSocialWorkPlan({
+          socialWorkId: editingSocialWork.id,
+          name: planFormData.name,
+          code: planFormData.code,
+          description: planFormData.description,
+          isActive: true
+        });
+      }
+      setShowPlanForm(false);
+      setPlanFormData({ name: '', code: '', description: '' });
+      setEditingPlan(null);
+    } catch (error) {
+      console.error('Error saving plan:', error);
+      setErrorMessage('Error al guardar el plan. Por favor, intente nuevamente.');
+      setShowErrorModal(true);
+    }
+  };
+
   return (
     <>
       <div className="bg-white rounded-lg shadow-lg p-3 sm:p-6">
