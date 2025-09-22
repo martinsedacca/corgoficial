@@ -202,7 +202,6 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
         setPatientCreationSuccess(false);
         setCreatingPatient(false);
         setShowPatientForm(false);
-        setDniValidation({ isChecking: false, exists: false, message: '' });
         setNewPatientData({
           name: '',
           lastName: '',
