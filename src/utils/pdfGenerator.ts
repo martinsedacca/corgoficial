@@ -1128,6 +1128,7 @@ export const generateMultiplePrescriptionsPDF = async (prescriptions: Prescripti
   const pdfWidth = pdf.internal.pageSize.getWidth(); // 297mm
   const pdfHeight = pdf.internal.pageSize.getHeight(); // 210mm
   const recipeWidth = pdfWidth / 2; // 148.5mm cada receta
+
   for (let i = 0; i < prescriptions.length; i++) {
     const prescription = prescriptions[i];
     const isLeftSide = i % 2 === 0;
@@ -1340,6 +1341,9 @@ export const generateMultiplePrescriptionsPDF = async (prescriptions: Prescripti
         </div>
       </div>
     `;
+
+    // Agregar el contenido al DOM temporalmente
+    document.body.appendChild(pdfContent);
     
     try {
       // Generar el canvas del contenido
@@ -1351,13 +1355,11 @@ export const generateMultiplePrescriptionsPDF = async (prescriptions: Prescripti
         width: 559, // Ancho para media página A4 horizontal
         height: 794  // Alto A4
       });
-    // Posición X según el lado
+
       const imgData = canvas.toDataURL('image/png');
       const imgWidth = recipeWidth - 4; // Margen pequeño
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       const yOffset = imgHeight > pdfHeight ? 0 : (pdfHeight - imgHeight) / 2;
-    const xOffset = isLeftSide ? 2 : recipeWidth + 2;
-      // Posición X según el lado
       const xOffset = isLeftSide ? 2 : recipeWidth + 2;
       
       // Agregar la receta al PDF
@@ -1369,15 +1371,15 @@ export const generateMultiplePrescriptionsPDF = async (prescriptions: Prescripti
       // Remover el contenido temporal del DOM
       document.body.removeChild(pdfContent);
     }
-    if (prescriptions.length > 1 && i % 2 === 1) {
+
     // Agregar línea divisoria vertical si es el lado derecho
-    if (!isLeftSide) {
+    if (!isLeftSide && prescriptions.length > 1) {
+      pdf.setDrawColor(200, 200, 200);
+      pdf.setLineDashPattern([2, 2], 0);
       pdf.line(pdfWidth / 2, 0, pdfWidth / 2, pdfHeight);
     }
   }
 
-    // Agregar el contenido al DOM temporalmente
-    document.body.appendChild(pdfContent);
   // Descargar el PDF
   const fileName = `Recetas_Lote_${prescriptions.length}_${new Date().toISOString().split('T')[0]}.pdf`;
   pdf.save(fileName);
