@@ -78,6 +78,7 @@ export function PatientManager() {
     exists: boolean;
     message: string;
   }>({ isChecking: false, exists: false, message: '' });
+  const [selectedSocialWorkForForm, setSelectedSocialWorkForForm] = useState<SocialWork | null>(null);
   const [debouncedFilters, setDebouncedFilters] = useState({
     searchTerm: '',
     filterName: '',
@@ -319,6 +320,7 @@ export function PatientManager() {
     setDniValidation({ isChecking: false, exists: false, message: '' });
     setEditingPatient(null);
     setShowForm(false);
+    setSelectedSocialWorkForForm(null);
   };
 
   return (
@@ -419,8 +421,9 @@ export function PatientManager() {
                   value={formData.socialWork}
                   onChange={(value) => {
                     setFormData({...formData, socialWork: value, plan: ''});
-                    const socialWork = socialWorks.find(sw => sw.name === value);
-                    setSelectedSocialWorkForForm(socialWork || null);
+                    // Buscar la obra social seleccionada en los datos cargados
+                    // Nota: Necesitaríamos acceso a socialWorks desde el contexto
+                    setSelectedSocialWorkForForm(null); // Por ahora null hasta tener acceso a socialWorks
                   }}
                   required
                 />
