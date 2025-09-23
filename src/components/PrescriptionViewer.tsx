@@ -18,7 +18,7 @@ interface PrescriptionViewerProps {
 }
 
 export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
-  const { updatePrescriptionAuthorization, prescriptions, patients, updatePatient, socialWorks, getSocialWorkPlans } = useData();
+  const { updatePrescriptionAuthorization, prescriptions, patients, updatePatient, socialWorks, getSocialWorkPlans, loadPrescriptions } = useData();
   const { isDoctor, hasPermission } = useAuth();
   const { printFormat } = usePrintConfig();
   const { loadSocialWorkPlans } = useData();
@@ -143,9 +143,10 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
     
     try {
       await updatePatient(currentPrescription.patient.id, patientFormData);
+      // Recargar las recetas para obtener los datos actualizados del paciente
+      await loadPrescriptions();
       setShowEditPatientModal(false);
       setEditingPatient(false);
-      // La actualización es reactiva - los datos se actualizan automáticamente
     } catch (error) {
       console.error('Error updating patient:', error);
       setErrorMessage('Error al actualizar los datos del paciente. Por favor, intente nuevamente.');
