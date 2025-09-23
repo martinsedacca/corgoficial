@@ -63,6 +63,10 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
     loadDoctors();
     loadPractices();
     loadSocialWorkPlans();
+    // Asegurar que se carguen las obras sociales también
+    if (socialWorks.length === 0) {
+      loadSocialWorks();
+    }
   }, []);
 
   // Si es doctor, preseleccionar su información

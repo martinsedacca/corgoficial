@@ -21,6 +21,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
   const { updatePrescriptionAuthorization, prescriptions, patients, updatePatient, socialWorks, getSocialWorkPlans } = useData();
   const { isDoctor, hasPermission } = useAuth();
   const { printFormat } = usePrintConfig();
+  const { loadSocialWorkPlans } = useData();
   const [showDeauthorizeModal, setShowDeauthorizeModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   
@@ -59,6 +60,8 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
   useEffect(() => {
     // El viewer ahora usa el sistema de notificaciones global
     // en lugar de suscripciones automáticas
+    // Cargar planes de obra social cuando se monta el componente
+    loadSocialWorkPlans();
   }, []);
   
   const typeLabels = {
