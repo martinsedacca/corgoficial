@@ -77,15 +77,15 @@ const createSupabaseClient = () => {
       }),
       rpc: () => Promise.resolve({ data: 1, error: mockError })
     } as any;
-  }
-  
-  return createClient(supabaseUrl, supabaseAnonKey, {
-    realtime: {
-      params: {
-        eventsPerSecond: 20
+  } else {
+    return createClient(supabaseUrl, supabaseAnonKey, {
+      realtime: {
+        params: {
+          eventsPerSecond: 20
+        }
       }
-    }
-  });
+    });
+  }
 };
 
 export const supabase = createSupabaseClient();
