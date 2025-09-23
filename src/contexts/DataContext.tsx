@@ -90,6 +90,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
   // Configurar suscripciones en tiempo real
   useEffect(() => {
     const setupSubscriptions = async () => {
+      // Check if Supabase is properly configured before attempting subscriptions
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        console.warn('Supabase not configured, skipping realtime subscriptions.');
+        return;
+      }
+      
       // Solo configurar suscripciones automáticas para médicos (sus propias recetas)
       // Los administradores y secretarias usan el sistema de notificaciones
       if (!user) return;
