@@ -105,16 +105,6 @@ export function SocialWorkAutocomplete({
               <div className="px-3 py-2 text-gray-500 text-sm">
                 No se encontraron obras sociales
               </div>
-              {value.trim() && (
-                <button
-                  type="button"
-                  onClick={() => handleCreateNew(value.trim())}
-                  className="w-full px-3 py-2 text-left hover:bg-primary-50 focus:bg-primary-50 focus:outline-none border-t border-gray-200 text-primary-600 font-medium flex items-center gap-2 text-sm"
-                >
-                  <Plus className="h-4 w-4" />
-                  Crear nueva obra social: "{value.trim()}"
-                </button>
-              )}
             </div>
           ) : (
             <>
@@ -136,16 +126,6 @@ export function SocialWorkAutocomplete({
                   )}
                 </button>
               ))}
-              {value.trim() && !filteredOptions.some(sw => sw.name.toLowerCase() === value.trim().toLowerCase()) && (
-                <button
-                  type="button"
-                  onClick={() => handleCreateNew(value.trim())}
-                  className="w-full px-3 py-2 text-left hover:bg-primary-50 focus:bg-primary-50 focus:outline-none border-t border-gray-200 text-primary-600 font-medium flex items-center gap-2 text-sm"
-                >
-                  <Plus className="h-4 w-4" />
-                  Crear nueva obra social: "{value.trim()}"
-                </button>
-              )}
             </>
           )}
         </div>
