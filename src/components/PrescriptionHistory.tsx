@@ -944,7 +944,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                 </div>
                 
                 <div className="lg:ml-4">
-                  <div className="flex items-center justify-center gap-1 sm:gap-2">
+                  <div className="flex flex-col items-center justify-center gap-2">
                     {/* Estado de autorización */}
                     {prescription.authorized ? (
                       <div className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
