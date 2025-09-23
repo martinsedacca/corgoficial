@@ -15,9 +15,16 @@
     - Positioned after additional_notes in the prescription
 */
 
--- Add the dx column to prescriptions table
-ALTER TABLE prescriptions 
-ADD COLUMN IF NOT EXISTS dx text;
-
--- Add comment for documentation
-COMMENT ON COLUMN prescriptions.dx IS 'Diagnosis field - 1-2 lines maximum for prescription diagnosis';
+-- Add the dx column to prescriptions table if it doesn't exist
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'prescriptions' AND column_name = 'dx'
+  ) THEN
+    ALTER TABLE prescriptions ADD COLUMN dx text;
+    
+    -- Add comment for documentation
+    COMMENT ON COLUMN prescriptions.dx IS 'Diagnosis field - 1-2 lines maximum for prescription diagnosis';
+  END IF;
+END $$;
