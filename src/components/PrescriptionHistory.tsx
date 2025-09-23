@@ -84,6 +84,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   const [filterType, setFilterType] = useState<string>('all');
   const [filterAuthorization, setFilterAuthorization] = useState<string>('all');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [batchPrintLoading, setBatchPrintLoading] = useState(false);
 
   // Cargar recetas cuando se monta el componente
   useEffect(() => {
@@ -312,6 +313,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
       return;
     }
 
+    setBatchPrintLoading(true);
     try {
       const prescriptionsToProcess = filteredPrescriptions.filter(p => selectedPrescriptions.has(p.id));
       await generateMultiplePrescriptionsPDF(prescriptionsToProcess);
@@ -321,6 +323,8 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
       console.error('Error al imprimir lote:', error);
       setErrorMessage('Error al generar el PDF en lote. Por favor, intente nuevamente.');
       setShowErrorModal(true);
+    } finally {
+      setBatchPrintLoading(false);
     }
   };
 
@@ -639,10 +643,20 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           {selectedPrescriptions.size > 0 && (
             <button
               onClick={handleBatchPrint}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+              disabled={batchPrintLoading}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Printer className="h-4 w-4" />
-              Imprimir Lote ({selectedPrescriptions.size})
+              {batchPrintLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Procesando...
+                </>
+              ) : (
+                <>
+                  <Printer className="h-4 w-4" />
+                  Imprimir Lote ({selectedPrescriptions.size})
+                </>
+              )}
             </button>
           )}
         </div>
