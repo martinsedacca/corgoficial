@@ -18,7 +18,7 @@ interface PrescriptionViewerProps {
 }
 
 export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
-  const { updatePrescriptionAuthorization, prescriptions, updatePatient, socialWorks, getSocialWorkPlans } = useData();
+  const { updatePrescriptionAuthorization, prescriptions, patients, updatePatient, socialWorks, getSocialWorkPlans } = useData();
   const { isDoctor, hasPermission } = useAuth();
   const { printFormat } = usePrintConfig();
   const [showDeauthorizeModal, setShowDeauthorizeModal] = useState(false);
@@ -40,8 +40,20 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
   });
   // Obtener la receta actualizada del contexto para reactividad
   const currentPrescription = useMemo(() => {
-    return prescriptions.find(p => p.id === prescription.id) || prescription;
-  }, [prescriptions, prescription.id, prescription]);
+    const foundPrescription = prescriptions.find(p => p.id === prescription.id) || prescription;
+    
+    // Obtener datos actualizados del paciente
+    const updatedPatient = patients.find(p => p.id === foundPrescription.patient.id);
+    
+    if (updatedPatient) {
+      return {
+        ...foundPrescription,
+        patient: updatedPatient
+      };
+    }
+    
+    return foundPrescription;
+  }, [prescriptions, patients, prescription.id, prescription]);
 
   // Configurar suscripción en tiempo real para esta receta específica
   useEffect(() => {
@@ -130,6 +142,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       await updatePatient(currentPrescription.patient.id, patientFormData);
       setShowEditPatientModal(false);
       setEditingPatient(false);
+      // La actualización es reactiva - los datos se actualizan automáticamente
     } catch (error) {
       console.error('Error updating patient:', error);
       setErrorMessage('Error al actualizar los datos del paciente. Por favor, intente nuevamente.');
