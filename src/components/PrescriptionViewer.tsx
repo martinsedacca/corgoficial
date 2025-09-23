@@ -314,6 +314,16 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
         </div>
       )}
 
+      {/* Dx Field */}
+      {currentPrescription.dx && (
+        <div className="mb-6">
+          <div className="text-sm font-medium text-gray-600 mb-2">Dx:</div>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs sm:text-sm">
+            {currentPrescription.dx}
+          </div>
+        </div>
+      )}
+
       {/* Doctor Info */}
       <div className="mb-8">
         <div className="text-sm font-medium text-gray-600 mb-2">Médico:</div>

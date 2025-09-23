@@ -50,6 +50,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const [prescriptionType, setPrescriptionType] = useState<'studies' | 'treatments' | 'surgery'>('studies');
   const [selectedPractices, setSelectedPractices] = useState<{[key: string]: 'AO' | 'OI' | 'OD' | null}>({});
   const [additionalNotes, setAdditionalNotes] = useState('');
+  const [dx, setDx] = useState('');
   const [doctorSearch, setDoctorSearch] = useState('');
   const [patientSearch, setPatientSearch] = useState('');
   const [patientSearchResults, setPatientSearchResults] = useState<Patient[]>([]);
@@ -129,6 +130,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       setDoctorSearch(editingPrescription.doctor.name);
       setPatientSearch(`${editingPrescription.patient.name} ${editingPrescription.patient.lastName} - DNI: ${editingPrescription.patient.dni} - ${editingPrescription.patient.socialWork}${editingPrescription.patient.plan ? ` (${editingPrescription.patient.plan})` : ''}`);
       setAdditionalNotes(editingPrescription.additionalNotes || '');
+      setDx(editingPrescription.dx || '');
       
       // Configurar prácticas seleccionadas
       const practicesMap: {[key: string]: 'AO' | 'OI' | 'OD' | null} = {};
@@ -282,6 +284,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
       patient: selectedPatient,
       items: selectedPracticesList,
       additionalNotes,
+      dx,
       date: editingPrescription?.date || new Date().toISOString().split('T')[0]
     };
 
@@ -688,6 +691,24 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
+        </div>
+
+        {/* Campo Dx */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Dx (Diagnóstico)
+          </label>
+          <textarea
+            value={dx}
+            onChange={(e) => setDx(e.target.value)}
+            placeholder="Diagnóstico (máximo 2 líneas)..."
+            rows={2}
+            maxLength={200}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Máximo 2 líneas para el diagnóstico
+          </p>
         </div>
 
         {/* Botones de acción */}

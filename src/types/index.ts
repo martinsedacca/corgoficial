@@ -56,6 +56,7 @@ export interface Prescription {
   patient: Patient;
   items: PrescriptionItem[];
   additionalNotes?: string;
+  dx?: string;
   date: string;
   createdAt: string;
   createdBy?: string;

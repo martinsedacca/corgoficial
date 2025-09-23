@@ -201,6 +201,7 @@ export interface Database {
           doctor_id: string;
           patient_id: string;
           additional_notes: string | null;
+          dx: string | null;
           date: string;
           created_at: string;
           updated_at: string;
@@ -213,6 +214,7 @@ export interface Database {
           doctor_id: string;
           patient_id: string;
           additional_notes?: string | null;
+          dx?: string | null;
           date?: string;
           created_at?: string;
           updated_at?: string;
@@ -225,6 +227,7 @@ export interface Database {
           doctor_id?: string;
           patient_id?: string;
           additional_notes?: string | null;
+          dx?: string | null;
           date?: string;
           created_at?: string;
           updated_at?: string;

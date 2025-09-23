@@ -506,6 +506,8 @@ export const prescriptionService = {
           notes: item.notes
         })),
         additionalNotes: prescription.additional_notes,
+        dx: fullPrescription.dx,
+        dx: fullPrescription.dx,
         date: prescription.date,
         createdAt: prescription.created_at,
         createdBy: prescription.created_by,
@@ -544,6 +546,7 @@ export const prescriptionService = {
         doctor_id: prescriptionData.doctorId,
         patient_id: prescriptionData.patientId,
         additional_notes: prescriptionData.additionalNotes || null,
+        dx: prescriptionData.dx || null,
         date: prescriptionData.date,
         authorized: false,
         created_by: user.id
@@ -632,6 +635,7 @@ export const prescriptionService = {
         doctor_id: updates.doctorId,
         patient_id: updates.patientId,
         additional_notes: updates.additionalNotes || null,
+        dx: updates.dx || null,
         date: updates.date
       })
       .eq('id', id)
