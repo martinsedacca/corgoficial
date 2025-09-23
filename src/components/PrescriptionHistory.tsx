@@ -114,7 +114,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     };
     
     loadUserProfiles();
-  }, []);</parameter>
+  }, []);
 
   // Cargar recetas cuando se monta el componente
   useEffect(() => {
@@ -128,6 +128,21 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     loadPrescriptions();
     loadSocialWorks();
   }, []);
+
+  // Cerrar dropdown cuando se hace clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.relative')) {
+        setShowCreatedByDropdown(false);
+      }
+    };
+
+    if (showCreatedByDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showCreatedByDropdown]);
 
   const typeLabels = {
     studies: 'Estudios',
@@ -215,7 +230,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
 
   const hasActiveFilters = searchTerm || filterNumber || filterDoctor || filterPatient || 
                           filterDNI || filterSocialWork ||
-                          filterDateFrom || filterDateTo || filterType !== 'all' || filterAuthorization !== 'all' || filterCreatedBy.length > 0;</parameter>
+                          filterDateFrom || filterDateTo || filterType !== 'all' || filterAuthorization !== 'all' || filterCreatedBy.length > 0;
 
   const handlePrintPrescription = async (prescription: Prescription) => {
     try {
