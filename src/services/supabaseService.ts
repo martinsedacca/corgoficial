@@ -506,8 +506,7 @@ export const prescriptionService = {
           notes: item.notes
         })),
         additionalNotes: prescription.additional_notes,
-        dx: fullPrescription.dx,
-        dx: fullPrescription.dx,
+        dx: prescription.dx,
         date: prescription.date,
         createdAt: prescription.created_at,
         createdBy: prescription.created_by,
