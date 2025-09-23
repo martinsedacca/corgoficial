@@ -499,15 +499,11 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
             />
           </div>
           <div>
-           <label className="block text-xs font-medium text-gray-600 mb-1">
-             Obra Social
-           </label>
-            <input
-              type="text"
-              placeholder="Ej: OSDE, IOMA"
+            <SocialWorkAutocomplete
               value={filterSocialWork}
-              onChange={(e) => setFilterSocialWork(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              onChange={(value) => setFilterSocialWork(value)}
+              placeholder="Ej: OSDE, IOMA"
+              label="Obra Social"
             />
           </div>
         </div>
