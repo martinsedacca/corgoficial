@@ -107,8 +107,6 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
   const handleEditPatient = () => {
     const socialWork = socialWorks.find(sw => sw.name === currentPrescription.patient.socialWork);
-    console.log('Found social work:', socialWork);
-    console.log('Available plans for this social work:', socialWork ? getSocialWorkPlans(socialWork.id) : []);
     setSelectedSocialWorkForEdit(socialWork || null);
     setPatientFormData({
       name: currentPrescription.patient.name,
@@ -131,12 +129,11 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
     try {
       await updatePatient(currentPrescription.patient.id, patientFormData);
       setShowEditPatientModal(false);
-      // La actualización es reactiva a través del contexto de datos
-      // No necesitamos recargar manualmente la página
+      setEditingPatient(false);
+    } catch (error) {
       console.error('Error updating patient:', error);
       setErrorMessage('Error al actualizar los datos del paciente. Por favor, intente nuevamente.');
       setShowErrorModal(true);
-    } finally {
       setEditingPatient(false);
     }
   };
@@ -493,6 +490,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
                     onChange={(value) => {
                       setPatientFormData({...patientFormData, socialWork: value, plan: ''});
                       const socialWork = socialWorks.find(sw => sw.name === value);
+                      console.log('Selected social work:', socialWork);
                       setSelectedSocialWorkForEdit(socialWork || null);
                     }}
                     disabled={editingPatient}
