@@ -294,6 +294,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const getSocialWorkPlans = useCallback((socialWorkId: string): SocialWorkPlan[] => {
     console.log('getSocialWorkPlans called with socialWorkId:', socialWorkId);
     console.log('Available socialWorkPlans:', socialWorkPlans);
+    console.log('Filtering plans for socialWorkId:', socialWorkId);
+    console.log('All plan socialWorkIds:', socialWorkPlans.map(p => ({ id: p.id, socialWorkId: p.socialWorkId, name: p.name })));
     const filtered = socialWorkPlans.filter(plan => plan.socialWorkId === socialWorkId && plan.isActive);
     console.log('Filtered plans:', filtered);
     return filtered;

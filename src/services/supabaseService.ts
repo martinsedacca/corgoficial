@@ -799,8 +799,10 @@ export const socialWorkPlanService = {
 
       const { data, error } = await supabase
         .from('social_work_plans')
-        .select('*')
-        .eq('is_active', true)
+        .select(`
+          *,
+          social_work:social_works(name)
+        `)
         .order('name', { ascending: true });
       
       if (error) {
@@ -808,13 +810,16 @@ export const socialWorkPlanService = {
         return [];
       }
       
+      console.log('Raw social work plans data from DB:', data);
+      
       return data.map(plan => ({
         id: plan.id,
         socialWorkId: plan.social_work_id,
         name: plan.name,
         code: plan.code,
         description: plan.description,
-        isActive: plan.is_active
+        isActive: plan.is_active,
+        socialWorkName: plan.social_work?.name
       }));
     } catch (error) {
       console.error('Network error fetching social work plans:', error);
