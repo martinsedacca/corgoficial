@@ -9,7 +9,7 @@ import { AlertTriangle } from 'lucide-react';
 
 export function UserManager() {
   const { hasPermission } = useAuth();
-  const { doctors } = useData();
+  const { doctors, loadDoctors } = useData();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -38,6 +38,7 @@ export function UserManager() {
 
   useEffect(() => {
     loadUsers();
+    loadDoctors(); // Cargar médicos cuando se monta el componente
   }, []);
 
   const loadUsers = async () => {
