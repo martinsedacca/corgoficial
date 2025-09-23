@@ -7,7 +7,7 @@ import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { usePrintConfig } from '../contexts/PrintConfigContext';
-import { Calendar, User, Stethoscope, FileText, Download, Printer, Clock, CheckCircle } from 'lucide-react';
+import { Calendar, User, Stethoscope, FileText, Download, Printer, Clock, CheckCircle, Edit3, X, Save } from 'lucide-react';
 import { generatePrescriptionPDF, printPrescriptionPDF, generatePrescriptionPDF_A5, printPrescriptionPDF_A5 } from '../utils/pdfGenerator';
 import { AlertTriangle } from 'lucide-react';
 
@@ -16,13 +16,25 @@ interface PrescriptionViewerProps {
 }
 
 export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
-  const { updatePrescriptionAuthorization, prescriptions } = useData();
+  const { updatePrescriptionAuthorization, prescriptions, updatePatient, socialWorks, getSocialWorkPlans } = useData();
   const { isDoctor, hasPermission } = useAuth();
   const { printFormat } = usePrintConfig();
   const [showDeauthorizeModal, setShowDeauthorizeModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
   
+  const [showEditPatientModal, setShowEditPatientModal] = useState(false);
+  const [editingPatient, setEditingPatient] = useState(false);
+  const [patientFormData, setPatientFormData] = useState({
+    name: '',
+    lastName: '',
+    dni: '',
+    socialWork: '',
+    affiliateNumber: '',
+    plan: '',
+    phone: '',
+    email: '',
+    address: ''
+  });
   // Obtener la receta actualizada del contexto para reactividad
   const currentPrescription = useMemo(() => {
     return prescriptions.find(p => p.id === prescription.id) || prescription;
@@ -87,6 +99,37 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       setShowDeauthorizeModal(false);
       setErrorMessage('Error al desautorizar la receta. Por favor, intente nuevamente.');
       setShowErrorModal(true);
+    }
+  };
+
+  const handleEditPatient = () => {
+    setPatientFormData({
+      name: currentPrescription.patient.name,
+      lastName: currentPrescription.patient.lastName,
+      dni: currentPrescription.patient.dni,
+      socialWork: currentPrescription.patient.socialWork,
+      affiliateNumber: currentPrescription.patient.affiliateNumber || '',
+      plan: currentPrescription.patient.plan || '',
+      phone: currentPrescription.patient.phone || '',
+      email: currentPrescription.patient.email || '',
+      address: currentPrescription.patient.address || ''
+    });
+    setShowEditPatientModal(true);
+  };
+
+  const handleSavePatient = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEditingPatient(true);
+    
+    try {
+      await updatePatient(currentPrescription.patient.id, patientFormData);
+      setShowEditPatientModal(false);
+    } catch (error) {
+      console.error('Error updating patient:', error);
+      setErrorMessage('Error al actualizar los datos del paciente. Por favor, intente nuevamente.');
+      setShowErrorModal(true);
+    } finally {
+      setEditingPatient(false);
     }
   };
 
@@ -194,7 +237,17 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
       {/* Patient Info */}
       <div className="mb-6">
-        <div className="bg-gray-50 p-3 sm:p-4 rounded-lg">
+        <div className="bg-gray-50 p-3 sm:p-4 rounded-lg relative">
+          {/* Botón de editar paciente */}
+          {hasPermission('manage_patients') && (
+            <button
+              onClick={handleEditPatient}
+              className="absolute top-3 right-3 p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              title="Editar datos del paciente"
+            >
+              <Edit3 className="h-4 w-4" />
+            </button>
+          )}
           <div className="text-sm font-medium text-gray-600 mb-2">Datos del Paciente:</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
             <div>
@@ -339,6 +392,184 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de edición de paciente */}
+      {showEditPatientModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Editar Datos del Paciente
+              </h3>
+              <button
+                onClick={() => setShowEditPatientModal(false)}
+                disabled={editingPatient}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSavePatient} className="p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nombre *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={patientFormData.name}
+                    onChange={(e) => setPatientFormData({...patientFormData, name: e.target.value})}
+                    disabled={editingPatient}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    placeholder="Juan Carlos"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Apellido *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={patientFormData.lastName}
+                    onChange={(e) => setPatientFormData({...patientFormData, lastName: e.target.value})}
+                    disabled={editingPatient}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    placeholder="Martínez"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    DNI *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={patientFormData.dni}
+                    onChange={(e) => {
+                      const newDni = e.target.value.replace(/\D/g, '');
+                      setPatientFormData({...patientFormData, dni: newDni});
+                    }}
+                    disabled={editingPatient}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    placeholder="12345678"
+                    pattern="[0-9]{4,}"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Obra Social *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={patientFormData.socialWork}
+                    onChange={(e) => setPatientFormData({...patientFormData, socialWork: e.target.value, plan: ''})}
+                    disabled={editingPatient}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    placeholder="OSDE, IOMA, Swiss Medical..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Plan
+                  </label>
+                  <input
+                    type="text"
+                    value={patientFormData.plan}
+                    onChange={(e) => setPatientFormData({...patientFormData, plan: e.target.value})}
+                    disabled={editingPatient}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    placeholder="Plan 210, SMG02..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Número de Afiliado
+                  </label>
+                  <input
+                    type="text"
+                    value={patientFormData.affiliateNumber}
+                    onChange={(e) => setPatientFormData({...patientFormData, affiliateNumber: e.target.value})}
+                    disabled={editingPatient}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    placeholder="123456789"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Teléfono
+                  </label>
+                  <input
+                    type="tel"
+                    value={patientFormData.phone}
+                    onChange={(e) => setPatientFormData({...patientFormData, phone: e.target.value})}
+                    disabled={editingPatient}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    placeholder="2966 123456"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={patientFormData.email}
+                    onChange={(e) => setPatientFormData({...patientFormData, email: e.target.value})}
+                    disabled={editingPatient}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    placeholder="paciente@email.com"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Dirección
+                  </label>
+                  <input
+                    type="text"
+                    value={patientFormData.address}
+                    onChange={(e) => setPatientFormData({...patientFormData, address: e.target.value})}
+                    disabled={editingPatient}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    placeholder="Av. Kirchner 456"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={editingPatient}
+                  className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {editingPatient ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Guardando...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4" />
+                      Guardar Cambios
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowEditPatientModal(false)}
+                  disabled={editingPatient}
+                  className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors font-medium disabled:opacity-50"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
