@@ -935,7 +935,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                       </span>
                     </div>
                     {/* Información de quién emitió la receta */}
-                    {prescription.createdBy && userProfiles[prescription.createdBy] && (
+                    {prescription.createdBy && userProfiles[prescription.createdBy] && hasPermission('manage_users') && (
                       <div className="text-xs text-gray-500 mt-1">
                         <strong>Emitida por:</strong> {userProfiles[prescription.createdBy]}
                       </div>
