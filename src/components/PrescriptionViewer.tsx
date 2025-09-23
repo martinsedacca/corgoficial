@@ -7,6 +7,8 @@ import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { usePrintConfig } from '../contexts/PrintConfigContext';
+import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
+import { SocialWorkPlanSelector } from './SocialWorkPlanSelector';
 import { Calendar, User, Stethoscope, FileText, Download, Printer, Clock, CheckCircle, Edit3, X, Save } from 'lucide-react';
 import { generatePrescriptionPDF, printPrescriptionPDF, generatePrescriptionPDF_A5, printPrescriptionPDF_A5 } from '../utils/pdfGenerator';
 import { AlertTriangle } from 'lucide-react';
@@ -127,7 +129,8 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
     try {
       await updatePatient(currentPrescription.patient.id, patientFormData);
       setShowEditPatientModal(false);
-    } catch (error) {
+      // La actualización es reactiva a través del contexto de datos
+      // No necesitamos recargar manualmente la página
       console.error('Error updating patient:', error);
       setErrorMessage('Error al actualizar los datos del paciente. Por favor, intente nuevamente.');
       setShowErrorModal(true);
@@ -466,29 +469,41 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Obra Social *
+                    DNI *
                   </label>
                   <input
                     type="text"
                     required
-                    value={patientFormData.socialWork}
-                    onChange={(e) => setPatientFormData({...patientFormData, socialWork: e.target.value, plan: ''})}
+                    value={patientFormData.dni}
+                    onChange={(e) => {
+                      const newDni = e.target.value.replace(/\D/g, '');
+                      setPatientFormData({...patientFormData, dni: newDni});
+                    }}
                     disabled={editingPatient}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-                    placeholder="OSDE, IOMA, Swiss Medical..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100"
+                    placeholder="12345678"
+                    pattern="[0-9]{4,}"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Plan
-                  </label>
-                  <input
-                    type="text"
-                    value={patientFormData.plan}
-                    onChange={(e) => setPatientFormData({...patientFormData, plan: e.target.value})}
+                  <SocialWorkAutocomplete
+                    value={patientFormData.socialWork}
+                    onChange={(value) => {
+                      setPatientFormData({...patientFormData, socialWork: value, plan: ''});
+                      const socialWork = socialWorks.find(sw => sw.name === value);
+                      setSelectedSocialWorkForEdit(socialWork || null);
+                    }}
                     disabled={editingPatient}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-                    placeholder="Plan 210, SMG02..."
+                    required
+                  />
+                </div>
+                <div>
+                  <SocialWorkPlanSelector
+                    selectedSocialWork={selectedSocialWorkForEdit}
+                    value={patientFormData.plan}
+                    onChange={(value) => setPatientFormData({...patientFormData, plan: value})}
+                    disabled={editingPatient}
+                    placeholder="Seleccionar plan..."
                   />
                 </div>
                 <div>
@@ -500,7 +515,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
                     value={patientFormData.affiliateNumber}
                     onChange={(e) => setPatientFormData({...patientFormData, affiliateNumber: e.target.value})}
                     disabled={editingPatient}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100"
                     placeholder="123456789"
                   />
                 </div>
@@ -513,7 +528,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
                     value={patientFormData.phone}
                     onChange={(e) => setPatientFormData({...patientFormData, phone: e.target.value})}
                     disabled={editingPatient}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100"
                     placeholder="2966 123456"
                   />
                 </div>
@@ -526,7 +541,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
                     value={patientFormData.email}
                     onChange={(e) => setPatientFormData({...patientFormData, email: e.target.value})}
                     disabled={editingPatient}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100"
                     placeholder="paciente@email.com"
                   />
                 </div>
@@ -539,7 +554,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
                     value={patientFormData.address}
                     onChange={(e) => setPatientFormData({...patientFormData, address: e.target.value})}
                     disabled={editingPatient}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 disabled:bg-gray-100"
                     placeholder="Av. Kirchner 456"
                   />
                 </div>
@@ -549,7 +564,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
                 <button
                   type="submit"
                   disabled={editingPatient}
-                  className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {editingPatient ? (
                     <>
@@ -567,7 +582,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
                   type="button"
                   onClick={() => setShowEditPatientModal(false)}
                   disabled={editingPatient}
-                  className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors font-medium disabled:opacity-50"
+                  className="bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancelar
                 </button>
