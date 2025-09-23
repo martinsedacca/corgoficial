@@ -24,6 +24,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
   
   const [showEditPatientModal, setShowEditPatientModal] = useState(false);
   const [editingPatient, setEditingPatient] = useState(false);
+  const [selectedSocialWorkForEdit, setSelectedSocialWorkForEdit] = useState<any>(null);
   const [patientFormData, setPatientFormData] = useState({
     name: '',
     lastName: '',
@@ -103,6 +104,8 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
   };
 
   const handleEditPatient = () => {
+    const socialWork = socialWorks.find(sw => sw.name === currentPrescription.patient.socialWork);
+    setSelectedSocialWorkForEdit(socialWork || null);
     setPatientFormData({
       name: currentPrescription.patient.name,
       lastName: currentPrescription.patient.lastName,
