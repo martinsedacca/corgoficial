@@ -27,7 +27,9 @@ export function SocialWorkPlanSelector({
   const [filter, setFilter] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  console.log('SocialWorkPlanSelector - selectedSocialWork:', selectedSocialWork);
   const availablePlans = selectedSocialWork ? getSocialWorkPlans(selectedSocialWork.id) : [];
+  console.log('SocialWorkPlanSelector - availablePlans:', availablePlans);
   
   const filteredPlans = availablePlans.filter(plan =>
     plan.name.toLowerCase().includes(filter.toLowerCase()) ||

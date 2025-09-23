@@ -107,6 +107,8 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
   const handleEditPatient = () => {
     const socialWork = socialWorks.find(sw => sw.name === currentPrescription.patient.socialWork);
+    console.log('Found social work:', socialWork);
+    console.log('Available plans for this social work:', socialWork ? getSocialWorkPlans(socialWork.id) : []);
     setSelectedSocialWorkForEdit(socialWork || null);
     setPatientFormData({
       name: currentPrescription.patient.name,

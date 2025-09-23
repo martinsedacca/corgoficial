@@ -292,7 +292,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [loadingSocialWorkPlans]);
 
   const getSocialWorkPlans = useCallback((socialWorkId: string): SocialWorkPlan[] => {
-    return socialWorkPlans.filter(plan => plan.socialWorkId === socialWorkId && plan.isActive);
+    console.log('getSocialWorkPlans called with socialWorkId:', socialWorkId);
+    console.log('Available socialWorkPlans:', socialWorkPlans);
+    const filtered = socialWorkPlans.filter(plan => plan.socialWorkId === socialWorkId && plan.isActive);
+    console.log('Filtered plans:', filtered);
+    return filtered;
   }, [socialWorkPlans]);
 
   const refreshData = useCallback(async () => {
