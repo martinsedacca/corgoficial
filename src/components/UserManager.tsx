@@ -5,6 +5,7 @@ import { useData } from '../contexts/DataContext';
 import { UserProfile } from '../contexts/AuthContext';
 import { Doctor } from '../types';
 import { Users, Plus, Edit3, Trash2, Shield, User, UserCheck, Eye, EyeOff } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 export function UserManager() {
   const { hasPermission } = useAuth();
