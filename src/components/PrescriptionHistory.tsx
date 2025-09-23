@@ -944,10 +944,10 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                 </div>
                 
                 <div className="lg:ml-4">
-                  <div className="flex flex-col items-center justify-center gap-2">
+                  <div className="flex items-center justify-center gap-4">
                     {/* Estado de autorización */}
                     {prescription.authorized ? (
-                      <div className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                      <div className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200 w-20 justify-center">
                         <CheckCircle className="h-3 w-3" />
                         <span>Autorizado</span>
                       </div>
@@ -956,44 +956,50 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                       hasPermission('manage_prescriptions') && !isDoctor ? (
                         <button
                           onClick={() => handleToggleAuthorization(prescription)}
-                          className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200 transition-colors"
+                          className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200 transition-colors w-20 justify-center"
                           title="Autorizar receta"
                         >
                           <Clock className="h-3 w-3" />
                           <span>Autorizar</span>
                         </button>
                       ) : (
-                        <div className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
+                        <div className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200 w-20 justify-center">
                           <Clock className="h-3 w-3" />
                           <span>Pendiente</span>
                         </div>
                       )
                     )}
-                    <button
-                      onClick={() => onViewPrescription(prescription)}
-                      className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
-                    >
-                      <Eye className="h-4 w-4" />
-                      <span className="hidden sm:inline">Ver</span>
-                    </button>
-                    {/* Solo mostrar botón de editar si el usuario tiene permisos */}
-                    {(hasPermission('manage_prescriptions') || isDoctor) && (
+                    
+                    {/* Botones de acción en columna vertical */}
+                    <div className="flex flex-col gap-2">
                       <button
-                        onClick={() => onEditPrescription(prescription)}
-                        className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                        onClick={() => onViewPrescription(prescription)}
+                        className="flex items-center justify-center gap-1 px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm w-20"
                       >
-                        <Edit3 className="h-4 w-4" />
-                        <span className="hidden sm:inline">Editar</span>
+                        <Eye className="h-4 w-4" />
+                        <span>Ver</span>
                       </button>
-                    )}
-                    <button
-                      onClick={() => handlePrintPrescription(prescription)}
-                      className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
-                      title="Imprimir receta"
-                    >
-                      <Printer className="h-4 w-4" />
-                      <span className="hidden sm:inline">Imprimir</span>
-                    </button>
+                      
+                      {/* Solo mostrar botón de editar si el usuario tiene permisos */}
+                      {(hasPermission('manage_prescriptions') || isDoctor) && (
+                        <button
+                          onClick={() => onEditPrescription(prescription)}
+                          className="flex items-center justify-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm w-20"
+                        >
+                          <Edit3 className="h-4 w-4" />
+                          <span>Editar</span>
+                        </button>
+                      )}
+                      
+                      <button
+                        onClick={() => handlePrintPrescription(prescription)}
+                        className="flex items-center justify-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm w-20"
+                        title="Imprimir receta"
+                      >
+                        <Printer className="h-4 w-4" />
+                        <span>Imprimir</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
