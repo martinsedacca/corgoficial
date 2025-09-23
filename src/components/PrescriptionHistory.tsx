@@ -68,7 +68,7 @@ interface PrescriptionHistoryProps {
 }
 
 export default function PrescriptionHistory({ onViewPrescription, onEditPrescription, onNewPrescription }: PrescriptionHistoryProps) {
-  const { prescriptions, updatePrescriptionAuthorization, deletePrescription, loadingPrescriptions, loadPrescriptions, loadSocialWorks } = useData();
+  const { prescriptions, updatePrescriptionAuthorization, loadingPrescriptions, loadPrescriptions, loadSocialWorks } = useData();
   const { isDoctor, hasPermission, profile } = useAuth();
   const { printFormat } = usePrintConfig();
   const [selectedPrescriptions, setSelectedPrescriptions] = useState<Set<string>>(new Set());
@@ -86,8 +86,6 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   const [filterAuthorization, setFilterAuthorization] = useState<string>('all');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [batchPrintLoading, setBatchPrintLoading] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [prescriptionToDelete, setPrescriptionToDelete] = useState<Prescription | null>(null);
 
   // Cargar recetas cuando se monta el componente
   useEffect(() => {
@@ -328,33 +326,6 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
       setShowErrorModal(true);
     } finally {
       setBatchPrintLoading(false);
-    }
-  };
-
-  const handleDeleteClick = (prescription: Prescription) => {
-    setPrescriptionToDelete(prescription);
-    setShowDeleteModal(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!prescriptionToDelete) return;
-    
-    try {
-      await deletePrescription(prescriptionToDelete.id);
-      setShowDeleteModal(false);
-      setPrescriptionToDelete(null);
-      // Limpiar la receta de las selecciones si estaba seleccionada
-      setSelectedPrescriptions(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(prescriptionToDelete.id);
-        return newSet;
-      });
-    } catch (error) {
-      console.error('Error deleting prescription:', error);
-      setShowDeleteModal(false);
-      setPrescriptionToDelete(null);
-      setErrorMessage('Error al eliminar la receta. Por favor, intente nuevamente.');
-      setShowErrorModal(true);
     }
   };
 
@@ -895,16 +866,6 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                         <span className="hidden sm:inline">Editar</span>
                       </button>
                     )}
-                    {/* Solo mostrar botón de eliminar para admin y secretary */}
-                    {hasPermission('manage_prescriptions') && !isDoctor && (
-                      <button
-                        onClick={() => handleDeleteClick(prescription)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Eliminar receta"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    )}
                     <button
                       onClick={() => handlePrintPrescription(prescription)}
                       className="flex items-center gap-1 px-2 sm:px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
@@ -929,47 +890,6 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
               (filtradas)
             </span>
           )}
-        </div>
-      )}
-
-      {/* Modal de confirmación de eliminación */}
-      {showDeleteModal && prescriptionToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-            <div className="p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                  <AlertTriangle className="h-6 w-6 text-red-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Confirmar Eliminación
-                  </h3>
-                  <p className="text-sm text-gray-500">Esta acción no se puede deshacer</p>
-                </div>
-              </div>
-              <p className="text-gray-600 mb-6">
-                ¿Está seguro que desea eliminar la receta <strong>#{prescriptionToDelete.number}</strong> del paciente <strong>{prescriptionToDelete.patient.name} {prescriptionToDelete.patient.lastName}</strong>?
-              </p>
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={() => {
-                    setShowDeleteModal(false);
-                    setPrescriptionToDelete(null);
-                  }}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleDeleteConfirm}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                >
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       )}
 
