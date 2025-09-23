@@ -129,21 +129,6 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     loadSocialWorks();
   }, []);
 
-  // Cerrar dropdown cuando se hace clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.relative')) {
-        setShowCreatedByDropdown(false);
-      }
-    };
-
-    if (showCreatedByDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [showCreatedByDropdown]);
-
   const typeLabels = {
     studies: 'Estudios',
     treatments: 'Tratamientos',
@@ -673,6 +658,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                 )}
               </div>
             )}
+          </div>
         </div>
       </div>
 
@@ -945,12 +931,6 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                         {prescription.items.length > 3 && ` y ${prescription.items.length - 3} más...`}
                       </span>
                     </div>
-                    {/* Información de quién emitió la receta */}
-                    {prescription.createdBy && userProfiles[prescription.createdBy] && (
-                      <div className="text-xs text-gray-500 mt-1">
-                        <strong>Emitida por:</strong> {userProfiles[prescription.createdBy]}
-                      </div>
-                    )}
                   </div>
                 </div>
                 
