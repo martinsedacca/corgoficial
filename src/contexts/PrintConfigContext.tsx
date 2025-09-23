@@ -1,34 +1,15 @@
-import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 
-type PrintFormat = 'A4' | 'A5';
-
+// Remove PrintFormat type and context since we're only using A4 now
 interface PrintConfigContextType {
-  printFormat: PrintFormat;
-  setPrintFormat: (format: PrintFormat) => void;
+  // Keep empty for now, might be useful for future print settings
 }
 
 const PrintConfigContext = createContext<PrintConfigContextType | undefined>(undefined);
 
 export function PrintConfigProvider({ children }: { children: ReactNode }) {
-  const [printFormat, setPrintFormatState] = useState<PrintFormat>('A4');
-
-  // Cargar configuración desde localStorage al inicializar
-  useEffect(() => {
-    const savedFormat = localStorage.getItem('printFormat') as PrintFormat;
-    if (savedFormat && (savedFormat === 'A4' || savedFormat === 'A5')) {
-      setPrintFormatState(savedFormat);
-    }
-  }, []);
-
-  // Guardar configuración en localStorage cuando cambie
-  const setPrintFormat = (format: PrintFormat) => {
-    setPrintFormatState(format);
-    localStorage.setItem('printFormat', format);
-  };
-
   const value = {
-    printFormat,
-    setPrintFormat
+    // Empty for now
   };
 
   return (

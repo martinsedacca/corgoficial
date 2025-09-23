@@ -6,11 +6,10 @@ import { companyInfo } from '../data/mockData';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { usePrintConfig } from '../contexts/PrintConfigContext';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
 import { SocialWorkPlanSelector } from './SocialWorkPlanSelector';
 import { Calendar, User, Stethoscope, FileText, Download, Printer, Clock, CheckCircle, Edit3, X, Save } from 'lucide-react';
-import { generatePrescriptionPDF, printPrescriptionPDF, generatePrescriptionPDF_A5, printPrescriptionPDF_A5 } from '../utils/pdfGenerator';
+import { generatePrescriptionPDF, printPrescriptionPDF } from '../utils/pdfGenerator';
 import { AlertTriangle } from 'lucide-react';
 
 interface PrescriptionViewerProps {
@@ -20,7 +19,6 @@ interface PrescriptionViewerProps {
 export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
   const { updatePrescriptionAuthorization, prescriptions, patients, updatePatient, socialWorks, getSocialWorkPlans, loadPrescriptions } = useData();
   const { isDoctor, hasPermission } = useAuth();
-  const { printFormat } = usePrintConfig();
   const { loadSocialWorkPlans } = useData();
   const [showDeauthorizeModal, setShowDeauthorizeModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
@@ -72,11 +70,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
   const handleExportPDF = async () => {
     try {
-      if (printFormat === 'A5') {
-        await generatePrescriptionPDF_A5(currentPrescription);
-      } else {
-        await generatePrescriptionPDF(currentPrescription);
-      }
+      await generatePrescriptionPDF(currentPrescription);
     } catch (error) {
       console.error('Error al exportar PDF:', error);
       setErrorMessage('Error al exportar el PDF. Por favor, intente nuevamente.');
@@ -86,11 +80,7 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
 
   const handlePrintPDF = async () => {
     try {
-      if (printFormat === 'A5') {
-        await printPrescriptionPDF_A5(currentPrescription);
-      } else {
-        await printPrescriptionPDF(currentPrescription);
-      }
+      await printPrescriptionPDF(currentPrescription);
     } catch (error) {
       console.error('Error al imprimir PDF:', error);
       setErrorMessage('Error al imprimir el PDF. Por favor, intente nuevamente.');

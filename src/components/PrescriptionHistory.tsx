@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { usePrintConfig } from '../contexts/PrintConfigContext';
 import { Prescription } from '../types';
 import { PrescriptionForm } from './PrescriptionForm';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
 import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X, Printer, Clock, CheckCircle, Square, CheckSquare, ChevronDown } from 'lucide-react';
 import { Download } from 'lucide-react';
 import { Trash2 } from 'lucide-react';
-import { printPrescriptionPDF, printPrescriptionPDF_A5, generateMultiplePrescriptionsPDF } from '../utils/pdfGenerator';
+import { printPrescriptionPDF, generateMultiplePrescriptionsPDF } from '../utils/pdfGenerator';
 import { generateStatisticsReport } from '../utils/reportGenerator';
 import { AlertTriangle } from 'lucide-react';
 import { DateRangePicker } from './DateRangePicker';
@@ -70,7 +69,6 @@ interface PrescriptionHistoryProps {
 export default function PrescriptionHistory({ onViewPrescription, onEditPrescription, onNewPrescription }: PrescriptionHistoryProps) {
   const { prescriptions, updatePrescriptionAuthorization, loadingPrescriptions, loadPrescriptions, loadSocialWorks } = useData();
   const { isDoctor, hasPermission, profile } = useAuth();
-  const { printFormat } = usePrintConfig();
   const [selectedPrescriptions, setSelectedPrescriptions] = useState<Set<string>>(new Set());
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -219,11 +217,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
 
   const handlePrintPrescription = async (prescription: Prescription) => {
     try {
-      if (printFormat === 'A5') {
-        await printPrescriptionPDF_A5(prescription);
-      } else {
-        await printPrescriptionPDF(prescription);
-      }
+      await printPrescriptionPDF(prescription);
     } catch (error) {
       console.error('Error al imprimir receta:', error);
       setErrorMessage('Error al imprimir la receta. Por favor, intente nuevamente.');
@@ -743,7 +737,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
       )}
 
       {/* Controles de selección en lote - Solo para formato A4 */}
-      {printFormat === 'A4' && filteredPrescriptions.length > 0 && (
+      {filteredPrescriptions.length > 0 && (
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
           <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
             <input
@@ -823,7 +817,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
             >
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 {/* Checkbox para selección en lote - Solo para formato A4 */}
-                {printFormat === 'A4' && (
+                {(
                   <div className="flex items-center">
                     <button
                       type="button"

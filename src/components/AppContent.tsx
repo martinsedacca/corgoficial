@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { usePrintConfig } from '../contexts/PrintConfigContext';
 import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications';
 import { useData } from '../contexts/DataContext';
 import { NotificationBanner } from './NotificationBanner';
@@ -23,7 +22,6 @@ type View = 'history' | 'dashboard' | 'new' | 'doctors' | 'patients' | 'practice
 
 export function AppContent() {
   const { user, profile, signOut, hasPermission, isDoctor } = useAuth();
-  const { printFormat, setPrintFormat } = usePrintConfig();
   const { refreshData } = useData();
   const { notifications, hasAnyNotification, clearNotifications } = useRealtimeNotifications();
   const [currentView, setCurrentView] = useState<View>('history');
@@ -203,47 +201,6 @@ export function AppContent() {
             </div>
             
             <div className="flex items-center gap-2 sm:gap-4">
-              {/* Toggle de formato de impresión */}
-              {(hasPermission('manage_practices') || hasPermission('manage_prescriptions')) && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-600 hidden sm:inline">Papel:</span>
-                  <div className="relative inline-flex items-center">
-                    <div className="flex bg-gray-200 rounded-full p-1 relative w-24">
-                      {/* Fondo deslizante */}
-                      <div 
-                        className={`absolute top-1 bottom-1 w-11 bg-primary-600 rounded-full transition-transform duration-200 ease-in-out ${
-                          printFormat === 'A4' ? 'translate-x-0' : 'translate-x-11'
-                        }`}
-                      ></div>
-                      
-                      {/* Opción A4 */}
-                      <button
-                        onClick={() => setPrintFormat('A4')}
-                        className={`relative z-10 w-11 py-1 text-xs font-medium rounded-full transition-colors duration-200 ${
-                          printFormat === 'A4'
-                            ? 'text-white'
-                            : 'text-gray-600 hover:text-gray-800'
-                        }`}
-                      >
-                        A4
-                      </button>
-                      
-                      {/* Opción A5 */}
-                      <button
-                        onClick={() => setPrintFormat('A5')}
-                        className={`relative z-10 w-11 py-1 text-xs font-medium rounded-full transition-colors duration-200 ${
-                          printFormat === 'A5'
-                            ? 'text-white'
-                            : 'text-gray-600 hover:text-gray-800'
-                        }`}
-                      >
-                        A5
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
               <button
                 onClick={handleSignOut}
                 className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium text-red-600 hover:text-red-900 hover:bg-red-50 transition-colors"
