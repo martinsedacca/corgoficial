@@ -501,8 +501,10 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
                   <SocialWorkAutocomplete
                     value={patientFormData.socialWork}
                     onChange={(value) => {
+                     console.log('SocialWork changed to:', value);
                       setPatientFormData({...patientFormData, socialWork: value, plan: ''});
                       const socialWork = socialWorks.find(sw => sw.name === value);
+                     console.log('Found socialWork object:', socialWork);
                       console.log('Selected social work:', socialWork);
                       setSelectedSocialWorkForEdit(socialWork || null);
                     }}
