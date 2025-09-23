@@ -5,29 +5,67 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 // Create a mock client if environment variables are missing
 const createSupabaseClient = () => {
-  if (!supabaseUrl || !supabaseAnonKey) {
+  if (!supabaseUrl || !supabaseAnonKey || 
+      supabaseUrl === 'YOUR_SUPABASE_URL' || 
+      supabaseAnonKey === 'YOUR_SUPABASE_ANON_KEY' ||
+      supabaseUrl.includes('placeholder') ||
+      supabaseAnonKey.includes('placeholder')) {
     console.warn('Supabase environment variables not found. Using mock client.');
     // Return a mock client that doesn't make actual requests
+    const mockError = { message: 'Supabase not configured' };
+    const mockData = null;
+    
+    const createMockQueryBuilder = () => ({
+      select: () => createMockQueryBuilder(),
+      insert: () => createMockQueryBuilder(),
+      update: () => createMockQueryBuilder(),
+      delete: () => createMockQueryBuilder(),
+      eq: () => createMockQueryBuilder(),
+      neq: () => createMockQueryBuilder(),
+      gt: () => createMockQueryBuilder(),
+      gte: () => createMockQueryBuilder(),
+      lt: () => createMockQueryBuilder(),
+      lte: () => createMockQueryBuilder(),
+      like: () => createMockQueryBuilder(),
+      ilike: () => createMockQueryBuilder(),
+      is: () => createMockQueryBuilder(),
+      in: () => createMockQueryBuilder(),
+      contains: () => createMockQueryBuilder(),
+      containedBy: () => createMockQueryBuilder(),
+      rangeGt: () => createMockQueryBuilder(),
+      rangeGte: () => createMockQueryBuilder(),
+      rangeLt: () => createMockQueryBuilder(),
+      rangeLte: () => createMockQueryBuilder(),
+      rangeAdjacent: () => createMockQueryBuilder(),
+      overlaps: () => createMockQueryBuilder(),
+      textSearch: () => createMockQueryBuilder(),
+      match: () => createMockQueryBuilder(),
+      not: () => createMockQueryBuilder(),
+      or: () => createMockQueryBuilder(),
+      filter: () => createMockQueryBuilder(),
+      order: () => createMockQueryBuilder(),
+      limit: () => createMockQueryBuilder(),
+      range: () => createMockQueryBuilder(),
+      single: () => Promise.resolve({ data: mockData, error: mockError }),
+      maybeSingle: () => Promise.resolve({ data: mockData, error: mockError }),
+      then: (resolve: any) => resolve({ data: mockData, error: mockError })
+    });
+    
     return {
       auth: {
         getSession: () => Promise.resolve({ data: { session: null }, error: null }),
         getUser: () => Promise.resolve({ data: { user: null }, error: null }),
-        signInWithPassword: () => Promise.resolve({ data: { user: null, session: null }, error: { message: 'Supabase not configured' } }),
+        signInWithPassword: () => Promise.resolve({ data: { user: null, session: null }, error: mockError }),
         signOut: () => Promise.resolve({ error: null }),
         onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } })
       },
-      from: () => ({
-        select: () => ({ eq: () => ({ single: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }) }) }),
-        insert: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }),
-        update: () => ({ eq: () => Promise.resolve({ data: null, error: { message: 'Supabase not configured' } }) }),
-        delete: () => ({ eq: () => Promise.resolve({ error: { message: 'Supabase not configured' } }) })
-      }),
+      from: () => createMockQueryBuilder(),
       channel: () => ({
         on: () => ({ subscribe: () => {} }),
         subscribe: () => {},
         unsubscribe: () => {}
       }),
-      rpc: () => Promise.resolve({ data: 1, error: null })
+      rpc: () => Promise.resolve({ data: 1, error: mockError })
     } as any;
   }
   
