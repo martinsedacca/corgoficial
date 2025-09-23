@@ -879,20 +879,20 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                       
                       if (diffMonths >= 1) {
                         timeText = `${diffMonths} ${diffMonths === 1 ? 'mes' : 'meses'} desde emisión`;
-                        colorClass = 'text-red-600'; // Más de 5 días = rojo
+                        colorClass = 'text-red-600';
                       } else if (diffDays >= 5) {
                         timeText = `${diffDays} días desde emisión`;
-                        colorClass = 'text-red-600'; // Más de 5 días = rojo
+                        colorClass = 'text-red-600';
                       } else if (diffDays >= 1) {
                         timeText = `${diffDays} ${diffDays === 1 ? 'día' : 'días'} desde emisión`;
-                        colorClass = 'text-yellow-600'; // Menos de 5 días = amarillo
+                        colorClass = 'text-yellow-600';
                       } else {
                         timeText = `${diffHours} hs desde emisión`;
-                        colorClass = 'text-gray-600'; // Horas = gris
+                        colorClass = 'text-gray-600';
                       }
                       
                       return (
-                        <div className={`text-xs font-bold ${colorClass}`}>
+                        <div className={`px-2 py-1 rounded-full text-xs font-bold ${colorClass} bg-white border`}>
                           {timeText}
                         </div>
                       );
