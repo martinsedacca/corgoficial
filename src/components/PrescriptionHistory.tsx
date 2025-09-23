@@ -447,18 +447,20 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">
-              Médico
-            </label>
-            <input
-              type="text"
-              placeholder="Nombre del médico"
-              value={filterDoctor}
-              onChange={(e) => setFilterDoctor(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-            />
-          </div>
+          {hasPermission('manage_users') && (
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">
+                Médico
+              </label>
+              <input
+                type="text"
+                placeholder="Nombre del médico"
+                value={filterDoctor}
+                onChange={(e) => setFilterDoctor(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              />
+            </div>
+          )}
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">
               Paciente
@@ -597,147 +599,151 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           </div>
         </div>
         
-        {/* Filtro de Emitido por */}
-        <div className="mt-4">
-          <label className="block text-xs font-medium text-gray-600 mb-1">
-            Emitido por
-          </label>
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowCreatedByDropdown(!showCreatedByDropdown)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white hover:bg-gray-50 transition-colors flex items-center justify-between"
-            >
-              <span className={filterCreatedBy.length === 0 ? 'text-gray-500' : 'text-gray-900'}>
-                {filterCreatedBy.length === 0 
-                  ? 'Seleccionar usuarios...' 
-                  : `${filterCreatedBy.length} usuario${filterCreatedBy.length > 1 ? 's' : ''} seleccionado${filterCreatedBy.length > 1 ? 's' : ''}`
-                }
-              </span>
-              <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showCreatedByDropdown ? 'rotate-180' : ''}`} />
-            </button>
-            
-            {showCreatedByDropdown && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-auto">
-                {uniqueCreators.length === 0 ? (
-                  <div className="px-3 py-2 text-gray-500 text-sm">
-                    No hay usuarios disponibles
-                  </div>
-                ) : (
-                  <>
-                    <div className="p-2 border-b border-gray-200">
-                      <button
-                        type="button"
-                        onClick={() => setFilterCreatedBy([])}
-                        className="w-full text-left px-2 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded"
-                      >
-                        Limpiar selección
-                      </button>
+        {/* Filtro de Emitido por - Solo para administradores */}
+        {hasPermission('manage_users') && (
+          <div className="mt-4">
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Emitido por
+            </label>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowCreatedByDropdown(!showCreatedByDropdown)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white hover:bg-gray-50 transition-colors flex items-center justify-between"
+              >
+                <span className={filterCreatedBy.length === 0 ? 'text-gray-500' : 'text-gray-900'}>
+                  {filterCreatedBy.length === 0 
+                    ? 'Seleccionar usuarios...' 
+                    : `${filterCreatedBy.length} usuario${filterCreatedBy.length > 1 ? 's' : ''} seleccionado${filterCreatedBy.length > 1 ? 's' : ''}`
+                  }
+                </span>
+                <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showCreatedByDropdown ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {showCreatedByDropdown && (
+                <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-auto">
+                  {uniqueCreators.length === 0 ? (
+                    <div className="px-3 py-2 text-gray-500 text-sm">
+                      No hay usuarios disponibles
                     </div>
-                    {uniqueCreators.map((creator) => (
-                      <label
-                        key={creator.id}
-                        className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 cursor-pointer"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={filterCreatedBy.includes(creator.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setFilterCreatedBy(prev => [...prev, creator.id]);
-                            } else {
-                              setFilterCreatedBy(prev => prev.filter(id => id !== creator.id));
-                            }
-                          }}
-                          className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2"
-                        />
-                        <span className="text-sm text-gray-700">{creator.name}</span>
-                      </label>
-                    ))}
-                  </>
-                )}
+                  ) : (
+                    <>
+                      <div className="p-2 border-b border-gray-200">
+                        <button
+                          type="button"
+                          onClick={() => setFilterCreatedBy([])}
+                          className="w-full text-left px-2 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded"
+                        >
+                          Limpiar selección
+                        </button>
+                      </div>
+                      {uniqueCreators.map((creator) => (
+                        <label
+                          key={creator.id}
+                          className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={filterCreatedBy.includes(creator.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setFilterCreatedBy(prev => [...prev, creator.id]);
+                              } else {
+                                setFilterCreatedBy(prev => prev.filter(id => id !== creator.id));
+                              }
+                            }}
+                            className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2"
+                          />
+                          <span className="text-sm text-gray-700">{creator.name}</span>
+                        </label>
+                      ))}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Estadísticas basadas en filtros - Solo para administradores */}
+      {hasPermission('manage_users') && (
+        <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Estadísticas del Período Seleccionado</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {/* Días seleccionados */}
+            <div className="text-center p-3 bg-blue-50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-700">
+                {(() => {
+                  if (!filterDateFrom || !filterDateTo) return '-';
+                  const startDate = new Date(filterDateFrom);
+                  const endDate = new Date(filterDateTo);
+                  const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+                  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                  return diffDays;
+                })()}
               </div>
-            )}
+              <div className="text-sm text-blue-600">Días Seleccionados</div>
+            </div>
+
+            {/* Recetas autorizadas */}
+            <div className="text-center p-3 bg-green-50 rounded-lg">
+              <div className="text-2xl font-bold text-green-700">
+                {filteredPrescriptions.filter(p => p.authorized).length}
+              </div>
+              <div className="text-sm text-green-600">Recetas Autorizadas</div>
+            </div>
+
+            {/* Recetas sin autorizar */}
+            <div className="text-center p-3 bg-orange-50 rounded-lg">
+              <div className="text-2xl font-bold text-orange-700">
+                {filteredPrescriptions.filter(p => !p.authorized).length}
+              </div>
+              <div className="text-sm text-orange-600">Recetas Sin Autorizar</div>
+            </div>
+
+            {/* Total estudios autorizados */}
+            <div className="text-center p-3 bg-purple-50 rounded-lg">
+              <div className="text-2xl font-bold text-purple-700">
+                {(() => {
+                  let total = 0;
+                  filteredPrescriptions
+                    .filter(p => p.authorized)
+                    .forEach(prescription => {
+                      prescription.items.forEach(item => {
+                        if (['study', 'treatment', 'surgery'].includes(item.practice.category)) {
+                          total++;
+                        }
+                      });
+                    });
+                  return total;
+                })()}
+              </div>
+              <div className="text-sm text-purple-600">Estudios Autorizados</div>
+            </div>
+
+            {/* Total estudios sin autorizar */}
+            <div className="text-center p-3 bg-red-50 rounded-lg">
+              <div className="text-2xl font-bold text-red-700">
+                {(() => {
+                  let total = 0;
+                  filteredPrescriptions
+                    .filter(p => !p.authorized)
+                    .forEach(prescription => {
+                      prescription.items.forEach(item => {
+                        if (['study', 'treatment', 'surgery'].includes(item.practice.category)) {
+                          total++;
+                        }
+                      });
+                    });
+                  return total;
+                })()}
+              </div>
+              <div className="text-sm text-red-600">Estudios Sin Autorizar</div>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Estadísticas basadas en filtros */}
-      <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Estadísticas del Período Seleccionado</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {/* Días seleccionados */}
-          <div className="text-center p-3 bg-blue-50 rounded-lg">
-            <div className="text-2xl font-bold text-blue-700">
-              {(() => {
-                if (!filterDateFrom || !filterDateTo) return '-';
-                const startDate = new Date(filterDateFrom);
-                const endDate = new Date(filterDateTo);
-                const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                return diffDays;
-              })()}
-            </div>
-            <div className="text-sm text-blue-600">Días Seleccionados</div>
-          </div>
-
-          {/* Recetas autorizadas */}
-          <div className="text-center p-3 bg-green-50 rounded-lg">
-            <div className="text-2xl font-bold text-green-700">
-              {filteredPrescriptions.filter(p => p.authorized).length}
-            </div>
-            <div className="text-sm text-green-600">Recetas Autorizadas</div>
-          </div>
-
-          {/* Recetas sin autorizar */}
-          <div className="text-center p-3 bg-orange-50 rounded-lg">
-            <div className="text-2xl font-bold text-orange-700">
-              {filteredPrescriptions.filter(p => !p.authorized).length}
-            </div>
-            <div className="text-sm text-orange-600">Recetas Sin Autorizar</div>
-          </div>
-
-          {/* Total estudios autorizados */}
-          <div className="text-center p-3 bg-purple-50 rounded-lg">
-            <div className="text-2xl font-bold text-purple-700">
-              {(() => {
-                let total = 0;
-                filteredPrescriptions
-                  .filter(p => p.authorized)
-                  .forEach(prescription => {
-                    prescription.items.forEach(item => {
-                      if (['study', 'treatment', 'surgery'].includes(item.practice.category)) {
-                        total++;
-                      }
-                    });
-                  });
-                return total;
-              })()}
-            </div>
-            <div className="text-sm text-purple-600">Estudios Autorizados</div>
-          </div>
-
-          {/* Total estudios sin autorizar */}
-          <div className="text-center p-3 bg-red-50 rounded-lg">
-            <div className="text-2xl font-bold text-red-700">
-              {(() => {
-                let total = 0;
-                filteredPrescriptions
-                  .filter(p => !p.authorized)
-                  .forEach(prescription => {
-                    prescription.items.forEach(item => {
-                      if (['study', 'treatment', 'surgery'].includes(item.practice.category)) {
-                        total++;
-                      }
-                    });
-                  });
-                return total;
-              })()}
-            </div>
-            <div className="text-sm text-red-600">Estudios Sin Autorizar</div>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Controles de selección en lote - Solo para formato A4 */}
       {printFormat === 'A4' && filteredPrescriptions.length > 0 && (
