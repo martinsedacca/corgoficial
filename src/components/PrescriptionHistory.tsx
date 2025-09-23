@@ -6,7 +6,7 @@ import { usePrintConfig } from '../contexts/PrintConfigContext';
 import { Prescription } from '../types';
 import { PrescriptionForm } from './PrescriptionForm';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
-import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X, Printer, Clock, CheckCircle, Square, CheckSquare } from 'lucide-react';
+import { Search, FileText, Calendar, User, Eye, Stethoscope, Edit3, Filter, X, Printer, Clock, CheckCircle, Square, CheckSquare, ChevronDown } from 'lucide-react';
 import { Download } from 'lucide-react';
 import { Trash2 } from 'lucide-react';
 import { printPrescriptionPDF, printPrescriptionPDF_A5, generateMultiplePrescriptionsPDF } from '../utils/pdfGenerator';
@@ -84,8 +84,37 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
   const [filterDateTo, setFilterDateTo] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterAuthorization, setFilterAuthorization] = useState<string>('all');
+  const [filterCreatedBy, setFilterCreatedBy] = useState<string[]>([]);
+  const [showCreatedByDropdown, setShowCreatedByDropdown] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [batchPrintLoading, setBatchPrintLoading] = useState(false);
+  const [userProfiles, setUserProfiles] = useState<{[key: string]: string}>({});
+
+  // Cargar perfiles de usuarios para mostrar nombres
+  useEffect(() => {
+    const loadUserProfiles = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('user_id, full_name');
+        
+        if (error) {
+          console.error('Error loading user profiles:', error);
+          return;
+        }
+        
+        const profilesMap: {[key: string]: string} = {};
+        data.forEach(profile => {
+          profilesMap[profile.user_id] = profile.full_name;
+        });
+        setUserProfiles(profilesMap);
+      } catch (error) {
+        console.error('Error loading user profiles:', error);
+      }
+    };
+    
+    loadUserProfiles();
+  }, []);</parameter>
 
   // Cargar recetas cuando se monta el componente
   useEffect(() => {
@@ -108,6 +137,20 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
 
   // Usar todas las prescripciones (modo público)
   const availablePrescriptions = prescriptions; // Las políticas RLS ya filtran automáticamente para médicos
+
+  // Obtener lista única de emisores para el filtro
+  const uniqueCreators = React.useMemo(() => {
+    const creators = new Set<string>();
+    prescriptions.forEach(prescription => {
+      if (prescription.createdBy && userProfiles[prescription.createdBy]) {
+        creators.add(prescription.createdBy);
+      }
+    });
+    return Array.from(creators).map(userId => ({
+      id: userId,
+      name: userProfiles[userId] || 'Usuario desconocido'
+    })).sort((a, b) => a.name.localeCompare(b.name));
+  }, [prescriptions, userProfiles]);
 
   const filteredPrescriptions = availablePrescriptions.filter(prescription => {
     const matchesSearch = 
@@ -134,6 +177,9 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
       (filterAuthorization === 'authorized' && prescription.authorized) ||
       (filterAuthorization === 'pending' && !prescription.authorized);
     
+    const matchesCreatedBy = filterCreatedBy.length === 0 || 
+      (prescription.createdBy && filterCreatedBy.includes(prescription.createdBy));
+    
     // Filtrar por tipo basado en las categorías de prácticas que contiene la receta
     const matchesType = filterType === 'all' || (() => {
       const practiceCategories = [...new Set(prescription.items.map(item => item.practice.category))];
@@ -150,7 +196,7 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     })();
     
     return matchesSearch && matchesNumber && matchesDoctor && matchesPatient && matchesDNI &&
-           matchesSocialWork && matchesDateFrom && matchesDateTo && matchesType && matchesAuthorization;
+           matchesSocialWork && matchesDateFrom && matchesDateTo && matchesType && matchesAuthorization && matchesCreatedBy;
   }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const clearAllFilters = () => {
@@ -164,11 +210,12 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
     setFilterDateTo('');
     setFilterType('all');
     setFilterAuthorization('all');
+    setFilterCreatedBy([]);
   };
 
   const hasActiveFilters = searchTerm || filterNumber || filterDoctor || filterPatient || 
                           filterDNI || filterSocialWork ||
-                          filterDateFrom || filterDateTo || filterType !== 'all' || filterAuthorization !== 'all';
+                          filterDateFrom || filterDateTo || filterType !== 'all' || filterAuthorization !== 'all' || filterCreatedBy.length > 0;</parameter>
 
   const handlePrintPrescription = async (prescription: Prescription) => {
     try {
@@ -502,52 +549,115 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
           </div>
           
           <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Tipo de Prácticas
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setFilterType('all')}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  filterType === 'all'
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Todos
+              </button>
+              <button
+                onClick={() => setFilterType('studies')}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  filterType === 'studies'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Estudios
+              </button>
+              <button
+                onClick={() => setFilterType('treatments')}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  filterType === 'treatments'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Tratamientos
+              </button>
+              <button
+                onClick={() => setFilterType('authorization')}
+                className={`px-3 py-1 text-sm rounded-full transition-colors ${
+                  filterType === 'authorization'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Cirugías
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Filtro de Emitido por */}
+        <div className="mt-4">
           <label className="block text-xs font-medium text-gray-600 mb-1">
-            Tipo de Prácticas
+            Emitido por
           </label>
-          <div className="flex flex-wrap gap-2">
+          <div className="relative">
             <button
-              onClick={() => setFilterType('all')}
-              className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                filterType === 'all'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
+              type="button"
+              onClick={() => setShowCreatedByDropdown(!showCreatedByDropdown)}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white hover:bg-gray-50 transition-colors flex items-center justify-between"
             >
-              Todos
+              <span className={filterCreatedBy.length === 0 ? 'text-gray-500' : 'text-gray-900'}>
+                {filterCreatedBy.length === 0 
+                  ? 'Seleccionar usuarios...' 
+                  : `${filterCreatedBy.length} usuario${filterCreatedBy.length > 1 ? 's' : ''} seleccionado${filterCreatedBy.length > 1 ? 's' : ''}`
+                }
+              </span>
+              <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showCreatedByDropdown ? 'rotate-180' : ''}`} />
             </button>
-            <button
-              onClick={() => setFilterType('studies')}
-              className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                filterType === 'studies'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              Estudios
-            </button>
-            <button
-              onClick={() => setFilterType('treatments')}
-              className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                filterType === 'treatments'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              Tratamientos
-            </button>
-            <button
-              onClick={() => setFilterType('authorization')}
-              className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                filterType === 'authorization'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              Cirugías
-            </button>
-          </div>
-          </div>
+            
+            {showCreatedByDropdown && (
+              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-auto">
+                {uniqueCreators.length === 0 ? (
+                  <div className="px-3 py-2 text-gray-500 text-sm">
+                    No hay usuarios disponibles
+                  </div>
+                ) : (
+                  <>
+                    <div className="p-2 border-b border-gray-200">
+                      <button
+                        type="button"
+                        onClick={() => setFilterCreatedBy([])}
+                        className="w-full text-left px-2 py-1 text-sm text-gray-600 hover:bg-gray-50 rounded"
+                      >
+                        Limpiar selección
+                      </button>
+                    </div>
+                    {uniqueCreators.map((creator) => (
+                      <label
+                        key={creator.id}
+                        className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={filterCreatedBy.includes(creator.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFilterCreatedBy(prev => [...prev, creator.id]);
+                            } else {
+                              setFilterCreatedBy(prev => prev.filter(id => id !== creator.id));
+                            }
+                          }}
+                          className="w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 rounded focus:ring-primary-500 focus:ring-2"
+                        />
+                        <span className="text-sm text-gray-700">{creator.name}</span>
+                      </label>
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
         </div>
       </div>
 
@@ -820,6 +930,12 @@ export default function PrescriptionHistory({ onViewPrescription, onEditPrescrip
                         {prescription.items.length > 3 && ` y ${prescription.items.length - 3} más...`}
                       </span>
                     </div>
+                    {/* Información de quién emitió la receta */}
+                    {prescription.createdBy && userProfiles[prescription.createdBy] && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        <strong>Emitida por:</strong> {userProfiles[prescription.createdBy]}
+                      </div>
+                    )}
                   </div>
                 </div>
                 
