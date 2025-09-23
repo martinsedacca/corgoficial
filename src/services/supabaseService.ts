@@ -387,11 +387,19 @@ export const practiceService = {
         .order('name', { ascending: true });
       
       if (error) {
+        if (error.message?.includes('Failed to fetch') || error.message?.includes('Supabase not configured')) {
+          console.warn('Supabase connection failed, returning empty practices array');
+          return [];
+        }
         console.error('Error fetching practices:', error);
         return [];
       }
       return data || [];
     } catch (error) {
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        console.warn('Network error fetching practices, returning empty array');
+        return [];
+      }
       console.error('Network error fetching practices:', error);
       return [];
     }
@@ -464,6 +472,10 @@ export const prescriptionService = {
         .order('created_at', { ascending: false });
       
       if (error) {
+        if (error.message?.includes('Failed to fetch') || error.message?.includes('Supabase not configured')) {
+          console.warn('Supabase connection failed, returning empty prescriptions array');
+          return [];
+        }
         console.error('Error fetching prescriptions:', error);
         return [];
       }
@@ -500,6 +512,10 @@ export const prescriptionService = {
         authorized: prescription.authorized
       }));
     } catch (error) {
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        console.warn('Network error fetching prescriptions, returning empty array');
+        return [];
+      }
       console.error('Network error fetching prescriptions:', error);
       return [];
     }

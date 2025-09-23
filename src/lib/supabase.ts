@@ -8,6 +8,8 @@ const createSupabaseClient = () => {
   if (!supabaseUrl || !supabaseAnonKey || 
       supabaseUrl === 'YOUR_SUPABASE_URL' || 
       supabaseAnonKey === 'YOUR_SUPABASE_ANON_KEY' ||
+      supabaseUrl === '' || 
+      supabaseAnonKey === '' ||
       supabaseUrl.includes('placeholder') ||
       supabaseAnonKey.includes('placeholder')) {
     console.warn('Supabase environment variables not found. Using mock client.');
@@ -46,18 +48,26 @@ const createSupabaseClient = () => {
       order: () => createMockQueryBuilder(),
       limit: () => createMockQueryBuilder(),
       range: () => createMockQueryBuilder(),
+      count: 'exact',
+      head: true,
       single: () => Promise.resolve({ data: mockData, error: mockError }),
       maybeSingle: () => Promise.resolve({ data: mockData, error: mockError }),
-      then: (resolve: any) => resolve({ data: mockData, error: mockError })
+      then: (resolve: any) => resolve({ data: mockData, error: mockError, count: 0 })
     });
     
     return {
       auth: {
         getSession: () => Promise.resolve({ data: { session: null }, error: null }),
         getUser: () => Promise.resolve({ data: { user: null }, error: null }),
+        resetPasswordForEmail: () => Promise.resolve({ error: mockError }),
         signInWithPassword: () => Promise.resolve({ data: { user: null, session: null }, error: mockError }),
+        signUp: () => Promise.resolve({ data: { user: null, session: null }, error: mockError }),
         signOut: () => Promise.resolve({ error: null }),
-        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } })
+        onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+        admin: {
+          createUser: () => Promise.resolve({ data: { user: null }, error: mockError }),
+          deleteUser: () => Promise.resolve({ error: mockError })
+        }
       },
       from: () => createMockQueryBuilder(),
       channel: () => ({
