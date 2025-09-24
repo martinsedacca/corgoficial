@@ -3,389 +3,6 @@ import html2canvas from 'html2canvas';
 import { Prescription } from '../types';
 import { companyInfo } from '../data/mockData';
 
-// Función para generar PDF en formato A5 (hoja completa)
-export const generatePrescriptionPDF_A5 = async (prescription: Prescription): Promise<void> => {
-  try {
-    const pdf = new jsPDF('p', 'mm', 'a5');
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    let yPosition = 8;
-
-    // Header con logo y título
-    pdf.setFontSize(11);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(companyInfo.name, pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 4;
-    pdf.setFontSize(8);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(companyInfo.subtitle, pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 6;
-    pdf.setFontSize(7);
-    pdf.text('DIRECTOR MÉDICO', pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 3;
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(companyInfo.director, pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 3;
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(companyInfo.license, pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 8;
-
-    // Línea separadora
-    pdf.setLineWidth(0.5);
-    pdf.line(8, yPosition, pageWidth - 8, yPosition);
-    yPosition += 6;
-
-    // Información de la receta
-    pdf.setFontSize(8);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(`RECETA N° ${prescription.number}`, 8, yPosition);
-    pdf.text(`FECHA: ${new Date(prescription.date).toLocaleDateString('es-AR')}`, pageWidth - 8, yPosition, { align: 'right' });
-    
-    yPosition += 6;
-
-    // Tipo de receta
-    const typeLabels = {
-      studies: 'AUTORIZACIÓN DE ESTUDIOS',
-      treatments: 'AUTORIZACIÓN DE TRATAMIENTOS',
-      authorization: 'AUTORIZACIÓN DE CIRUGÍA'
-    };
-    
-    pdf.setFontSize(9);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(typeLabels[prescription.type] || 'AUTORIZACIÓN MÉDICA', pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 8;
-
-    // Datos del paciente
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('DATOS DEL PACIENTE:', 8, yPosition);
-    yPosition += 5;
-
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(`Nombre y Apellido: ${prescription.patient.name} ${prescription.patient.lastName}`, 8, yPosition);
-    yPosition += 3;
-    pdf.text(`Obra Social: ${prescription.patient.socialWork}${prescription.patient.plan ? ` - ${prescription.patient.plan}` : ''}`, 8, yPosition);
-    yPosition += 3;
-    pdf.text(`N° Afiliado: ${prescription.patient.affiliateNumber || 'No especificado'}`, 8, yPosition);
-    
-    yPosition += 6;
-
-    // Prácticas solicitadas
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('SOLICITO:', 8, yPosition);
-    yPosition += 5;
-
-    // Organizar prácticas en dos columnas
-    const leftMargin = 8;
-    const rightMargin = pageWidth - 8;
-    const columnWidth = (rightMargin - leftMargin) / 2;
-    const rightColumnStart = leftMargin + columnWidth + 5;
-    
-    pdf.setFontSize(6);
-    pdf.setFont('helvetica', 'normal');
-    
-    let leftColumnY = yPosition;
-    let rightColumnY = yPosition;
-    
-    prescription.items.forEach((item, index) => {
-      const isLeftColumn = index % 2 === 0;
-      const currentY = isLeftColumn ? leftColumnY : rightColumnY;
-      const xPosition = isLeftColumn ? leftMargin : rightColumnStart;
-      
-      // Texto de la práctica
-      const practiceText = `☐ ${item.practice.name.toUpperCase()}`;
-      pdf.text(practiceText, xPosition, currentY);
-      
-      // AO indicator
-      const aoX = xPosition + columnWidth - 15;
-      pdf.setFont('helvetica', 'bold');
-      pdf.text(item.ao || 'AO', aoX, currentY);
-      pdf.setFont('helvetica', 'normal');
-      
-      if (isLeftColumn) {
-        leftColumnY += 3;
-      } else {
-        rightColumnY += 3;
-      }
-    });
-    
-    yPosition = Math.max(leftColumnY, rightColumnY) + 5;
-
-    // Observaciones
-    if (prescription.additionalNotes) {
-      pdf.setFontSize(7);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('OBSERVACIONES:', 8, yPosition);
-      yPosition += 4;
-      
-      pdf.setFontSize(6);
-      pdf.setFont('helvetica', 'normal');
-      const notesLines = pdf.splitTextToSize(prescription.additionalNotes, pageWidth - 16);
-      notesLines.forEach((line: string) => {
-        pdf.text(line, 8, yPosition);
-        yPosition += 2.5;
-      });
-      yPosition += 4;
-    }
-
-    // Información del médico
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('MÉDICO:', 8, yPosition);
-    yPosition += 4;
-    
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(prescription.doctor.name, 8, yPosition);
-    yPosition += 3;
-    pdf.text(`${prescription.doctor.specialty} - ${prescription.doctor.license}`, 8, yPosition);
-    
-    yPosition += 10;
-
-    // Área de firma
-    const signatureY = Math.max(yPosition, pageHeight - 30);
-    
-    pdf.setFontSize(6);
-    pdf.setFont('helvetica', 'normal');
-    
-    // Líneas para fecha y firma
-    const dateX = 20;
-    const signatureX = pageWidth - 35;
-    
-    pdf.line(dateX, signatureY, dateX + 20, signatureY);
-    pdf.line(signatureX, signatureY, signatureX + 25, signatureY);
-    
-    pdf.text('FECHA', dateX + 10, signatureY + 3, { align: 'center' });
-    pdf.text('FIRMA Y SELLO', signatureX + 12.5, signatureY + 3, { align: 'center' });
-
-    // Footer
-    const footerY = pageHeight - 15;
-    
-    pdf.setFontSize(5);
-    pdf.setFont('helvetica', 'normal');
-    
-    // Información de contacto en dos columnas
-    const leftFooterX = 8;
-    const rightFooterX = pageWidth - 8;
-    
-    pdf.text(`${companyInfo.address}`, leftFooterX, footerY);
-    pdf.text(`Turnos: ${companyInfo.phone1}/${companyInfo.phone2}`, leftFooterX, footerY + 2.5);
-    pdf.text(`WhatsApp: ${companyInfo.whatsapp}`, leftFooterX, footerY + 5);
-    
-    pdf.text(`${companyInfo.social}`, rightFooterX, footerY, { align: 'right' });
-    pdf.text(`${companyInfo.location}`, rightFooterX, footerY + 2.5, { align: 'right' });
-
-    // Descargar el PDF
-    const fileName = `Receta_${prescription.number}_${prescription.patient.name}_${prescription.patient.lastName}.pdf`;
-    pdf.save(fileName);
-
-  } catch (error) {
-    console.error('Error generando PDF A5:', error);
-    throw new Error('Error al generar el PDF A5. Por favor, intente nuevamente.');
-  }
-};
-
-// Función para imprimir directamente en formato A5
-export const printPrescriptionPDF_A5 = async (prescription: Prescription): Promise<void> => {
-  try {
-    const pdf = new jsPDF('p', 'mm', 'a5');
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    let yPosition = 8;
-
-    // Header con logo y título
-    pdf.setFontSize(11);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(companyInfo.name, pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 4;
-    pdf.setFontSize(8);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(companyInfo.subtitle, pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 6;
-    pdf.setFontSize(7);
-    pdf.text('DIRECTOR MÉDICO', pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 3;
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(companyInfo.director, pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 3;
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(companyInfo.license, pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 8;
-
-    // Línea separadora
-    pdf.setLineWidth(0.5);
-    pdf.line(8, yPosition, pageWidth - 8, yPosition);
-    yPosition += 6;
-
-    // Información de la receta
-    pdf.setFontSize(8);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(`RECETA N° ${prescription.number}`, 8, yPosition);
-    pdf.text(`FECHA: ${new Date(prescription.date).toLocaleDateString('es-AR')}`, pageWidth - 8, yPosition, { align: 'right' });
-    
-    yPosition += 6;
-
-    // Tipo de receta
-    const typeLabels = {
-      studies: 'AUTORIZACIÓN DE ESTUDIOS',
-      treatments: 'AUTORIZACIÓN DE TRATAMIENTOS',
-      authorization: 'AUTORIZACIÓN DE CIRUGÍA'
-    };
-    
-    pdf.setFontSize(9);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(typeLabels[prescription.type] || 'AUTORIZACIÓN MÉDICA', pageWidth / 2, yPosition, { align: 'center' });
-    
-    yPosition += 8;
-
-    // Datos del paciente
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('DATOS DEL PACIENTE:', 8, yPosition);
-    yPosition += 5;
-
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(`Nombre y Apellido: ${prescription.patient.name} ${prescription.patient.lastName}`, 8, yPosition);
-    yPosition += 3;
-    pdf.text(`Obra Social: ${prescription.patient.socialWork}${prescription.patient.plan ? ` - ${prescription.patient.plan}` : ''}`, 8, yPosition);
-    yPosition += 3;
-    pdf.text(`N° Afiliado: ${prescription.patient.affiliateNumber || 'No especificado'}`, 8, yPosition);
-    
-    yPosition += 6;
-
-    // Prácticas solicitadas
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('SOLICITO:', 8, yPosition);
-    yPosition += 5;
-
-    // Organizar prácticas en dos columnas
-    const leftMargin = 8;
-    const rightMargin = pageWidth - 8;
-    const columnWidth = (rightMargin - leftMargin) / 2;
-    const rightColumnStart = leftMargin + columnWidth + 5;
-    
-    pdf.setFontSize(6);
-    pdf.setFont('helvetica', 'normal');
-    
-    let leftColumnY = yPosition;
-    let rightColumnY = yPosition;
-    
-    prescription.items.forEach((item, index) => {
-      const isLeftColumn = index % 2 === 0;
-      const currentY = isLeftColumn ? leftColumnY : rightColumnY;
-      const xPosition = isLeftColumn ? leftMargin : rightColumnStart;
-      
-      // Texto de la práctica
-      const practiceText = `☐ ${item.practice.name.toUpperCase()}`;
-      pdf.text(practiceText, xPosition, currentY);
-      
-      // AO indicator
-      const aoX = xPosition + columnWidth - 15;
-      pdf.setFont('helvetica', 'bold');
-      pdf.text(item.ao || 'AO', aoX, currentY);
-      pdf.setFont('helvetica', 'normal');
-      
-      if (isLeftColumn) {
-        leftColumnY += 3;
-      } else {
-        rightColumnY += 3;
-      }
-    });
-    
-    yPosition = Math.max(leftColumnY, rightColumnY) + 5;
-
-    // Observaciones
-    if (prescription.additionalNotes) {
-      pdf.setFontSize(7);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('OBSERVACIONES:', 8, yPosition);
-      yPosition += 4;
-      
-      pdf.setFontSize(6);
-      pdf.setFont('helvetica', 'normal');
-      const notesLines = pdf.splitTextToSize(prescription.additionalNotes, pageWidth - 16);
-      notesLines.forEach((line: string) => {
-        pdf.text(line, 8, yPosition);
-        yPosition += 2.5;
-      });
-      yPosition += 4;
-    }
-
-    // Información del médico
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('MÉDICO:', 8, yPosition);
-    yPosition += 4;
-    
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(prescription.doctor.name, 8, yPosition);
-    yPosition += 3;
-    pdf.text(`${prescription.doctor.specialty} - ${prescription.doctor.license}`, 8, yPosition);
-    
-    yPosition += 10;
-
-    // Área de firma
-    const signatureY = Math.max(yPosition, pageHeight - 30);
-    
-    pdf.setFontSize(6);
-    pdf.setFont('helvetica', 'normal');
-    
-    // Líneas para fecha y firma
-    const dateX = 20;
-    const signatureX = pageWidth - 35;
-    
-    pdf.line(dateX, signatureY, dateX + 20, signatureY);
-    pdf.line(signatureX, signatureY, signatureX + 25, signatureY);
-    
-    pdf.text('FECHA', dateX + 10, signatureY + 3, { align: 'center' });
-    pdf.text('FIRMA Y SELLO', signatureX + 12.5, signatureY + 3, { align: 'center' });
-
-    // Footer
-    const footerY = pageHeight - 15;
-    
-    pdf.setFontSize(5);
-    pdf.setFont('helvetica', 'normal');
-    
-    // Información de contacto en dos columnas
-    const leftFooterX = 8;
-    const rightFooterX = pageWidth - 8;
-    
-    pdf.text(`${companyInfo.address}`, leftFooterX, footerY);
-    pdf.text(`Turnos: ${companyInfo.phone1}/${companyInfo.phone2}`, leftFooterX, footerY + 2.5);
-    pdf.text(`WhatsApp: ${companyInfo.whatsapp}`, leftFooterX, footerY + 5);
-    
-    pdf.text(`${companyInfo.social}`, rightFooterX, footerY, { align: 'right' });
-    pdf.text(`${companyInfo.location}`, rightFooterX, footerY + 2.5, { align: 'right' });
-
-    // Imprimir directamente
-    pdf.autoPrint();
-    window.open(pdf.output('bloburl'), '_blank');
-
-  } catch (error) {
-    console.error('Error generando PDF A5 para imprimir:', error);
-    throw new Error('Error al generar el PDF A5 para imprimir. Por favor, intente nuevamente.');
-  }
-};
 
 export const generatePrescriptionPDF = async (prescription: Prescription): Promise<void> => {
   // Convertir el logo a base64 para incluirlo en el PDF
@@ -526,6 +143,9 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
     return practicesHtml;
   };
 
+  const containsSurgery = prescription.items.some(item => item.practice.category === 'surgery');
+  const studyCount = prescription.items.filter(item => item.practice.category === 'study').length;
+
   pdfContent.innerHTML = `
     <!-- Número de receta sutil arriba a la izquierda -->
     <div style="text-align: left; margin-bottom: 10px;">
@@ -579,12 +199,22 @@ export const generatePrescriptionPDF = async (prescription: Prescription): Promi
       ${generatePracticesGrid()}
     </div>
     
-    <!-- Vale por estudios -->
+    <!-- Vale por estudios (condicional y con contador) -->
+    ${!containsSurgery && studyCount > 0 ? `
     <div style="margin-bottom: 15px; font-size: 9px; color: #4A5568;">
-      <span>Vale X:</span>
-      <span style="border-bottom: 1px dotted #666; margin-left: 8px; margin-right: 8px; display: inline-block; width: 60px; height: 12px;"></span>
-      <span>Estudio/s</span>
+      <span>Vale por:</span>
+      <span style="font-weight: bold; color: #000; margin: 0 4px;">${studyCount}</span>
+      <span>${studyCount === 1 ? 'Estudio' : 'Estudios'}</span>
     </div>
+    ` : ''}
+
+    <!-- Diagnóstico (Dx) si existe -->
+    ${prescription.dx ? `
+    <div style="margin-top: 10px; font-size: 9px; color: #4A5568;">
+      <span style="font-weight: bold;">Dx:</span>
+      <span style="color: #000;"> ${prescription.dx}</span>
+    </div>
+    ` : ''}
     
     <!-- Footer con fecha y firma pegadas -->
     <div style="position: absolute; bottom: 18mm; left: 8mm; right: 8mm;">
@@ -807,6 +437,9 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
     return practicesHtml;
   };
 
+  const containsSurgery = prescription.items.some(item => item.practice.category === 'surgery');
+  const studyCount = prescription.items.filter(item => item.practice.category === 'study').length;
+
   pdfContent.innerHTML = `
     <!-- Número de receta sutil arriba a la izquierda -->
     <div style="text-align: left; margin-bottom: 10px;">
@@ -860,12 +493,22 @@ export const printPrescriptionPDF = async (prescription: Prescription): Promise<
       ${generatePracticesGrid()}
     </div>
     
-    <!-- Vale por estudios -->
+    <!-- Vale por estudios (condicional y con contador) -->
+    ${!containsSurgery && studyCount > 0 ? `
     <div style="margin-bottom: 15px; font-size: 9px; color: #4A5568;">
-      <span>Vale X:</span>
-      <span style="border-bottom: 1px dotted #666; margin-left: 8px; margin-right: 8px; display: inline-block; width: 60px; height: 12px;"></span>
-      <span>Estudio/s</span>
+      <span>Vale por:</span>
+      <span style="font-weight: bold; color: #000; margin: 0 4px;">${studyCount}</span>
+      <span>${studyCount === 1 ? 'Estudio' : 'Estudios'}</span>
     </div>
+    ` : ''}
+
+    <!-- Diagnóstico (Dx) si existe -->
+    ${prescription.dx ? `
+    <div style="margin-top: 10px; font-size: 9px; color: #4A5568;">
+      <span style="font-weight: bold;">Dx:</span>
+      <span style="color: #000;"> ${prescription.dx}</span>
+    </div>
+    ` : ''}
     
     <!-- Footer con fecha y firma pegadas -->
     <div style="position: absolute; bottom: 18mm; left: 8mm; right: 8mm;">
@@ -1098,7 +741,10 @@ export const generateMultiplePrescriptionsPDF = async (prescriptions: Prescripti
       return practicesHtml;
     };
 
-    pdfContent.innerHTML = `
+    const containsSurgery = prescription.items.some(item => item.practice.category === 'surgery');
+  const studyCount = prescription.items.filter(item => item.practice.category === 'study').length;
+
+  pdfContent.innerHTML = `
       <!-- Número de receta sutil arriba a la izquierda -->
       <div style="text-align: left; margin-bottom: 10px;">
         <div style="font-size: 11px; color: #000; font-weight: normal;">R: ${prescription.number}</div>
@@ -1151,12 +797,14 @@ export const generateMultiplePrescriptionsPDF = async (prescriptions: Prescripti
         ${generatePracticesGrid()}
       </div>
       
-      <!-- Vale por estudios -->
-      <div style="margin-bottom: 15px; font-size: 9px; color: #4A5568;">
-        <span>Vale X:</span>
-        <span style="border-bottom: 1px dotted #666; margin-left: 8px; margin-right: 8px; display: inline-block; width: 60px; height: 12px;"></span>
-        <span>Estudio/s</span>
-      </div>
+      <!-- Vale por estudios (condicional y con contador) -->
+    ${!containsSurgery && studyCount > 0 ? `
+    <div style="margin-bottom: 15px; font-size: 9px; color: #4A5568;">
+      <span>Vale por:</span>
+      <span style="font-weight: bold; color: #000; margin: 0 4px;">${studyCount}</span>
+      <span>${studyCount === 1 ? 'Estudio' : 'Estudios'}</span>
+    </div>
+    ` : ''}
       
       <!-- Footer con fecha y firma pegadas -->
       <div style="position: absolute; bottom: 18mm; left: 8mm; right: 8mm;">
