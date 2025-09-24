@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications';
 import { useData } from '../contexts/DataContext';
 import { NotificationBanner } from './NotificationBanner';
-import { LoadingSpinner } from './LoadingSpinner';
 import { PrescriptionForm } from './PrescriptionForm';
 import { PrescriptionViewer } from './PrescriptionViewer';
 import PrescriptionHistory from './PrescriptionHistory';
@@ -13,12 +12,12 @@ import { PracticeAdmin } from './PracticeAdmin';
 import { SocialWorkManager } from './SocialWorkManager';
 import { Dashboard } from './Dashboard';
 import { UserManager } from './UserManager';
-import { PrintFormatSettings } from './PrintFormatSettings';
 import { Prescription } from '../types';
-import { FileText, History, User, Users, Activity, Building2, BarChart3, Settings, LogOut, ChevronDown } from 'lucide-react';
-import { Printer, ToggleLeft, ToggleRight } from 'lucide-react';
+import { History, User, Users, Activity, Building2, BarChart3, Settings, LogOut, ChevronDown } from 'lucide-react';
 
-type View = 'history' | 'dashboard' | 'new' | 'doctors' | 'patients' | 'practices' | 'admin-practices' | 'social-works' | 'users' | 'print-settings';
+import LogsPage from './logs/LogsPage';
+
+type View = 'history' | 'dashboard' | 'new' | 'doctors' | 'patients' | 'practices' | 'admin-practices' | 'social-works' | 'users' | 'logs';
 
 export function AppContent() {
   const { user, profile, signOut, hasPermission, isDoctor } = useAuth();
@@ -29,7 +28,11 @@ export function AppContent() {
   const [viewingPrescription, setViewingPrescription] = useState<Prescription | null>(null);
   const [editingPrescription, setEditingPrescription] = useState<Prescription | null>(null);
 
-  const handlePrescriptionSubmit = (prescriptionData: any) => {
+  const handleCloseViewer = () => {
+    setViewingPrescription(null);
+  };
+
+    const handlePrescriptionSubmit = () => {
     setEditingPrescription(null);
     setCurrentView('history');
   };
@@ -75,7 +78,8 @@ export function AppContent() {
     ...(hasPermission('manage_patients') ? [{ key: 'patients', label: 'Pacientes', icon: Users, color: 'text-green-600' }] : []),
     ...(hasPermission('manage_practices') ? [{ key: 'admin-practices', label: 'Prácticas', icon: Activity, color: 'text-purple-600' }] : []),
     ...(hasPermission('manage_social_works') ? [{ key: 'social-works', label: 'Obras Sociales', icon: Building2, color: 'text-blue-600' }] : []),
-    ...(hasPermission('manage_users') ? [{ key: 'users', label: 'Usuarios', icon: Settings, color: 'text-red-600' }] : [])
+    ...(hasPermission('manage_users') ? [{ key: 'users', label: 'Usuarios', icon: Settings, color: 'text-red-600' }] : []),
+    ...(user?.email === 'm.sedacca@gmail.com' ? [{ key: 'logs', label: 'Logs del Sistema', icon: Activity, color: 'text-yellow-600' }] : [])
   ].filter(Boolean);
 
   const hasAdminAccess = adminMenuItems.length > 0;
@@ -92,7 +96,7 @@ export function AppContent() {
               ← Volver al historial
             </button>
           </div>
-          <PrescriptionViewer prescription={viewingPrescription} />
+          <PrescriptionViewer prescription={viewingPrescription} onDeleted={handleCloseViewer} />
         </div>
       </div>
     );
@@ -236,6 +240,7 @@ export function AppContent() {
         {currentView === 'admin-practices' && <PracticeAdmin />}
         {currentView === 'social-works' && <SocialWorkManager />}
         {currentView === 'users' && <UserManager />}
+        {currentView === 'logs' && <LogsPage />}
       </div>
     </div>
   );

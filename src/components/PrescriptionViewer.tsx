@@ -5,10 +5,9 @@ import { Prescription } from '../types';
 import { companyInfo } from '../data/mockData';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
 import { SocialWorkPlanSelector } from './SocialWorkPlanSelector';
-import { Calendar, User, Stethoscope, FileText, Download, Printer, Clock, CheckCircle, Edit3, X, Save } from 'lucide-react';
+import { Calendar, User, Stethoscope, FileText, Download, Printer, Clock, CheckCircle, Edit3, X, Save, Trash2 } from 'lucide-react';
 import { generatePrescriptionPDF, printPrescriptionPDF } from '../utils/pdfGenerator';
 import { AlertTriangle } from 'lucide-react';
 
@@ -17,11 +16,13 @@ interface PrescriptionViewerProps {
 }
 
 export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
-  const { updatePrescriptionAuthorization, prescriptions, patients, updatePatient, socialWorks, getSocialWorkPlans, loadPrescriptions } = useData();
-  const { isDoctor, hasPermission } = useAuth();
+  const { deletePrescriptionAndLog, updatePrescriptionAuthorization, prescriptions, patients, updatePatient, socialWorks, getSocialWorkPlans, loadPrescriptions } = useData();
+  const { user, isDoctor, hasPermission } = useAuth();
   const { loadSocialWorkPlans } = useData();
   const [showDeauthorizeModal, setShowDeauthorizeModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   
   const [showEditPatientModal, setShowEditPatientModal] = useState(false);
   const [editingPatient, setEditingPatient] = useState(false);
@@ -77,6 +78,24 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
       setShowErrorModal(true);
     }
   };
+
+  const handleDelete = () => {
+    setShowDeleteConfirmModal(true);
+  };
+
+  const confirmDelete = async () => {
+    setShowDeleteConfirmModal(false);
+    try {
+      await deletePrescriptionAndLog(currentPrescription.id, user?.email || 'unknown');
+      alert('Receta eliminada con éxito.');
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting prescription:', error);
+      setErrorMessage('Error al eliminar la receta.');
+      setShowErrorModal(true);
+    }
+  };
+
 
   const handlePrintPDF = async () => {
     try {
@@ -164,6 +183,15 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
             <Printer className="h-5 w-5" />
             Imprimir
           </button>
+          {user?.email === 'm.sedacca@gmail.com' && (
+            <button
+              onClick={handleDelete}
+              className="flex items-center gap-2 bg-red-50 text-red-700 border-2 border-red-300 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-medium hover:bg-red-100 hover:border-red-400 transition-colors text-sm sm:text-base"
+            >
+              <Trash2 className="h-5 w-5" />
+              Eliminar
+            </button>
+          )}
         </div>
       </div>
 
@@ -607,6 +635,43 @@ export function PrescriptionViewer({ prescription }: PrescriptionViewerProps) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación de borrado */}
+      {showDeleteConfirmModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-start gap-3 mb-4">
+                <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Eliminar Receta
+                  </h3>
+                  <p className="text-gray-600 mt-1">
+                    ¿Estás seguro de que quieres eliminar esta receta de forma permanente? Esta acción no se puede deshacer.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3 justify-end mt-6">
+                <button
+                  onClick={() => setShowDeleteConfirmModal(false)}
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  Sí, eliminar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -1,8 +1,8 @@
-import React, { createContext, useContext, ReactNode, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, ReactNode, useState, useCallback, useEffect } from 'react';
 import { useRef } from 'react';
 import { useAuth } from './AuthContext';
 import { supabase } from '../lib/supabase';
-import { Doctor, Patient, Practice, Prescription, SocialWork } from '../types';
+import { Doctor, Patient, Practice, Prescription, SocialWork, SocialWorkPlan } from '../types';
 import { doctorService, patientService, practiceService, prescriptionService, socialWorkService, socialWorkPlanService } from '../services/supabaseService';
 
 interface DataContextType {
@@ -45,6 +45,7 @@ interface DataContextType {
   addPrescription: (prescription: Omit<Prescription, 'id' | 'number' | 'createdAt'>) => Promise<void>;
   updatePrescription: (id: string, prescription: Partial<Prescription>) => Promise<void>;
   deletePrescription: (id: string) => Promise<void>;
+  deletePrescriptionAndLog: (id: string, userEmail: string) => Promise<void>;
   addSocialWork: (socialWork: Omit<SocialWork, 'id'>) => Promise<void>;
   updateSocialWork: (id: string, socialWork: Partial<SocialWork>) => Promise<void>;
   deleteSocialWork: (id: string) => Promise<void>;
@@ -451,6 +452,20 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const deletePrescriptionAndLog = async (id: string, userEmail: string) => {
+    try {
+      const { error } = await supabase.rpc('delete_prescription_and_log', {
+        p_prescription_id: id,
+        p_user_email: userEmail
+      });
+      if (error) throw error;
+      setPrescriptions(prev => prev.filter(p => p.id !== id));
+    } catch (err) {
+      console.error('Error deleting prescription with log:', err);
+      throw err;
+    }
+  };
+
   const deletePrescription = async (id: string) => {
     try {
       await prescriptionService.delete(id);
@@ -577,6 +592,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
     updatePrescription,
     updatePrescriptionAuthorization,
     deletePrescription,
+    deletePrescriptionAndLog,
     addSocialWork,
     updateSocialWork,
     deleteSocialWork,

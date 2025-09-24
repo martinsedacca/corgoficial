@@ -26,7 +26,7 @@ export interface SocialWorkPlan {
   name: string;
   code?: string;
   description?: string;
-  isActive?: boolean;
+  isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -49,7 +49,7 @@ export interface PrescriptionItem {
 export interface Prescription {
   id: string;
   number: number;
-  type: 'studies' | 'treatments' | 'authorization';
+  type: 'studies' | 'treatments' | 'surgery';
   doctorId: string;
   doctor: Doctor;
   patientId: string;
@@ -81,13 +81,4 @@ export interface SocialWork {
   name: string;
   code?: string;
   description?: string;
-}
-
-export interface SocialWorkPlan {
-  id: string;
-  socialWorkId: string;
-  name: string;
-  code?: string;
-  description?: string;
-  isActive: boolean;
 }

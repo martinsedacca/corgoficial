@@ -5,8 +5,15 @@ import { supabase } from '../lib/supabase';
 import { AutoComplete } from './AutoComplete';
 import { SocialWorkAutocomplete } from './SocialWorkAutocomplete';
 import { SocialWorkPlanSelector } from './SocialWorkPlanSelector';
-import { PrescriptionItem, Doctor, Patient, Practice, Prescription, SocialWork } from '../types';
-import { Plus, Trash2, FileText, Save, X, AlertTriangle } from 'lucide-react';
+import { Doctor, Patient, Prescription, SocialWork } from '../types';
+
+// Define the missing Option type for autocompletes
+interface Option {
+  id: string;
+  label: string;
+  value: any;
+}
+import { FileText, Save, X, AlertTriangle } from 'lucide-react';
 
 interface PrescriptionFormProps {
   onSubmit: (prescription: any) => void;
@@ -19,18 +26,16 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
     doctors, 
     socialWorks,
     practices, 
-    loadingDoctors,
-    loadingPractices,
     loadDoctors,
     loadPractices,
+    loadSocialWorks,
     loadSocialWorkPlans,
     searchPatientsForAutocomplete,
     getNextPrescriptionNumber, 
     addPrescription, 
-    updatePrescription, 
     addPatient 
   } = useData();
-  const { profile, isDoctor } = useAuth();
+  const { user, profile, isDoctor } = useAuth();
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [selectedSocialWorkForNewPatient, setSelectedSocialWorkForNewPatient] = useState<SocialWork | null>(null);
   const [newPatientData, setNewPatientData] = useState({
@@ -53,8 +58,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const [dx, setDx] = useState('');
   const [doctorSearch, setDoctorSearch] = useState('');
   const [patientSearch, setPatientSearch] = useState('');
-  const [patientSearchResults, setPatientSearchResults] = useState<Patient[]>([]);
-  const [showErrorModal, setShowErrorModal] = useState(false);
+    const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [patientCreationSuccess, setPatientCreationSuccess] = useState(false);
   const [creatingPatient, setCreatingPatient] = useState(false);
@@ -126,7 +130,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
     if (editingPrescription) {
       setSelectedDoctor(editingPrescription.doctor);
       setSelectedPatient(editingPrescription.patient);
-      setPrescriptionType(editingPrescription.type);
+      setPrescriptionType(editingPrescription.type as 'studies' | 'treatments' | 'surgery');
       setDoctorSearch(editingPrescription.doctor.name);
       setPatientSearch(`${editingPrescription.patient.name} ${editingPrescription.patient.lastName} - DNI: ${editingPrescription.patient.dni} - ${editingPrescription.patient.socialWork}${editingPrescription.patient.plan ? ` (${editingPrescription.patient.plan})` : ''}`);
       setAdditionalNotes(editingPrescription.additionalNotes || '');
@@ -150,7 +154,7 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
   const filteredPractices = practices.filter(practice => {
     if (prescriptionType === 'studies') return practice.category === 'study';
     if (prescriptionType === 'treatments') return practice.category === 'treatment';
-    return practice.category === 'surgery';
+    return practice.category === 'surgery'; // Keep 'surgery' for filtering, but the type is 'authorization'
   });
 
   const handleDoctorChange = (value: string, option?: any) => {
@@ -291,9 +295,53 @@ export function PrescriptionForm({ onSubmit, onCancel, editingPrescription }: Pr
     const handleAsync = async () => {
       try {
         if (editingPrescription) {
-          await updatePrescription(editingPrescription.id, prescriptionData);
+          // Prepare data for the RPC call
+          const prescriptionPayload = {
+            number: editingPrescription.number,
+            type: prescriptionType,
+            date: editingPrescription.date,
+            doctor_id: selectedDoctor.id,
+            patient_id: selectedPatient.id,
+            authorized: editingPrescription.authorized, // Keep original authorized status
+            dx: dx,
+            additional_notes: additionalNotes
+          };
+
+          const itemsPayload = selectedPracticesList.map(item => {
+            // Find the corresponding item in the original prescription to get its junction table ID
+            const oldItem = editingPrescription.items.find(i => i.practiceId === item.practiceId);
+            return {
+              id: oldItem ? (oldItem as any).id : null,
+              practice_id: item.practiceId,
+              ao: item.ao === null ? undefined : item.ao // Convert null to undefined to match DB type
+            };
+          });
+
+          // Call the RPC function
+          const { error: rpcError } = await supabase.rpc('update_prescription_and_items', {
+            p_prescription_id: editingPrescription.id,
+            p_prescription_data: prescriptionPayload,
+            p_items_data: itemsPayload,
+            p_user_email: user?.email || 'unknown'
+          });
+
+          if (rpcError) {
+            throw rpcError;
+          }
         } else {
-          await addPrescription(prescriptionData);
+          // Ensure 'authorized' is included for new prescriptions
+                              await addPrescription({
+            type: prescriptionType,
+            doctorId: selectedDoctor.id,
+            doctor: selectedDoctor, // Add missing object
+            patientId: selectedPatient.id,
+            patient: selectedPatient, // Add missing object
+            items: selectedPracticesList.map(item => ({ ...item, ao: item.ao === null ? undefined : item.ao })),
+            additionalNotes,
+            dx,
+            date: new Date().toISOString().split('T')[0],
+            authorized: false
+          });
         }
         onSubmit(prescriptionData);
       } catch (error) {
